@@ -1,10 +1,8 @@
-package com.wisekrakr.androidmain;
+package com.wisekrakr.androidmain.factories;
 
-import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 
 import java.util.ArrayList;
 import java.util.List;

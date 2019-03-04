@@ -8,16 +8,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.wisekrakr.androidmain.AndroidGame;
-import com.wisekrakr.androidmain.components.EntityComponent;
-import com.wisekrakr.androidmain.components.Box2dBodyComponent;
-import com.wisekrakr.androidmain.components.PlayerComponent;
+import com.wisekrakr.androidmain.components.*;
 import com.wisekrakr.androidmain.controls.Controls;
+import com.wisekrakr.androidmain.helpers.GameHelper;
 
-import java.util.Iterator;
+import java.util.List;
 
 public class PlayerControlSystem extends IteratingSystem {
 
-    private ComponentMapper<EntityComponent>ballComponentMapper;
+    private ComponentMapper<BallComponent>ballComponentMapper;
     private ComponentMapper<PlayerComponent> playerComponentMapper;
     private ComponentMapper<Box2dBodyComponent> box2dBodyComponentMapper;
     private AndroidGame game;
@@ -34,58 +33,76 @@ public class PlayerControlSystem extends IteratingSystem {
 
         playerComponentMapper = ComponentMapper.getFor(PlayerComponent.class);
         box2dBodyComponentMapper = ComponentMapper.getFor(Box2dBodyComponent.class);
-        ballComponentMapper = ComponentMapper.getFor(EntityComponent.class);
+        ballComponentMapper = ComponentMapper.getFor(BallComponent.class);
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        Box2dBodyComponent b2body = box2dBodyComponentMapper.get(entity);
+        Box2dBodyComponent bodyComponent = box2dBodyComponentMapper.get(entity);
         PlayerComponent playerComponent = playerComponentMapper.get(entity);
 
         if (controller.left) {
-            b2body.body.setLinearVelocity(-500f, 0);
+            bodyComponent.body.setLinearVelocity(-500f, 0);//a
         }
         if (controller.right) {
-            b2body.body.setLinearVelocity(500f, 0);
+            bodyComponent.body.setLinearVelocity(500f, 0); //d
         }
         if (controller.down) {
-            b2body.body.setLinearVelocity(0, 0);
+            bodyComponent.body.setLinearVelocity(0, 0); //s
         }
+        if (controller.nextLevel){ //left alt
+            List<Entity>removeList = game.getGameThread().getEntityFactory().getTotalBricks();
+            if (removeList.size() > 0) {
+                for (Entity ent : removeList) {
+                    ent.getComponent(BrickComponent.class).setDestroy(true);
+                }
+            }
+        }
+
+        //todo mouse input takes the screenwidth and not worldwidth (1080 not 240)
 
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 
-        camera.unproject(mousePos); // convert position from screen to box2d world position
+        camera.unproject(mousePos);
 
-        float speed = 1000000000000f;  // set the speed of the ball
+        float speed = 1000000000f;
 
-        float xVelocity = mousePos.x - b2body.body.getPosition().x; // get distance from shooter to target on x plain
-        float yVelocity = mousePos.y - b2body.body.getPosition().y; // get distance from shooter to target on y plain
+        float xVelocity = mousePos.x - bodyComponent.body.getPosition().x;
+        float yVelocity = mousePos.y - bodyComponent.body.getPosition().y;
 
-        if (playerComponent.hasEntityToShoot){
-            if (controller.isLeftMouseDown || Gdx.input.isTouched()) {
+        if (!game.getGameThread().getEntityFactory().getTotalBalls().isEmpty()) {
+            if (!playerComponent.hasBall) {
+                if (controller.isLeftMouseDown || Gdx.input.isTouched()) {
+                    playerComponent.setHasBall(true);
 
-                float length = (float) Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity); // get distance to target direct
+                    float length = (float) Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
+                    if (length != 0) {
+                        xVelocity = xVelocity / length;
+                        yVelocity = yVelocity / length;
+                    }
 
-                if (length != 0) {
-                    xVelocity = xVelocity / length;  // get required x velocity to aim at target
-                    yVelocity = yVelocity / length;  // get required y velocity to aim at target
-                }
-
-                Iterator<Entity> iterator = game.getGameThread().getEntityCreator().getTotalShapes().iterator();
-                if (iterator.hasNext()) {
-                    game.getGameThread().getEntityCreator().getTotalShapes().get(0).getComponent(
+                    game.getGameThread().getEntityFactory().getTotalBalls().get(0).getComponent(
                             Box2dBodyComponent.class).body.applyForceToCenter(
-                                    xVelocity * speed, yVelocity * speed, true);
+                            xVelocity * speed, yVelocity * speed, true
+                    );
+
+
+                } else if (controller.up) {
+                    game.getGameThread().getEntityFactory().getTotalBalls().get(0).getComponent(
+                            Box2dBodyComponent.class).body.applyForceToCenter(
+                            xVelocity * speed, yVelocity * speed, true
+                    );
                 }
-                playerComponent.hasEntityToShoot = false;
-
-            }else if (controller.up){
-                game.getGameThread().getEntityCreator().getTotalShapes().get(0).getComponent(
-                        Box2dBodyComponent.class).body.applyForceToCenter(
-                        xVelocity * speed, yVelocity * speed, true);
-
-                playerComponent.hasEntityToShoot = false;
             }
+
+            if (controller.speedUp) { //spacebar
+                game.getGameThread().getEntityFactory().getTotalBalls().get(0).getComponent(
+                        Box2dBodyComponent.class).body.applyForceToCenter(
+                        GameHelper.randomDirection() * speed, GameHelper.randomDirection() * speed, true
+                );
+            }
+        }else {
+            System.out.println("no balls to play with");
         }
     }
 }

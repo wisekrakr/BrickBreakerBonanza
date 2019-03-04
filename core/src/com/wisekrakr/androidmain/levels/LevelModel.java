@@ -2,65 +2,73 @@ package com.wisekrakr.androidmain.levels;
 
 import com.badlogic.ashley.core.Entity;
 import com.wisekrakr.androidmain.AndroidGame;
-import com.wisekrakr.androidmain.EntityCreator;
+import com.wisekrakr.androidmain.factories.EntityFactory;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.Box2dBodyComponent;
-import com.wisekrakr.androidmain.components.EntityComponent;
-import com.wisekrakr.androidmain.components.ObstacleComponent;
+
 import com.wisekrakr.androidmain.components.PlayerComponent;
+import com.wisekrakr.androidmain.factories.LevelFactory;
+import com.wisekrakr.androidmain.helpers.GameHelper;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
+import com.wisekrakr.androidmain.systems.PowerImplementation;
 
 
 public class LevelModel extends AbstractLevelContext{
 
-    public boolean gameOver = false;
-    private Entity player;
     private AndroidGame game;
-    private EntityCreator entityCreator;
+    private EntityFactory entityFactory;
+    private PowerImplementation powerImplementation;
 
-    public LevelModel(AndroidGame game, EntityCreator entityCreator) {
+    public LevelModel(AndroidGame game, EntityFactory entityFactory) {
         this.game = game;
-        this.entityCreator = entityCreator;
+        this.entityFactory = entityFactory;
     }
 
     private void constantEntities(){
-        player = entityCreator.createPlayer(GameConstants.WORLD_WIDTH /2, GameConstants.BALL_RADIUS/2,
-                GameConstants.WORLD_WIDTH/10, GameConstants.BALL_RADIUS/3);
+        entityFactory.createPlayer(GameConstants.WORLD_WIDTH /2, GameConstants.BALL_RADIUS/2,
+                GameConstants.PLAYER_WIDTH, GameConstants.PLAYER_HEIGHT
+        );
 
-        entityCreator.createWalls(0,0, 5f, GameConstants.WORLD_HEIGHT *2);
-        entityCreator.createWalls(GameConstants.WORLD_WIDTH,0, 5f, GameConstants.WORLD_HEIGHT *2);
-        entityCreator.createWalls(GameConstants.WORLD_WIDTH,GameConstants.WORLD_HEIGHT, GameConstants.WORLD_WIDTH *2,10f);
-        //entityCreator.createWalls(0,0, GameConstants.WORLD_WIDTH *2,5f);
+        entityFactory.createWalls(0,0, 1f, GameConstants.WORLD_HEIGHT *2);
+        entityFactory.createWalls(GameConstants.WORLD_WIDTH,0, 1f, GameConstants.WORLD_HEIGHT *2);
+        entityFactory.createWalls(GameConstants.WORLD_WIDTH,GameConstants.WORLD_HEIGHT, GameConstants.WORLD_WIDTH *2,1f);
+
+        entityFactory.createBall(entityFactory.getPlayer().getComponent(Box2dBodyComponent.class).body.getPosition().x,
+                entityFactory.getPlayer().getComponent(Box2dBodyComponent.class).body.getPosition().y + GameConstants.BALL_RADIUS
+        );
     }
 
+
+
     @Override
-    public void startLevel(int numberOfLevel, int rows, int columns) {
+    public void startLevel(int numberOfLevel, int columns, int rows) {
         constantEntities();
-        LevelCreator.getLevel(LevelNumber.valueOf(numberOfLevel), entityCreator, rows, columns);
+        LevelFactory.getLevel(LevelNumber.valueOf(numberOfLevel), entityFactory, columns, rows);
+        powerImplementation = new PowerImplementation(game, (int) GameHelper.generateRandomNumberBetween(2,5));
     }
 
     @Override
     public void updateLevel(int numberOfLevel, float delta) {
-        game.getGameThread().getTimeKeeper().time -= delta;
+        game.getGameThread().getTimeKeeper().time += delta;
 
-        if (game.getGameThread().getTimeKeeper().time > 0) {
+        powerImplementation.getPowerContext().init();
 
-            if (entityCreator.getTotalShapes().size() <= 2) {
-                completeLevel(numberOfLevel);
+        if (entityFactory.getPlayer().getComponent(PlayerComponent.class).lives == 0){
+            gameOver(numberOfLevel);
+        }else {
+            for (Entity entity: game.getGameThread().getEntityFactory().getTotalPowers()){
+                powerImplementation.updatingPowerUpSystem(entity);
             }
 
-        }else if (game.getGameThread().getTimeKeeper().time <= 0) {
-            gameOver = true;
-            gameOver(numberOfLevel);
+            if (entityFactory.getTotalBricks().size() == 0) {
+                completeLevel(numberOfLevel);
+            }
         }
-
     }
 
     @Override
     public void completeLevel(int numberOfLevel) {
         game.getGamePreferences().setLevelCompleted(numberOfLevel, true);
-
-        game.getGameThread().getTimeKeeper().setTime(game.getGameThread().getTimeKeeper().time + 60f);
 
         cleanUp();
     }
@@ -68,7 +76,7 @@ public class LevelModel extends AbstractLevelContext{
     @Override
     public void gameOver(int numberOfLevel) {
 
-        System.out.println("game over bitch");
+        System.out.println("game over");
 
         game.getGameThread().getTimeKeeper().reset();
         ScoreKeeper.reset();
@@ -80,16 +88,13 @@ public class LevelModel extends AbstractLevelContext{
 
 
     private void cleanUp(){
-        player.getComponent(PlayerComponent.class).hasEntityToShoot = false;
         for (Entity entity: game.getEngine().getEntities()){
             entity.getComponent(Box2dBodyComponent.class).isDead = true;
         }
 
-        entityCreator.getTotalShapes().clear();
-        entityCreator.getTotalObstacles().clear();
-    }
-
-    public Entity getPlayer() {
-        return player;
+        entityFactory.getTotalBricks().clear();
+        entityFactory.getTotalObstacles().clear();
+        entityFactory.getTotalBalls().clear();
+        entityFactory.getTotalPowers().clear();
     }
 }

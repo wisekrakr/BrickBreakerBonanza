@@ -22,7 +22,7 @@ public class PreferencesScreen extends ScreenAdapter {
 
     public PreferencesScreen(AndroidGame game) {
         this.game = game;
-        stage = new Stage(new FitViewport(GameConstants.WORLD_WIDTH * 2, GameConstants.WORLD_HEIGHT * 2));
+        stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
     }
 
     @Override

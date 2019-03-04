@@ -4,22 +4,14 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.ComponentInitializer;
-import com.wisekrakr.androidmain.components.Box2dBodyComponent;
-import com.wisekrakr.androidmain.components.CollisionComponent;
-import com.wisekrakr.androidmain.components.EntityComponent;
-import com.wisekrakr.androidmain.components.LevelComponent;
-import com.wisekrakr.androidmain.components.ObstacleComponent;
-import com.wisekrakr.androidmain.components.PlayerComponent;
-import com.wisekrakr.androidmain.components.TextureComponent;
-import com.wisekrakr.androidmain.components.TransformComponent;
-import com.wisekrakr.androidmain.components.TypeComponent;
+import com.wisekrakr.androidmain.components.*;
 
-public class EntityHelper {
+public class ComponentHelper {
 
 
     private AndroidGame game;
 
-    public EntityHelper(AndroidGame game) {
+    public ComponentHelper(AndroidGame game) {
         this.game = game;
     }
 
@@ -72,18 +64,26 @@ public class EntityHelper {
         }
 
         @Override
-        public void entityComponent(PooledEngine engine, Entity mainEntity, Box2dBodyComponent bodyComponent, float width, float height, float velocityX, float velocityY, EntityComponent.EntityColor color) {
-            EntityComponent entityComponent = engine.createComponent(EntityComponent.class);
+        public void ballComponent(PooledEngine engine, Entity mainEntity, Box2dBodyComponent bodyComponent, float radius) {
+            BallComponent ballComponent = engine.createComponent(BallComponent.class);
 
-            entityComponent.velocityX = velocityX;
-            entityComponent.velocityY = velocityY;
-            entityComponent.position = bodyComponent.body.getPosition();
-            entityComponent.width = width;
-            entityComponent.height = height;
+            ballComponent.radius = radius;
+            ballComponent.position = bodyComponent.body.getPosition();
 
-            entityComponent.setEntityColor(color);
+            mainEntity.add(ballComponent);
+        }
 
-            mainEntity.add(entityComponent);
+        @Override
+        public void brickComponent(PooledEngine engine, Entity mainEntity, Box2dBodyComponent bodyComponent, float width, float height, BrickComponent.BrickColor color) {
+            BrickComponent brickComponent = engine.createComponent(BrickComponent.class);
+
+            brickComponent.position = bodyComponent.body.getPosition();
+            brickComponent.width = width;
+            brickComponent.height = height;
+
+            brickComponent.setBrickColor(color);
+
+            mainEntity.add(brickComponent);
         }
 
         @Override
@@ -99,6 +99,17 @@ public class EntityHelper {
             mainEntity.add(obstacleComponent);
         }
 
+        @Override
+        public void powerUpComponent(PooledEngine engine, Entity mainEntity, Box2dBodyComponent bodyComponent, float velocityX, float velocityY, float radius) {
+            PowerUpComponent powerUpComponent = engine.createComponent(PowerUpComponent.class);
+
+            powerUpComponent.radius = radius;
+            powerUpComponent.velocityX = velocityX;
+            powerUpComponent.velocityY = velocityY;
+            powerUpComponent.position = bodyComponent.body.getPosition();
+
+            mainEntity.add(powerUpComponent);
+        }
 
         @Override
         public void playerComponent(PooledEngine engine, Entity mainEntity, float width, float height) {

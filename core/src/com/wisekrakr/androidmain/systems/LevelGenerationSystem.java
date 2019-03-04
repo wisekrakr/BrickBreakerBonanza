@@ -1,7 +1,7 @@
 package com.wisekrakr.androidmain.systems;
 
 import com.wisekrakr.androidmain.AndroidGame;
-import com.wisekrakr.androidmain.EntityCreator;
+import com.wisekrakr.androidmain.factories.EntityFactory;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.levels.LevelModel;
 import com.wisekrakr.androidmain.levels.LevelNumber;
@@ -14,10 +14,10 @@ import java.util.List;
 
 public class LevelGenerationSystem {
     private AndroidGame game;
-    private EntityCreator entityCreator;
+    private EntityFactory entityFactory;
     private LevelModel levelModel;
 
-    private enum State{
+    public enum State{
         START, BUILDING, UPDATE, END
     }
     private State state = State.START;
@@ -26,11 +26,11 @@ public class LevelGenerationSystem {
     private List<LevelNumber> levelCompleted = new ArrayList<LevelNumber>();
     private int mainLevel = 1;
 
-    public LevelGenerationSystem(AndroidGame game, EntityCreator entityCreator){
+    public LevelGenerationSystem(AndroidGame game, EntityFactory entityFactory){
         this.game = game;
-        this.entityCreator = entityCreator;
+        this.entityFactory = entityFactory;
 
-        levelModel = new LevelModel(game, entityCreator);
+        levelModel = new LevelModel(game, entityFactory);
 
         levelsToDo.addAll(Arrays.asList(LevelNumber.values()));
     }
@@ -81,16 +81,23 @@ public class LevelGenerationSystem {
     private void building(){
 
         if (!game.getGamePreferences().levelGoing(mainLevel)) {
-            if (mainLevel <= 4) {
-                levelModel.startLevel(mainLevel, 8, 5);
-            }else if (mainLevel >= 5 && mainLevel <=8){
-                levelModel.startLevel(mainLevel, 8, 8);
-            }else if (mainLevel >= 9 && mainLevel <=12){
-                levelModel.startLevel(mainLevel, 8, 12);
-            }else if (mainLevel >= 13 && mainLevel <=16){
-                levelModel.startLevel(mainLevel, 8, 18);
-            }else if (mainLevel >= 17 && mainLevel <=20){
-                levelModel.startLevel(mainLevel, 8, 25);
+            if (mainLevel == 1) {
+                levelModel.startLevel(mainLevel,
+                       (int) (GameConstants.WORLD_WIDTH / GameConstants.BRICK_WIDTH),
+                        (int) ((GameConstants.WORLD_HEIGHT - 200) / GameConstants.BRICK_HEIGHT)
+                );
+            }
+            if (mainLevel == 2) {
+                levelModel.startLevel(mainLevel,
+                        (int) (GameConstants.WORLD_WIDTH / GameConstants.BRICK_WIDTH),
+                        (int) ((GameConstants.WORLD_HEIGHT - 100) / GameConstants.BRICK_HEIGHT)
+                );
+            }
+            if (mainLevel == 3) {
+                levelModel.startLevel(mainLevel,
+                        (int) (GameConstants.WORLD_WIDTH / GameConstants.BRICK_WIDTH),
+                        (int) ((GameConstants.WORLD_HEIGHT) / GameConstants.BRICK_HEIGHT)
+                );
             }
 
             game.getGamePreferences().setLevelGoing(mainLevel, true);
@@ -131,11 +138,11 @@ public class LevelGenerationSystem {
         levelsToDo.addAll(Arrays.asList(LevelNumber.values()));
     }
 
-    public LevelModel getLevelModel() {
-        return levelModel;
-    }
-
     public int getMainLevel() {
         return mainLevel;
+    }
+
+    public LevelModel getLevelModel() {
+        return levelModel;
     }
 }

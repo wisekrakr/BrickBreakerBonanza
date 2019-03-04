@@ -2,35 +2,25 @@ package com.wisekrakr.androidmain.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.ashley.core.EntitySystem;
 import com.wisekrakr.androidmain.AndroidGame;
-import com.wisekrakr.androidmain.BodyFactory;
 import com.wisekrakr.androidmain.GameConstants;
-import com.wisekrakr.androidmain.components.Box2dBodyComponent;
-import com.wisekrakr.androidmain.components.EntityComponent;
-import com.wisekrakr.androidmain.components.TypeComponent;
+import com.wisekrakr.androidmain.components.*;
 import com.wisekrakr.androidmain.helpers.GameHelper;
 import com.wisekrakr.androidmain.helpers.PowerHelper;
+import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Initiate this system in EntitySystem since we did not extend this system with an IteratingSystem.
  *
  */
 
-public class PowerImplementation {
-
-    private Entity entity;
-
-    private boolean active;
+public class PowerImplementation implements SystemEntityContext {
 
     public enum PowerStage {
-        INIT, UPDATE, EXIT
+        INIT, REST, UPDATE, EXIT
     }
 
     private void setPowerStage(PowerStage powerStage) {
@@ -40,31 +30,38 @@ public class PowerImplementation {
     private PowerStage powerStage = PowerStage.INIT;
 
     private float timeCount = 0f;
-    private ArrayList<Entity> powers = new ArrayList<Entity>(); //todo create a hashmap
 
-    private ComponentMapper<EntityComponent> entityComponentMapper;
+    private ComponentMapper<Box2dBodyComponent> bodyComponentMapper;
+    private ComponentMapper<PowerUpComponent> powerUpComponentMapper;
+
     private AndroidGame game;
+    private int spawnInterval;
 
-    PowerImplementation(AndroidGame game){
+    public PowerImplementation(AndroidGame game, int spawnInterval){
         this.game = game;
+        this.spawnInterval = spawnInterval;
 
-        entityComponentMapper = ComponentMapper.getFor(EntityComponent.class);
+        powerUpComponentMapper = ComponentMapper.getFor(PowerUpComponent.class);
+        bodyComponentMapper = ComponentMapper.getFor(Box2dBodyComponent.class);
     }
 
     /**
-     * Initiate this method in the processEntity method in EntitySystem
+     * Initiate this method in the processEntity method in LevelModel
      *
-     * @param entity the ball that will hit the power up
-     * @param spawnInterval seconds it will take to spawn another power up
+     * @param entity is the power currently in game
      */
 
-    void updatingPowerUpSystem(Entity entity, float spawnInterval){
+    public void updatingPowerUpSystem(Entity entity){
+
         switch (powerStage) {
             case INIT:
-                powerContext.init(spawnInterval);
+                powerContext.init();
+                break;
+            case REST:
+                powerContext.respite(entity);
                 break;
             case UPDATE:
-                powerContext.powerTime(entity);
+                powerContext.powerTime();
                 break;
             case EXIT:
                 powerContext.exit();
@@ -74,17 +71,20 @@ public class PowerImplementation {
         }
     }
 
+    public PowerContext getPowerContext() {
+        return powerContext;
+    }
+
     private PowerContext powerContext = new PowerContext() {
-        float powerDuration;
 
         @Override
-        public void init(float spawnInterval){
+        public void init(){
 
             if (timeCount == 0){
                 timeCount = game.getGameThread().getTimeKeeper().gameClock;
             }
             if (game.getGameThread().getTimeKeeper().gameClock - timeCount > spawnInterval){
-                if (powers.size() == 0) {
+                if (game.getGameThread().getEntityFactory().getTotalPowers().size() == 0) {
                     spawnPower();
                 }
             }
@@ -92,115 +92,159 @@ public class PowerImplementation {
 
         @Override
         public void spawnPower() {
-            Vector2 filledPosition = new Vector2();
 
-            Iterator<Entity>iterator = game.getGameThread().getEntityCreator().getTotalShapes().iterator();
-            if (iterator.hasNext()){
-                Entity ent = iterator.next();
-                filledPosition = ent.getComponent(EntityComponent.class).position;
-            }
+            Entity power = game.getGameThread().getEntityFactory().createPower(
+                    GameHelper.notFilledPosition(game).x,
+                    GameHelper.notFilledPosition(game).y,
+                    0,
+                    0,
+                    GameConstants.BALL_RADIUS*2
+            );
 
-            Vector2 newPosition = GameHelper.randomPosition();
-            if (newPosition != filledPosition){
-                entity = game.getGameThread().getEntityCreator().createPower(newPosition.x, newPosition.y,
-                        0, 0,
-                        GameConstants.BALL_RADIUS - GameConstants.BALL_RADIUS/2,
-                        GameConstants.BALL_RADIUS - GameConstants.BALL_RADIUS/2);
+            PowerHelper.setPowerUp(power, PowerHelper.randomPowerUp());
 
-                PowerHelper.setPowerUp(entity, PowerHelper.randomPowerUp());
+            System.out.println(PowerHelper.getPowerUpMap());//todo remove
 
-                System.out.println(PowerHelper.getPowerUpMap());
+            setPowerStage(PowerStage.REST);
+        }
 
-                powers.add(entity);
+        @Override
+        public void respite(Entity entity) {
 
+            ComponentMapper<CollisionComponent>collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
+
+            if (collisionComponentMapper.get(entity).hitBall) {
+                System.out.println("RESPITE");//todo remove
+                destroy(entity, bodyComponentMapper.get(entity));
+                ScoreKeeper.setPointsToGive(1000);
+
+                collisionComponentMapper.get(entity).setHitBall(false);
                 setPowerStage(PowerStage.UPDATE);
-            }else {
-                setPowerStage(PowerStage.INIT);
+            } else {
+                outOfBounds(entity, bodyComponentMapper.get(entity));
             }
         }
 
         @Override
-        public void powerTime(Entity entity) {
+        public void powerTime() {
+            int randomBrick = GameHelper.randomGenerator.nextInt(game.getGameThread().getEntityFactory().getTotalBricks().size());
 
-            if (entityComponentMapper.get(entity).hitPower) {
-                switch (PowerHelper.getPower()) {
-                    case EXTRA_TIME:
-                        System.out.println("Extra time power up");
-                        game.getGameThread().getTimeKeeper().setTime(game.getGameThread().getTimeKeeper().time += 30f);
-                        setPowerStage(PowerStage.EXIT);
-                        break;
-                    case NUKE:
-                        System.out.println("Nuke power up");
+            switch (PowerHelper.getPower()) {
+                case NUKE:
+                    System.out.println("Nuke power UP");
+                    List<Entity> sub = game.getGameThread().getEntityFactory().getTotalBricks().subList(0,
+                            game.getGameThread().getEntityFactory().getTotalBricks().size() / 10);
+                    ArrayList<Entity> toBeKilled = new ArrayList<Entity>(sub);
 
-                        if (!game.getGameThread().getEntityCreator().getTotalShapes().isEmpty()) {
-                            Collections.reverse(game.getGameThread().getEntityCreator().getTotalShapes());
+                    for (Entity ent: toBeKilled){
+                        ent.getComponent(BrickComponent.class).setDestroy(true);
+                    }
 
-                            List<Entity>sub = game.getGameThread().getEntityCreator().getTotalShapes().subList(0,
-                                    game.getGameThread().getEntityCreator().getTotalShapes().size()/3);
-                            ArrayList<Entity> toBeKilled = new ArrayList<Entity>(sub);
-
-                            Iterator<Entity>iterator = toBeKilled.iterator();
-                            if (iterator.hasNext()){
-                                Entity ent = iterator.next();
-                                entityComponentMapper.get(ent).setDestroy(true);
+                    setPowerStage(PowerStage.EXIT);
+                    break;
+                case THEY_LIVE:
+                    for (EntitySystem system : game.getEngine().getSystems()) {
+                        if (system instanceof BrickSystem) {
+                            Entity entity = game.getGameThread().getEntityFactory().getTotalBricks().get(randomBrick);
+                            if (entity != null){
+                                System.out.println("THEY CAN MOVE?! power down " + entity.getComponent(TypeComponent.class).getType());
+                                ((BrickSystem) system).powerHandler(entity,
+                                        bodyComponentMapper.get(entity)
+                                );
                             }
                         }
-                        setPowerStage(PowerStage.EXIT);
-                        break;
-                    case THEY_LIVE:
-                        System.out.println("THEY CAN MOVE?!");
-
-                        for (Entity ent: game.getGameThread().getEntityCreator().getTotalShapes()){
-                            if (ent.getComponent(Box2dBodyComponent.class).body.getType() == BodyDef.BodyType.StaticBody) {
-                                ent.getComponent(Box2dBodyComponent.class).body.setType(BodyDef.BodyType.DynamicBody);
-                                ent.getComponent(Box2dBodyComponent.class).body.setAwake(true);
+                    }
+                    setPowerStage(PowerStage.EXIT);
+                    break;
+                case MORE_BRICKS:
+                    System.out.println("More Bricks Power Down");
+                    for (int i = 0; i < 10; i++) {
+                        game.getGameThread().getEntityFactory().createBrick(
+                                GameHelper.notFilledPosition(game).x,
+                                GameHelper.notFilledPosition(game).y,
+                                BrickComponent.randomBrickColor()
+                        );
+                    }
+                    setPowerStage(PowerStage.EXIT);
+                    break;
+                case ENLARGE_PLAYER:
+                    System.out.println("Enlarge player power UP");
+                    for (EntitySystem system : game.getEngine().getSystems()) {
+                        if (system instanceof PlayerSystem) {
+                            ((PlayerSystem) system).powerHandler(game.getGameThread().getEntityFactory().getPlayer(),
+                                    bodyComponentMapper.get(game.getGameThread().getEntityFactory().getPlayer())
+                            );
+                        }
+                    }
+                    setPowerStage(PowerStage.EXIT);
+                    break;
+                case SHORTEN_PLAYER:
+                    System.out.println("Shorten player power down");
+                    for (EntitySystem system : game.getEngine().getSystems()) {
+                        if (system instanceof PlayerSystem) {
+                            ((PlayerSystem) system).powerHandler(game.getGameThread().getEntityFactory().getPlayer(),
+                                    bodyComponentMapper.get(game.getGameThread().getEntityFactory().getPlayer())
+                            );
+                        }
+                    }
+                    setPowerStage(PowerStage.EXIT);
+                    break;
+                case BIGGER_BALL:
+                    System.out.println("Bigger Ball power UP ");
+                    for (EntitySystem system : game.getEngine().getSystems()) {
+                        if (system instanceof BallSystem) {
+                            for (Entity ent : game.getGameThread().getEntityFactory().getTotalBalls()) {
+                                ((BallSystem) system).powerHandler(ent,
+                                        bodyComponentMapper.get(ent)
+                                );
                             }
                         }
-
-                        setPowerStage(PowerStage.EXIT);
-                        break;
-                    case MORE_BALLS:
-                        System.out.println("More ball power down");
-                        Vector2 filledPosition;
-
-                        Iterator<Entity>iterator = game.getGameThread().getEntityCreator().getTotalShapes().iterator();
-                        if (iterator.hasNext()){
-                            Entity ent = iterator.next();
-                            filledPosition = ent.getComponent(EntityComponent.class).position;
-
-                            for (int i = 0; i < 10; i++) {
-                                Vector2 newPosition = GameHelper.randomPosition();
-
-                                if (newPosition != filledPosition) {
-                                    game.getGameThread().getEntityCreator().createRowEntity(TypeComponent.Type.BALL,
-                                            BodyDef.BodyType.StaticBody,
-                                            BodyFactory.Material.RUBBER,
-                                            newPosition.x, newPosition.y,
-                                            GameConstants.BALL_RADIUS, GameConstants.BALL_RADIUS,
-                                            EntityComponent.randomBallColor()
-                                    );
-                                }
-                            }
+                    }
+                    setPowerStage(PowerStage.EXIT);
+                    break;
+                case EXTRA_LIFE:
+                    System.out.println("Extra Life");
+                    for (EntitySystem system : game.getEngine().getSystems()) {
+                        if (system instanceof PlayerSystem) {
+                            ((PlayerSystem) system).powerHandler(game.getGameThread().getEntityFactory().getPlayer(),
+                                    bodyComponentMapper.get(game.getGameThread().getEntityFactory().getPlayer())
+                            );
                         }
-
-                        setPowerStage(PowerStage.EXIT);
-                        break;
-                }
-                entityComponentMapper.get(entity).setHitPower(false);
+                    }
+                    setPowerStage(PowerStage.EXIT);
+                    break;
             }
         }
 
         @Override
         public void exit() {
-            powers.remove(PowerImplementation.this.entity);
-
             timeCount = 0;
-
-            setPowerStage(PowerStage.INIT);
         }
     };
 
-    public void reset(){
-        powers.clear();
+    @Deprecated
+    public void powerHandler(Entity entity, Box2dBodyComponent bodyComponent) {
+
+    }
+
+    @Override
+    public void destroy(Entity entity, Box2dBodyComponent bodyComponent) {
+        game.getGameThread().getEntityFactory().getTotalPowers().remove(entity);
+        bodyComponent.isDead = true;
+        powerUpComponentMapper.get(entity).setDestroy(true);
+    }
+
+    @Override
+    public void outOfBounds(Entity entity, Box2dBodyComponent bodyComponent){
+
+        PowerUpComponent powerUpComponent = powerUpComponentMapper.get(entity);
+
+        if (bodyComponent.body.getPosition().x + powerUpComponent.radius  > GameConstants.WORLD_WIDTH || bodyComponent.body.getPosition().x - powerUpComponent.radius < 0) {
+            destroy(entity, bodyComponent);
+            powerUpComponent.setOutOfBounds(true);
+        } else if (bodyComponent.body.getPosition().y + powerUpComponent.radius  > GameConstants.WORLD_HEIGHT || bodyComponent.body.getPosition().y - powerUpComponent.radius < 0) {
+            destroy(entity, bodyComponent);
+            powerUpComponent.setOutOfBounds(true);
+        }
     }
 }

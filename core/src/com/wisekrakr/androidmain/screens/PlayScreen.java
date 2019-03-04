@@ -3,27 +3,16 @@ package com.wisekrakr.androidmain.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
-import com.wisekrakr.androidmain.audiovisuals.EntityAudio;
-import com.wisekrakr.androidmain.helpers.GameHelper;
 import com.wisekrakr.androidmain.controls.Controls;
-import com.wisekrakr.androidmain.systems.CollisionSystem;
-import com.wisekrakr.androidmain.systems.EntitySystem;
-import com.wisekrakr.androidmain.systems.LevelGenerationSystem;
-import com.wisekrakr.androidmain.systems.ObstacleSystem;
-import com.wisekrakr.androidmain.systems.PlayerControlSystem;
-import com.wisekrakr.androidmain.systems.PlayerSystem;
+import com.wisekrakr.androidmain.systems.*;
 import com.wisekrakr.androidmain.audiovisuals.Visualizer;
 
-import java.util.ArrayList;
-
-public class PlayScreen extends ScreenAdapter {
+public class PlayScreen extends ScreenAdapter  {
 
     private final InputMultiplexer inputMultiplexer;
     private Viewport viewport;
@@ -36,7 +25,7 @@ public class PlayScreen extends ScreenAdapter {
     private InfoDisplay infoDisplay;
     private TouchControl touchControl;
 
-    private EntityAudio entityAudio;
+//    private EntityAudio entityAudio;
 
     public PlayScreen(AndroidGame game) {
         this.game = game;
@@ -50,30 +39,33 @@ public class PlayScreen extends ScreenAdapter {
 
         infoDisplay = new InfoDisplay(game);
 
-        entityAudio = new EntityAudio(game);
+//        entityAudio = new EntityAudio(game);
     }
+
 
     /**
      * Add remaining systems we did not need to add to the Gamethread.
      */
     private void addSystems() {
-        //levelGenerationSystem = new LevelGenerationSystem(game, game.getGameThread().getEntityCreator());
+
         game.getGameThread().getLevelGenerationSystem().init();
 
-        EntitySystem entitySystem = new EntitySystem(game);
-        game.getEngine().addSystem(entitySystem);
+        game.getEngine().addSystem(new PlayerSystem(game));
+        game.getEngine().addSystem(new BrickSystem(game));
+        game.getEngine().addSystem(new BallSystem(game));
 
-        visualizer = new Visualizer(game, entitySystem);
+        visualizer = new Visualizer(game);
         controls = new Controls();
         touchControl = new TouchControl(game);
 
-        game.getEngine().addSystem(new PlayerSystem(game));
         game.getEngine().addSystem(new PlayerControlSystem(game, controls, visualizer.getRenderingSystem().getCamera()));
         game.getEngine().addSystem(new CollisionSystem());
 
-        game.getEngine().addSystem(new ObstacleSystem(game.getGameThread().getEntityCreator()));
+        game.getEngine().addSystem(new ObstacleSystem(game));
 
-        game.getGameThread().getEntityCreator().loadMap();
+    }
+    private void mapLoading() {
+         game.getGameThread().getEntityFactory().loadMap();
     }
 
     @Override
@@ -100,8 +92,8 @@ public class PlayScreen extends ScreenAdapter {
         game.getEngine().update(delta);
         visualizer.getRenderingSystem().getCamera().update();
 
-        game.getGameThread().getEntityCreator().getTiledMapRenderer().setView(visualizer.getRenderingSystem().getCamera());
-        game.getGameThread().getEntityCreator().getTiledMapRenderer().render();
+//        game.getGameThread().getEntityCreator().getTiledMapRenderer().setView(visualizer.getRenderingSystem().getCamera());
+//        game.getGameThread().getEntityCreator().getTiledMapRenderer().render();
 
         game.getGameThread().getLevelGenerationSystem().updateLevels(delta);
 
@@ -110,13 +102,18 @@ public class PlayScreen extends ScreenAdapter {
                 delta
         );
 
+        visualizer.debugDrawable();
+
+       // System.out.println(game.getGameThread().getEntityCreator().getTotalBalls().size());//todo remove
+
         //touchControl.renderTouchControls();
 
-        visualizer.draw();
+//        visualizer.draw();
 
-        entityAudio.audioForAction(controls);
-        entityAudio.audioForEntity();
+//        entityAudio.audioForAction(controls);
+//        entityAudio.audioForEntity();
     }
+
 
     @Override
     public void resize(int width, int height) {
@@ -126,4 +123,6 @@ public class PlayScreen extends ScreenAdapter {
     @Override
     public void dispose() {
     }
+
+
 }

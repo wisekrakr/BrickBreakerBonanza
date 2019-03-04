@@ -44,7 +44,6 @@ public class RenderingSystem extends SortedIteratingSystem {
         renderQueue = new Array<Entity>();
 
         camera = new OrthographicCamera(GameConstants.WORLD_WIDTH, GameConstants.WORLD_HEIGHT);
-//        camera.position.set(GameConstants.WORLD_WIDTH/2, GameConstants.WORLD_HEIGHT/2,0);
 
     }
 

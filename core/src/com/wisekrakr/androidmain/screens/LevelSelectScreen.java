@@ -26,7 +26,7 @@ public class LevelSelectScreen extends ScreenAdapter {
     public LevelSelectScreen(AndroidGame game) {
         this.game = game;
 
-        stage = new Stage(new FitViewport(GameConstants.WORLD_WIDTH, GameConstants.WORLD_HEIGHT));
+        stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
         preferences = game.getGamePreferences();
     }
@@ -79,5 +79,10 @@ public class LevelSelectScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act();
         stage.draw();
+    }
+
+    @Override
+    public void resize (int width, int height) {
+        stage.getViewport().update(width, height, true);
     }
 }

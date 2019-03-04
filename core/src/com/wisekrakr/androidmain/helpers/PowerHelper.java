@@ -9,7 +9,7 @@ public class PowerHelper {
     private static HashMap<Entity, Power> map;
 
     public enum Power {
-        THEY_LIVE, NUKE, EXTRA_TIME, MORE_BALLS
+        THEY_LIVE, NUKE, MORE_BRICKS, ENLARGE_PLAYER, SHORTEN_PLAYER, BIGGER_BALL, EXTRA_LIFE
     }
 
     private static Power[] powers = Power.values();

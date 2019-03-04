@@ -2,16 +2,14 @@ package com.wisekrakr.androidmain;
 
 
 import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.wisekrakr.androidmain.factories.EntityFactory;
 import com.wisekrakr.androidmain.retainers.TimeKeeper;
-import com.wisekrakr.androidmain.systems.EntitySystem;
 import com.wisekrakr.androidmain.systems.LevelGenerationSystem;
 import com.wisekrakr.androidmain.systems.PhysicsSystem;
-import com.wisekrakr.androidmain.systems.RenderingSystem;
 
 public class GameThread {
 
-    private final EntityCreator entityCreator;
+    private final EntityFactory entityFactory;
     private LevelGenerationSystem levelGenerationSystem;
     private AndroidGame game;
     private PooledEngine engine;
@@ -24,17 +22,17 @@ public class GameThread {
 
         engine = game.getEngine();
 
-        entityCreator = new EntityCreator(game, engine);
-        levelGenerationSystem = new LevelGenerationSystem(game, entityCreator);
+        entityFactory = new EntityFactory(game, engine);
+        levelGenerationSystem = new LevelGenerationSystem(game, entityFactory);
 
         init();
     }
 
     private void init() {
-        engine.addSystem(new PhysicsSystem(entityCreator.world));
+        engine.addSystem(new PhysicsSystem(entityFactory.world));
     }
 
-    public EntityCreator getEntityCreator(){return  entityCreator;}
+    public EntityFactory getEntityFactory(){return entityFactory;}
 
     public LevelGenerationSystem getLevelGenerationSystem(){return levelGenerationSystem;}
 

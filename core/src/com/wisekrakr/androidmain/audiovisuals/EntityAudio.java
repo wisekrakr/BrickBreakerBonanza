@@ -3,7 +3,7 @@ package com.wisekrakr.androidmain.audiovisuals;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.audio.Sound;
 import com.wisekrakr.androidmain.AndroidGame;
-import com.wisekrakr.androidmain.components.EntityComponent;
+import com.wisekrakr.androidmain.components.BallComponent;
 import com.wisekrakr.androidmain.components.TypeComponent;
 import com.wisekrakr.androidmain.controls.Controls;
 import com.wisekrakr.androidmain.helpers.PowerHelper;
@@ -18,39 +18,38 @@ public class EntityAudio implements EntityAudioContext {
 
     @Override
     public void audioForEntity() {
-        for (Entity entity: game.getEngine().getEntities()) {
-            if (entity != null) {
-                if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.BALL ||
-                        entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.SQUARE ||
-                        entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.TRIANGLE) {
-
-                    if (entity.getComponent(EntityComponent.class).hitSurface || entity.getComponent(EntityComponent.class).hitObstacle) {
-                        addSound("sounds/hit_wall.wav");
-
-                    } else if (entity.getComponent(EntityComponent.class).hitEntity) {
-                        if (entity.getComponent(EntityComponent.class).destroy) {
-                            addSound("sounds/secret.wav");
-                        }else {
-                            //addSound("sounds/bounce thicc.wav");
-                        }
-                    }
-                } else if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.POWER) {
-                    if (entity.getComponent(EntityComponent.class).destroy) {
-                        if (PowerHelper.getPower() == PowerHelper.Power.EXTRA_TIME) {
-                            addSound("sounds/powerup_extratime.wav");
-                        } else if (PowerHelper.getPower() == PowerHelper.Power.THEY_LIVE) {
-                            addSound("sounds/powerup_freeze.wav");
-                        } else if (PowerHelper.getPower() == PowerHelper.Power.NUKE) {
-                            addSound("sounds/powerup_nuke.wav");
-                        } else if (PowerHelper.getPower() == PowerHelper.Power.MORE_BALLS) {
-                            addSound("sounds/powerdown_moreballs.wav");
-                        }
-
-                    }
-                }
-
-            }
-        }
+//        for (Entity entity: game.getEngine().getEntities()) {
+//            if (entity != null) {
+//                if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.BALL ||
+//                        entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.BRICK) {
+//
+//                    if (entity.getComponent(BallComponent.class).hitSurface || entity.getComponent(BallComponent.class).hitObstacle) {
+//                        addSound("sounds/hit_wall.wav");
+//
+//                    } else if (entity.getComponent(BallComponent.class).hitEntity) {
+//                        if (entity.getComponent(BallComponent.class).destroy) {
+//                            addSound("sounds/secret.wav");
+//                        }else {
+//                            //addSound("sounds/bounce thicc.wav");
+//                        }
+//                    }
+//                } else if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.POWER) {
+//                    if (entity.getComponent(BallComponent.class).destroy) {
+//                        if (PowerHelper.getPower() == PowerHelper.Power.EXTRA_BALL) {
+//                            addSound("sounds/powerup_extratime.wav");
+//                        } else if (PowerHelper.getPower() == PowerHelper.Power.THEY_LIVE) {
+//                            addSound("sounds/powerup_freeze.wav");
+//                        } else if (PowerHelper.getPower() == PowerHelper.Power.NUKE) {
+//                            addSound("sounds/powerup_nuke.wav");
+//                        } else if (PowerHelper.getPower() == PowerHelper.Power.MORE_BRICKS) {
+//                            addSound("sounds/powerdown_moreballs.wav");
+//                        }
+//
+//                    }
+//                }
+//
+//            }
+//        }
     }
 
     @Override

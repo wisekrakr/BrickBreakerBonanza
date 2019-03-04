@@ -58,11 +58,11 @@ public class LoadingScreen extends ScreenAdapter {
 
     private void drawLoadingBar(int stage, TextureRegion currentFrame){
         for(int i = 0; i < stage;i++){
-            spriteBatch.draw(currentFrame, GameConstants.WORLD_WIDTH - title.getRegionWidth()/2 + (i * 60),
-                    GameConstants.WORLD_HEIGHT - title.getRegionHeight()/2,
+            spriteBatch.draw(currentFrame, Gdx.graphics.getWidth()/2f - title.getRegionWidth()/2f + (i * 60f),
+                    Gdx.graphics.getHeight()/2f - title.getRegionHeight()/2f,
                     40, 40);
-            spriteBatch.draw(dash, GameConstants.WORLD_WIDTH - title.getRegionWidth()/2 + (i * 60),
-                    GameConstants.WORLD_HEIGHT - title.getRegionHeight()/2,
+            spriteBatch.draw(dash, Gdx.graphics.getWidth()/2f - title.getRegionWidth()/2f + (i * 60),
+                    Gdx.graphics.getHeight()/2f - title.getRegionHeight()/2f,
                     40, 40);
         }
     }
@@ -83,7 +83,8 @@ public class LoadingScreen extends ScreenAdapter {
 
         spriteBatch.begin();
         drawLoadingBar(currentLoadingStage , currentFrame);
-        spriteBatch.draw(title, GameConstants.WORLD_WIDTH - title.getRegionWidth()/2, GameConstants.WORLD_HEIGHT - title.getRegionHeight()/2 );
+        spriteBatch.draw(title, Gdx.graphics.getWidth()/2f - title.getRegionWidth()/2f,
+                Gdx.graphics.getHeight()/2f - title.getRegionHeight()/2f);
         spriteBatch.end();
 
         if (game.assetManager().assetManager.update()){

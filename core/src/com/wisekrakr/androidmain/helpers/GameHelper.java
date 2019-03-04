@@ -1,8 +1,14 @@
 package com.wisekrakr.androidmain.helpers;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
+import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
+import com.wisekrakr.androidmain.components.Box2dBodyComponent;
+import com.wisekrakr.androidmain.components.BrickComponent;
 
+import java.util.Iterator;
 import java.util.Random;
 
 public class GameHelper {
@@ -22,8 +28,27 @@ public class GameHelper {
 
     public static Vector2 randomPosition() {
 
-        return new Vector2(randomGenerator.nextFloat() *  GameConstants.WORLD_WIDTH,
-                randomGenerator.nextFloat() * GameConstants.WORLD_HEIGHT);
+        return new Vector2(randomGenerator.nextFloat() * GameConstants.WORLD_WIDTH, //todo change
+                randomGenerator.nextFloat() * GameConstants.WORLD_HEIGHT
+        );
+    }
+
+    public static Vector2 notFilledPosition(AndroidGame game){
+        Vector2 filledPosition = new Vector2();
+
+        Iterator<Entity> iterator = game.getEngine().getEntities().iterator();
+        if (iterator.hasNext()){
+            Entity ent = iterator.next();
+            filledPosition = ent.getComponent(Box2dBodyComponent.class).body.getPosition();
+        }
+
+        Vector2 newPosition = GameHelper.randomPosition();
+        Vector2 bestPosition = new Vector2();
+        if (newPosition != filledPosition){
+            bestPosition.x = newPosition.x;
+            bestPosition.y = newPosition.y;
+        }
+        return bestPosition;
     }
 
     public static float distanceBetween(Vector2 subject, Vector2 target) {

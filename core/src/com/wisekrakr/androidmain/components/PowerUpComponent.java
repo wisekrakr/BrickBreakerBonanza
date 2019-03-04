@@ -1,10 +1,14 @@
 package com.wisekrakr.androidmain.components;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
 import com.wisekrakr.androidmain.systems.SystemEntityContext;
 
-public class PlayerComponent implements Component, Pool.Poolable {
+import java.util.ArrayList;
+
+public class PowerUpComponent implements Component, Pool.Poolable{
 
     public boolean destroy = false;
     public boolean outOfBounds = false;
@@ -16,26 +20,16 @@ public class PlayerComponent implements Component, Pool.Poolable {
         this.outOfBounds = outOfBounds;
     }
 
-
-    public float width = 0f;
-    public float height = 0f;
-
-    public boolean hasBall = false;
-
-    public void setHasBall(boolean hasBall) {
-        this.hasBall = hasBall;
-    }
-
-    public int lives = 3;
-
-    public void setLives(int lives) {
-        this.lives = lives;
-    }
+    public Vector2 position = new Vector2();
+    public float radius = 0f;
+    public float velocityX = 0;
+    public float velocityY = 0;
 
     @Override
     public void reset() {
-        width = 0f;
-        height = 0f;
-        hasBall = false;
+        position = new Vector2();
+        radius = 0;
+        velocityX = 0;
+        velocityY = 0;
     }
 }

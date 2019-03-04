@@ -9,6 +9,8 @@ import com.wisekrakr.androidmain.screens.PlayScreen;
 
 public class Controls implements InputProcessor {
     public boolean left, right, up, down;
+    public boolean nextLevel;
+    public boolean speedUp;
     public boolean isLeftMouseDown;
     public boolean isDragged;
     public Vector2 mousePosition;
@@ -34,6 +36,14 @@ public class Controls implements InputProcessor {
                 down = true;
                 keyProcessed = true;
                 break;
+            case Input.Keys.ALT_LEFT:
+                nextLevel = true;
+                keyProcessed = true;
+                break;
+            case Input.Keys.SPACE:
+                speedUp = true;
+                keyProcessed = true;
+                break;
         }
         return keyProcessed;
     }
@@ -57,6 +67,14 @@ public class Controls implements InputProcessor {
                 break;
             case Input.Keys.S:
                 down = false;
+                keyProcessed = true;
+                break;
+            case Input.Keys.ALT_LEFT:
+                nextLevel = false;
+                keyProcessed = true;
+                break;
+            case Input.Keys.SPACE:
+                speedUp = false;
                 keyProcessed = true;
                 break;
         }

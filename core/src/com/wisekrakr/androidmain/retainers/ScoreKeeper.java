@@ -13,7 +13,6 @@ public class ScoreKeeper {
     }
 
     public static int getScore() {
-
         int s = score;
 
         if (s < 0 || s > 999999999){
@@ -22,23 +21,32 @@ public class ScoreKeeper {
             return s;
         }
         return s;
-
     }
 
     private static int pointsToGive = 0;
-    private static int multiplier = 0;
 
-    public void setMultiplier(int multi) {
-        multiplier = multi;
+    public static int getPointsToGive() {
+        return pointsToGive;
     }
 
-    public int setPointsToGive(int points) {
-        pointsToGive = points * multiplier;
+    private static int multiplier = 1;
 
-        return pointsToGive;
+    public static int getMultiplier() {
+        return multiplier;
+    }
+
+    public static void setMultiplier(int multi) {
+        multiplier = multi;
+
+    }
+
+    public static void setPointsToGive(int points) {
+        pointsToGive = points;
     }
 
     public static void reset(){
         score = 0;
+        pointsToGive = 0;
+        multiplier = 1;
     }
 }

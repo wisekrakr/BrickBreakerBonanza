@@ -23,7 +23,7 @@ public class MenuScreen extends ScreenAdapter {
 
     public MenuScreen(AndroidGame game) {
         this.game = game;
-        stage = new Stage(new FitViewport(GameConstants.WORLD_WIDTH, GameConstants.WORLD_HEIGHT));
+        stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
     }
 
     @Override
@@ -82,9 +82,9 @@ public class MenuScreen extends ScreenAdapter {
         stage.act();
 
         stage.getBatch().begin();
-        stage.getBatch().draw(textureRegion, GameConstants.WORLD_WIDTH/2 - 300f/2 ,
-                GameConstants.WORLD_HEIGHT/2 - 400f/2,
-                300f, GameConstants.WORLD_HEIGHT);
+        stage.getBatch().draw(textureRegion, Gdx.graphics.getWidth()/2f - Gdx.graphics.getWidth()/2f,
+                Gdx.graphics.getHeight()/2f - Gdx.graphics.getHeight()/2f,
+                Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage.getBatch().end();
 
         stage.draw();
