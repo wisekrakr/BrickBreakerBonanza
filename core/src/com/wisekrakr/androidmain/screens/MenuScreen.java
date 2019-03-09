@@ -8,18 +8,22 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
+import com.wisekrakr.androidmain.helpers.LabelFormatter;
 import com.wisekrakr.androidmain.helpers.SpriteHelper;
+import javafx.scene.text.TextBoundsType;
 
 public class MenuScreen extends ScreenAdapter {
 
     private Stage stage;
     private AndroidGame game;
     private TextureRegion textureRegion;
+    private Label formatLabel;
 
     public MenuScreen(AndroidGame game) {
         this.game = game;
@@ -86,10 +90,25 @@ public class MenuScreen extends ScreenAdapter {
                 Gdx.graphics.getHeight()/2f - Gdx.graphics.getHeight()/2f,
                 Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         stage.getBatch().end();
-
         stage.draw();
 
     }
+
+//    private void labelFormattingTest(final float delta){
+//
+//        formatLabel = new Label("A Game made with Love, by The Wisekrakr", skin);
+//        formatLabel.setBounds(10, 10, Gdx.graphics.getWidth() - 10f, 30);
+//
+//
+//        formatLabel.addAction(new TemporalAction(10) {
+//            LabelFormatter formatter = new LabelFormatter("A Game made with Love, by The Wisekrakr");
+//            @Override
+//            protected void update(float percent) {
+//                formatLabel.setText(formatter.getText(delta));
+//            }
+//        });
+//
+//    }
 
     @Override
     public void resize (int width, int height) {

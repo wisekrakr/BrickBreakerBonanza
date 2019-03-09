@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Pool;
 public class TypeComponent implements Component, Pool.Poolable {
 
     public enum Type{
-        PLAYER, BALL, BRICK, OBSTACLE, SCENERY, POWER, OTHER;
+        PLAYER, BALL, BRICK, OBSTACLE, SCENERY, POWER, ROW
     }
 
     private Type type = null;
@@ -19,19 +19,11 @@ public class TypeComponent implements Component, Pool.Poolable {
         this.type = type;
     }
 
-    public enum Tag {
-        PLAYER_BALL, A_PRIORI_ENTITY, NONE
-    }
 
-    public Tag tag = null;
-
-    public void setTag(Tag tag) {
-        this.tag = tag;
-    }
 
     @Override
     public void reset() {
         type = null;
-        tag = null;
+
     }
 }

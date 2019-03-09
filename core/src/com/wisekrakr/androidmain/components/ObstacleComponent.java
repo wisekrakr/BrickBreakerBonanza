@@ -9,13 +9,9 @@ import com.wisekrakr.androidmain.systems.SystemEntityContext;
 public class ObstacleComponent implements Component, Pool.Poolable{
 
     public boolean destroy = false;
-    public boolean outOfBounds = false;
 
     public void setDestroy(boolean destroy) {
         this.destroy = destroy;
-    }
-    public void setOutOfBounds(boolean outOfBounds) {
-        this.outOfBounds = outOfBounds;
     }
 
     public Vector2 position = new Vector2();
@@ -27,6 +23,7 @@ public class ObstacleComponent implements Component, Pool.Poolable{
 
     @Override
     public void reset() {
+        destroy = false;
 
         position = new Vector2();
         velocityX = 0;

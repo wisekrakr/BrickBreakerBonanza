@@ -81,21 +81,21 @@ public class LevelGenerationSystem {
     private void building(){
 
         if (!game.getGamePreferences().levelGoing(mainLevel)) {
-            if (mainLevel == 1) {
+            if (mainLevel > 0 && mainLevel <=3) {
                 levelModel.startLevel(mainLevel,
-                       (int) (GameConstants.WORLD_WIDTH / GameConstants.BRICK_WIDTH),
+                       (int) ((GameConstants.WORLD_WIDTH - GameConstants.BRICK_WIDTH) / GameConstants.BRICK_WIDTH),
                         (int) ((GameConstants.WORLD_HEIGHT - 200) / GameConstants.BRICK_HEIGHT)
                 );
             }
-            if (mainLevel == 2) {
+            if (mainLevel > 3 && mainLevel <= 6) {
                 levelModel.startLevel(mainLevel,
-                        (int) (GameConstants.WORLD_WIDTH / GameConstants.BRICK_WIDTH),
+                        (int) ((GameConstants.WORLD_WIDTH - GameConstants.BRICK_WIDTH) / GameConstants.BRICK_WIDTH),
                         (int) ((GameConstants.WORLD_HEIGHT - 100) / GameConstants.BRICK_HEIGHT)
                 );
             }
-            if (mainLevel == 3) {
+            if (mainLevel >6 && mainLevel <= 9) {
                 levelModel.startLevel(mainLevel,
-                        (int) (GameConstants.WORLD_WIDTH / GameConstants.BRICK_WIDTH),
+                        (int) ((GameConstants.WORLD_WIDTH - GameConstants.BRICK_WIDTH) / GameConstants.BRICK_WIDTH),
                         (int) ((GameConstants.WORLD_HEIGHT) / GameConstants.BRICK_HEIGHT)
                 );
             }

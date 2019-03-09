@@ -38,39 +38,36 @@ public class BallSystem extends IteratingSystem implements SystemEntityContext{
         Box2dBodyComponent bodyComponent = bodyComponentMapper.get(entity);
         CollisionComponent collisionComponent = collisionComponentMapper.get(entity);
 
-        Entity player = game.getGameThread().getEntityFactory().getPlayer();
-        PlayerComponent playerComponent = ComponentMapper.getFor(PlayerComponent.class).get(player);
-
         if (collisionComponent.hitPlayer) {
             countBounces(collisionComponent);
         }else if (ballComponent.destroy) {
             collisionComponent.reset();
-            playerComponent.setLives(playerComponent.lives - 1);
-            ballComponent.setDestroy(false);
+            ScoreKeeper.setLives(ScoreKeeper.lives - 1);
+            destroy(entity, bodyComponent);
         }
 
         outOfBounds(entity, bodyComponent);
         powerHandler(entity, bodyComponent);
     }
 
-
-
     @Override
     public void destroy(Entity entity, Box2dBodyComponent bodyComponent){
         BallComponent ballComponent = ballComponentMapper.get(entity);
         bodyComponent.isDead = true;
-        ballComponent.setDestroy(true);
         game.getGameThread().getEntityFactory().getTotalBalls().remove(entity);
+        ballComponent.setOutOfBounds(false);
     }
 
     @Override
     public void outOfBounds(Entity entity, Box2dBodyComponent bodyComponent){
         BallComponent ballComponent = ballComponentMapper.get(entity);
 
-        if (bodyComponent.body.getPosition().x + ballComponent.radius/2 > GameConstants.WORLD_WIDTH || bodyComponent.body.getPosition().x - ballComponent.radius/2 < 0){
-            destroy(entity, bodyComponent);
-        }else if (bodyComponent.body.getPosition().y + ballComponent.radius/2 > GameConstants.WORLD_HEIGHT || bodyComponent.body.getPosition().y - ballComponent.radius/2 < 0){
-            destroy(entity, bodyComponent);
+        if (bodyComponent.body.getPosition().x + ballComponent.radius/2 > GameConstants.WORLD_WIDTH ||
+                bodyComponent.body.getPosition().x - ballComponent.radius/2 < 0 ||
+                bodyComponent.body.getPosition().y + ballComponent.radius/2 > GameConstants.WORLD_HEIGHT ||
+                bodyComponent.body.getPosition().y - ballComponent.radius/2 < 0){
+
+            ballComponent.setDestroy(true);
             ballComponent.setOutOfBounds(true);
         }
     }
@@ -78,12 +75,15 @@ public class BallSystem extends IteratingSystem implements SystemEntityContext{
     @Override
     public void powerHandler(Entity entity, Box2dBodyComponent bodyComponent) {
         BallComponent ballComponent = ballComponentMapper.get(entity);
-        CollisionComponent collisionComponent = collisionComponentMapper.get(entity);
+        float initialRadius = ballComponent.radius;
 
-        if (collisionComponent.hitPower) {
-            if (PowerHelper.getPower() == PowerHelper.Power.BIGGER_BALL) {
-                for (Fixture fixture : bodyComponent.body.getFixtureList()) {
-                    fixture.getShape().setRadius(ballComponent.radius * 1.2f);
+        for (Entity power: game.getGameThread().getEntityFactory().getTotalPowers()) {
+            if (power.getComponent(CollisionComponent.class).hitBall) {
+                if (PowerHelper.getPower() == PowerHelper.Power.BIGGER_BALL) {
+                    for (Fixture fixture : bodyComponent.body.getFixtureList()) {
+                        fixture.getShape().setRadius(initialRadius * 1.2f);
+                        ballComponent.radius = initialRadius;
+                    }
                 }
             }
         }

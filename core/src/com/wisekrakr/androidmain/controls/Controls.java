@@ -12,6 +12,7 @@ public class Controls implements InputProcessor {
     public boolean nextLevel;
     public boolean speedUp;
     public boolean isLeftMouseDown;
+    public boolean isRightMouseDown;
     public boolean isDragged;
     public Vector2 mousePosition;
 
@@ -89,8 +90,10 @@ public class Controls implements InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 
-        if (button == 0){
+        if (button == Input.Buttons.LEFT){
             isLeftMouseDown = true;
+        }else if (button == Input.Buttons.RIGHT){
+            isRightMouseDown = true;
         }
 
         mousePosition = new Vector2(screenX, screenY);
@@ -102,8 +105,10 @@ public class Controls implements InputProcessor {
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         isDragged = false;
 
-        if (button == 0 ) {
+        if (button == Input.Buttons.LEFT ) {
             isLeftMouseDown = false;
+        }else if (button == Input.Buttons.RIGHT){
+            isRightMouseDown = false;
         }
 
         mousePosition = new Vector2(screenX, screenY);

@@ -39,6 +39,7 @@ public class BrickSystem extends IteratingSystem implements SystemEntityContext{
         if (collisionComponent.hitBall && !brickComponent.outOfBounds) {
             game.getGameThread().getEntityFactory().getTotalBricks().remove(entity);
             destroy(entity, bodyComponent);
+            scoreHandler(brickComponent);
             collisionComponent.setHitBall(false);
         }else if (brickComponent.destroy){
             destroy(entity, bodyComponent);
@@ -48,18 +49,18 @@ public class BrickSystem extends IteratingSystem implements SystemEntityContext{
         powerHandler(entity, bodyComponent);
     }
 
-    private void scoreHandler(BrickComponent brickComponent){
-        //todo better scores. Higher levels mean more points instead of always the same
 
-        switch (brickComponent.getBrickColor()){
+    private void scoreHandler(BrickComponent brickComponent){
+
+        switch (brickComponent.getBrickColorContext().getBrickColor()){
             case RED:
                 ScoreKeeper.setPointsToGive(100);
                 break;
             case BLUE:
                 ScoreKeeper.setPointsToGive(50);
                 break;
-            case YELLOW:
-                ScoreKeeper.setPointsToGive(25);
+            case GOLD:
+                ScoreKeeper.setPointsToGive(500);
                 break;
             case GREEN:
                 ScoreKeeper.setPointsToGive(10);
@@ -68,41 +69,46 @@ public class BrickSystem extends IteratingSystem implements SystemEntityContext{
                 ScoreKeeper.setPointsToGive(250);
                 break;
             case ORANGE:
-                ScoreKeeper.setPointsToGive(25);
+                ScoreKeeper.setPointsToGive(100);
                 break;
-            case CYAN:
-                ScoreKeeper.setPointsToGive(500);
+            case WHITE:
+                ScoreKeeper.setPointsToGive(25);
                 break;
         }
         ScoreKeeper.setScore(ScoreKeeper.getPointsToGive() * ScoreKeeper.getMultiplier());
+
+        if (ScoreKeeper.getScore() > game.getGamePreferences().getHighScore()){
+            game.getGamePreferences().setHighScore(ScoreKeeper.getScore());
+        }
     }
 
     @Override
     public void destroy(Entity entity, Box2dBodyComponent bodyComponent){
         BrickComponent brickComponent = brickComponentMapper.get(entity);
-        scoreHandler(brickComponent);
+
         bodyComponent.isDead = true;
-        brickComponent.setDestroy(true);
         game.getGameThread().getEntityFactory().getTotalBricks().remove(entity);
+        brickComponent.setOutOfBounds(false);
+
     }
 
     @Override
     public void outOfBounds(Entity entity, Box2dBodyComponent bodyComponent){
         BrickComponent brickComponent = brickComponentMapper.get(entity);
 
-        if (bodyComponent.body.getPosition().x + brickComponent.width/2 > GameConstants.WORLD_WIDTH || bodyComponent.body.getPosition().x - brickComponent.width/2 < 0){
-            destroy(entity, bodyComponent);
-            brickComponent.setOutOfBounds(true);
-        }else if (bodyComponent.body.getPosition().y + brickComponent.height/2 > GameConstants.WORLD_HEIGHT || bodyComponent.body.getPosition().y - brickComponent.height/2 < 0){
-            destroy(entity, bodyComponent);
+        if (bodyComponent.body.getPosition().x + brickComponent.width/2 > GameConstants.WORLD_WIDTH ||
+                bodyComponent.body.getPosition().x - brickComponent.width/2 < 0 ||
+                bodyComponent.body.getPosition().y + brickComponent.height/2 > GameConstants.WORLD_HEIGHT ||
+                bodyComponent.body.getPosition().y - brickComponent.height/2 < 0){
+            brickComponent.setDestroy(true);
             brickComponent.setOutOfBounds(true);
         }
     }
 
     @Override
     public void powerHandler(Entity entity, Box2dBodyComponent bodyComponent) {
-        for (Entity ball: game.getGameThread().getEntityFactory().getTotalBalls()) {
-            if (ball.getComponent(CollisionComponent.class).hitPower) {
+        for (Entity power: game.getGameThread().getEntityFactory().getTotalPowers()) {
+            if (power.getComponent(CollisionComponent.class).hitBall) {
                 if (PowerHelper.getPower() == PowerHelper.Power.THEY_LIVE) {
                     if (bodyComponent.body.getType() == BodyDef.BodyType.StaticBody) {
                         bodyComponent.body.setType(BodyDef.BodyType.DynamicBody);
@@ -111,10 +117,6 @@ public class BrickSystem extends IteratingSystem implements SystemEntityContext{
                 }
             }
         }
-//        if (!game.getGameThread().getEntityFactory().getTotalBalls().isEmpty()) {
-//            if (game.getGameThread().getEntityFactory().getTotalBalls().get(0).getComponent(CollisionComponent.class).hitPower) {
-//
-//            }
-//        }
+
     }
 }

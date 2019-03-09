@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.*;
+import com.wisekrakr.androidmain.helpers.EntityColorHelper;
 import com.wisekrakr.androidmain.helpers.GameHelper;
 import com.wisekrakr.androidmain.helpers.PowerHelper;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
@@ -33,6 +34,7 @@ public class PowerImplementation implements SystemEntityContext {
 
     private ComponentMapper<Box2dBodyComponent> bodyComponentMapper;
     private ComponentMapper<PowerUpComponent> powerUpComponentMapper;
+    private ComponentMapper<CollisionComponent>collisionComponentMapper;
 
     private AndroidGame game;
     private int spawnInterval;
@@ -43,6 +45,7 @@ public class PowerImplementation implements SystemEntityContext {
 
         powerUpComponentMapper = ComponentMapper.getFor(PowerUpComponent.class);
         bodyComponentMapper = ComponentMapper.getFor(Box2dBodyComponent.class);
+        collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
     }
 
     /**
@@ -61,10 +64,10 @@ public class PowerImplementation implements SystemEntityContext {
                 powerContext.respite(entity);
                 break;
             case UPDATE:
-                powerContext.powerTime();
+                powerContext.powerTime(entity);
                 break;
             case EXIT:
-                powerContext.exit();
+                powerContext.exit(entity);
                 break;
             default:
                 System.out.println("no power stage");
@@ -96,14 +99,15 @@ public class PowerImplementation implements SystemEntityContext {
             Entity power = game.getGameThread().getEntityFactory().createPower(
                     GameHelper.notFilledPosition(game).x,
                     GameHelper.notFilledPosition(game).y,
-                    0,
-                    0,
-                    GameConstants.BALL_RADIUS*2
+                    GameHelper.randomDirection() * 10000000f,
+                    GameHelper.randomDirection() * 10000000f,
+                    GameConstants.POWER_WIDTH,
+                    GameConstants.POWER_HEIGHT
             );
 
             PowerHelper.setPowerUp(power, PowerHelper.randomPowerUp());
 
-            System.out.println(PowerHelper.getPowerUpMap());//todo remove
+            System.out.println(PowerHelper.getPowerUpMap() + " " + power.getComponent(PowerUpComponent.class).position);//todo remove
 
             setPowerStage(PowerStage.REST);
         }
@@ -111,22 +115,22 @@ public class PowerImplementation implements SystemEntityContext {
         @Override
         public void respite(Entity entity) {
 
-            ComponentMapper<CollisionComponent>collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
+            CollisionComponent collisionComponent = collisionComponentMapper.get(entity);
+            Box2dBodyComponent bodyComponent = bodyComponentMapper.get(entity);
 
-            if (collisionComponentMapper.get(entity).hitBall) {
-                System.out.println("RESPITE");//todo remove
-                destroy(entity, bodyComponentMapper.get(entity));
+            if (collisionComponent.hitBall) {
                 ScoreKeeper.setPointsToGive(1000);
 
-                collisionComponentMapper.get(entity).setHitBall(false);
+                collisionComponent.setHitBall(false);
                 setPowerStage(PowerStage.UPDATE);
-            } else {
-                outOfBounds(entity, bodyComponentMapper.get(entity));
             }
+
+            outOfBounds(entity, bodyComponent);
         }
 
         @Override
-        public void powerTime() {
+        public void powerTime(Entity entity) {
+
             int randomBrick = GameHelper.randomGenerator.nextInt(game.getGameThread().getEntityFactory().getTotalBricks().size());
 
             switch (PowerHelper.getPower()) {
@@ -145,11 +149,11 @@ public class PowerImplementation implements SystemEntityContext {
                 case THEY_LIVE:
                     for (EntitySystem system : game.getEngine().getSystems()) {
                         if (system instanceof BrickSystem) {
-                            Entity entity = game.getGameThread().getEntityFactory().getTotalBricks().get(randomBrick);
-                            if (entity != null){
-                                System.out.println("THEY CAN MOVE?! power down " + entity.getComponent(TypeComponent.class).getType());
-                                ((BrickSystem) system).powerHandler(entity,
-                                        bodyComponentMapper.get(entity)
+                            Entity ent = game.getGameThread().getEntityFactory().getTotalBricks().get(randomBrick);
+                            if (ent != null){
+                                System.out.println("THEY CAN MOVE?! power down " + ent.getComponent(TypeComponent.class).getType());
+                                ((BrickSystem) system).powerHandler(ent,
+                                        bodyComponentMapper.get(ent)
                                 );
                             }
                         }
@@ -162,7 +166,7 @@ public class PowerImplementation implements SystemEntityContext {
                         game.getGameThread().getEntityFactory().createBrick(
                                 GameHelper.notFilledPosition(game).x,
                                 GameHelper.notFilledPosition(game).y,
-                                BrickComponent.randomBrickColor()
+                                EntityColorHelper.randomEntityColor()
                         );
                     }
                     setPowerStage(PowerStage.EXIT);
@@ -203,7 +207,7 @@ public class PowerImplementation implements SystemEntityContext {
                     setPowerStage(PowerStage.EXIT);
                     break;
                 case EXTRA_LIFE:
-                    System.out.println("Extra Life");
+                    System.out.println("Extra Life power up");
                     for (EntitySystem system : game.getEngine().getSystems()) {
                         if (system instanceof PlayerSystem) {
                             ((PlayerSystem) system).powerHandler(game.getGameThread().getEntityFactory().getPlayer(),
@@ -217,7 +221,11 @@ public class PowerImplementation implements SystemEntityContext {
         }
 
         @Override
-        public void exit() {
+        public void exit(Entity entity) {
+            CollisionComponent collisionComponent = collisionComponentMapper.get(entity);
+
+            collisionComponent.setHitBall(false);
+            destroy(entity, bodyComponentMapper.get(entity));
             timeCount = 0;
         }
     };
@@ -232,6 +240,7 @@ public class PowerImplementation implements SystemEntityContext {
         game.getGameThread().getEntityFactory().getTotalPowers().remove(entity);
         bodyComponent.isDead = true;
         powerUpComponentMapper.get(entity).setDestroy(true);
+        powerUpComponentMapper.get(entity).setOutOfBounds(false);
     }
 
     @Override
@@ -239,10 +248,12 @@ public class PowerImplementation implements SystemEntityContext {
 
         PowerUpComponent powerUpComponent = powerUpComponentMapper.get(entity);
 
-        if (bodyComponent.body.getPosition().x + powerUpComponent.radius  > GameConstants.WORLD_WIDTH || bodyComponent.body.getPosition().x - powerUpComponent.radius < 0) {
-            destroy(entity, bodyComponent);
-            powerUpComponent.setOutOfBounds(true);
-        } else if (bodyComponent.body.getPosition().y + powerUpComponent.radius  > GameConstants.WORLD_HEIGHT || bodyComponent.body.getPosition().y - powerUpComponent.radius < 0) {
+        if (bodyComponent.body.getPosition().x + powerUpComponent.width/2 > GameConstants.WORLD_WIDTH ||
+                bodyComponent.body.getPosition().x - powerUpComponent.width/2 < 0 ||
+                bodyComponent.body.getPosition().y + powerUpComponent.height/2 > GameConstants.WORLD_HEIGHT ||
+                bodyComponent.body.getPosition().y - powerUpComponent.height/2 < 0) {
+
+            System.out.println("Power is out of bounds");
             destroy(entity, bodyComponent);
             powerUpComponent.setOutOfBounds(true);
         }

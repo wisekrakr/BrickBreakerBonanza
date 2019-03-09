@@ -21,14 +21,18 @@ public class PowerUpComponent implements Component, Pool.Poolable{
     }
 
     public Vector2 position = new Vector2();
-    public float radius = 0f;
+    public float width = 0;
+    public float height = 0;
     public float velocityX = 0;
     public float velocityY = 0;
 
     @Override
     public void reset() {
+        destroy = false;
+        outOfBounds = false;
         position = new Vector2();
-        radius = 0;
+        width = 0;
+        height = 0;
         velocityX = 0;
         velocityY = 0;
     }

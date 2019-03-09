@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.loaders.SkinLoader;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
@@ -21,11 +22,6 @@ public class MyAssetManager implements Disposable {
      * All the Sounds loaded in the the AssetManager
      */
     public void loadSounds() {
-
-        assetManager.load("sounds/bounce thicc.wav", Sound.class);
-        assetManager.load("sounds/bounce thoight.wav", Sound.class);
-        assetManager.load("sounds/bounce thwap.wav", Sound.class);
-        assetManager.load("sounds/bounce thwip.wav", Sound.class);
 
         assetManager.load("sounds/hit_wall.wav", Sound.class);
         assetManager.load("sounds/powerdown_moreballs.wav", Sound.class);
@@ -76,17 +72,7 @@ public class MyAssetManager implements Disposable {
      * All the Textures loaded in the the AssetManager
      */
     public void loadTextures() {
-
-        assetManager.load("images/game/earth.png", Texture.class);
-        assetManager.load("images/game/jupiter.png", Texture.class);
-        assetManager.load("images/game/mars.png", Texture.class);
-        assetManager.load("images/game/neptune.png", Texture.class);
-        assetManager.load("images/game/saturn.png", Texture.class);
-        assetManager.load("images/game/venus.png", Texture.class);
-        assetManager.load("images/game/mercury.png", Texture.class);
-
         assetManager.load("images/background/mainbg.jpg", Texture.class);
-
         assetManager.finishLoading();
     }
 
@@ -99,8 +85,9 @@ public class MyAssetManager implements Disposable {
     }
 
     public void queueGameImages(){
-        assetManager.load("images/game/game.atlas", TextureAtlas.class);
-        assetManager.load("images/objects/gameobjects.atlas", TextureAtlas.class);
+        assetManager.load("images/breakout/breakout.atlas", TextureAtlas.class);
+        assetManager.load("images/player/player.atlas", TextureAtlas.class);
+
     }
 
 

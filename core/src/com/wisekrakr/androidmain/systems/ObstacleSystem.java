@@ -29,13 +29,7 @@ public class ObstacleSystem extends IteratingSystem implements SystemEntityConte
         ObstacleComponent obstacleComponent = obstacleComponentMapper.get(entity);
         Box2dBodyComponent bodyComponent = bodyComponentMapper.get(entity);
 
-        if (bodyComponent.body.getPosition().x + obstacleComponent.width/2 > GameConstants.WORLD_WIDTH ||
-                bodyComponent.body.getPosition().x - obstacleComponent.width/2 < 0){
-            obstacleComponent.velocityX = -obstacleComponent.velocityX;
-        }else if (bodyComponent.body.getPosition().y + obstacleComponent.height/2 > GameConstants.WORLD_HEIGHT ||
-                bodyComponent.body.getPosition().y - obstacleComponent.height/2 < 0){
-            obstacleComponent.velocityY = -obstacleComponent.velocityY;
-        }
+        outOfBounds(entity, bodyComponent);
 
         if (obstacleComponent.destroy) {
            destroy(entity, bodyComponent);
@@ -52,7 +46,15 @@ public class ObstacleSystem extends IteratingSystem implements SystemEntityConte
 
     @Override
     public void outOfBounds(Entity entity, Box2dBodyComponent bodyComponent) {
+        ObstacleComponent obstacleComponent = obstacleComponentMapper.get(entity);
 
+        if (bodyComponent.body.getPosition().x + obstacleComponent.width/2 > GameConstants.WORLD_WIDTH ||
+                bodyComponent.body.getPosition().x - obstacleComponent.width/2 < 0){
+            obstacleComponent.velocityX = -obstacleComponent.velocityX;
+        }else if (bodyComponent.body.getPosition().y + obstacleComponent.height/2 > GameConstants.WORLD_HEIGHT ||
+                bodyComponent.body.getPosition().y - obstacleComponent.height/2 < 0){
+            obstacleComponent.velocityY = -obstacleComponent.velocityY;
+        }
     }
 
     @Override

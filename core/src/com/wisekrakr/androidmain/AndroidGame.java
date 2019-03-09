@@ -2,17 +2,12 @@ package com.wisekrakr.androidmain;
 
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.wisekrakr.androidmain.retainers.ScoreKeeper;
-import com.wisekrakr.androidmain.retainers.TimeKeeper;
 import com.wisekrakr.androidmain.screens.EndScreen;
-import com.wisekrakr.androidmain.screens.LevelSelectScreen;
+import com.wisekrakr.androidmain.screens.LevelCompleteScreen;
 import com.wisekrakr.androidmain.screens.LoadingScreen;
 import com.wisekrakr.androidmain.screens.MenuScreen;
 import com.wisekrakr.androidmain.screens.PlayScreen;
 import com.wisekrakr.androidmain.screens.PreferencesScreen;
-import com.wisekrakr.androidmain.systems.LevelGenerationSystem;
-import com.wisekrakr.androidmain.systems.RenderingSystem;
 
 public class AndroidGame extends Game {
 
@@ -23,7 +18,7 @@ public class AndroidGame extends Game {
 
 	private PreferencesScreen preferencesScreen;
 	private MenuScreen menuScreen;
-	private LevelSelectScreen levelSelectScreen;
+	private LevelCompleteScreen levelCompleteScreen;
 	private PlayScreen playScreen;
 	private EndScreen endScreen;
 
@@ -64,8 +59,8 @@ public class AndroidGame extends Game {
 				this.setScreen(preferencesScreen);
 				break;
 			case LEVELSELECTION:
-				if (levelSelectScreen == null) levelSelectScreen = new LevelSelectScreen(this);
-				this.setScreen(levelSelectScreen);
+				if (levelCompleteScreen == null) levelCompleteScreen = new LevelCompleteScreen(this);
+				this.setScreen(levelCompleteScreen);
 				break;
 			case APPLICATION:
 				if(playScreen == null) playScreen = new PlayScreen(this);

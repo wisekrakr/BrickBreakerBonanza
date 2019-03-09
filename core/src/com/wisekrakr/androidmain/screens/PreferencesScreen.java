@@ -94,6 +94,14 @@ public class PreferencesScreen extends ScreenAdapter {
             }
         });
 
+        final TextButton resetHighScores = new TextButton("Reset Highscore", skin);
+        resetHighScores.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.getGamePreferences().setHighScore(0);
+            }
+        });
+
         table.add(titleLabel);
         table.row();
         table.add(volumeMusicLabel);
@@ -107,6 +115,8 @@ public class PreferencesScreen extends ScreenAdapter {
         table.row();
         table.add(soundOnOffLabel);
         table.add(soundEffectsCheckbox);
+        table.row();
+        table.add(resetHighScores);
         table.row();
         table.add(backButton);
 

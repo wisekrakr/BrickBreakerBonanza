@@ -102,13 +102,10 @@ public class PlayScreen extends ScreenAdapter  {
                 delta
         );
 
-        visualizer.debugDrawable();
+//        visualizer.debugDrawableFilled();
+//        visualizer.debugDrawableLine();
 
-       // System.out.println(game.getGameThread().getEntityCreator().getTotalBalls().size());//todo remove
-
-        //touchControl.renderTouchControls();
-
-//        visualizer.draw();
+        visualizer.draw(delta);
 
 //        entityAudio.audioForAction(controls);
 //        entityAudio.audioForEntity();

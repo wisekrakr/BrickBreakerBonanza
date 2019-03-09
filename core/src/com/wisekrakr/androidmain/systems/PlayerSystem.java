@@ -9,6 +9,7 @@ import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.*;
 import com.wisekrakr.androidmain.helpers.PowerHelper;
+import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 
 import java.util.Iterator;
 
@@ -66,8 +67,6 @@ public class PlayerSystem extends IteratingSystem implements SystemEntityContext
 
         if (bodyComponent.body.getPosition().x + (playerComponent.width - playerComponent.width/2) > GameConstants.WORLD_WIDTH || bodyComponent.body.getPosition().x - (playerComponent.width - playerComponent.width/2) < 0){
             bodyComponent.body.setLinearVelocity(-bodyComponent.body.getLinearVelocity().x, 0);
-        }else if (bodyComponent.body.getPosition().y + playerComponent.height > GameConstants.WORLD_HEIGHT || bodyComponent.body.getPosition().y - playerComponent.height < 0){
-            bodyComponent.body.setLinearVelocity(0, -bodyComponent.body.getLinearVelocity().x);
         }
     }
 
@@ -78,8 +77,8 @@ public class PlayerSystem extends IteratingSystem implements SystemEntityContext
         Vector2 savedPosition = bodyComponent.body.getPosition();
         float initialWidth = playerComponent.width;
 
-        for (Entity ball: game.getGameThread().getEntityFactory().getTotalBalls()){
-            if (ball.getComponent(CollisionComponent.class).hitPower){
+        for (Entity power: game.getGameThread().getEntityFactory().getTotalPowers()){
+            if (power.getComponent(CollisionComponent.class).hitBall){
                 switch (PowerHelper.getPower()){
                     case SHORTEN_PLAYER:
                         destroy(entity, bodyComponent);
@@ -89,7 +88,7 @@ public class PlayerSystem extends IteratingSystem implements SystemEntityContext
                                 initialWidth /1.5f,
                                 GameConstants.PLAYER_HEIGHT
                         );
-//                        playerComponent.width = initialWidth;
+                        playerComponent.width = initialWidth;
                         break;
                     case ENLARGE_PLAYER:
                         destroy(entity, bodyComponent);
@@ -99,11 +98,10 @@ public class PlayerSystem extends IteratingSystem implements SystemEntityContext
                                 initialWidth *1.5f,
                                 GameConstants.PLAYER_HEIGHT
                         );
-//                        playerComponent.width = initialWidth;
+                        playerComponent.width = initialWidth;
                         break;
                     case EXTRA_LIFE:
-                        destroy(entity, bodyComponent);
-                        playerComponent.setLives(playerComponent.lives + 1);
+                        ScoreKeeper.setLives(ScoreKeeper.lives + 1);
                         break;
                 }
             }

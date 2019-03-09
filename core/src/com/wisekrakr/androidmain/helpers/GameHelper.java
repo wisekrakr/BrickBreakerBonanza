@@ -1,14 +1,14 @@
 package com.wisekrakr.androidmain.helpers;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.Box2dBodyComponent;
-import com.wisekrakr.androidmain.components.BrickComponent;
+import com.wisekrakr.androidmain.components.TypeComponent;
 
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class GameHelper {
@@ -34,20 +34,24 @@ public class GameHelper {
     }
 
     public static Vector2 notFilledPosition(AndroidGame game){
-        Vector2 filledPosition = new Vector2();
+        List<Vector2>positions = new ArrayList<Vector2>();
 
-        Iterator<Entity> iterator = game.getEngine().getEntities().iterator();
-        if (iterator.hasNext()){
-            Entity ent = iterator.next();
-            filledPosition = ent.getComponent(Box2dBodyComponent.class).body.getPosition();
-        }
-
-        Vector2 newPosition = GameHelper.randomPosition();
+        Vector2 newPosition = randomPosition();
         Vector2 bestPosition = new Vector2();
-        if (newPosition != filledPosition){
-            bestPosition.x = newPosition.x;
-            bestPosition.y = newPosition.y;
+
+        for (Entity entity: game.getEngine().getEntities()){
+            Vector2 filledPosition = entity.getComponent(Box2dBodyComponent.class).body.getPosition();
+            positions.add(filledPosition);
+
+            for (int i = positions.size() - 1; i > 0; i--) {
+//                System.out.println(entity.getComponent(TypeComponent.class).getType() + " - position: " + positions.get(i));
+
+                if (positions.get(i) != newPosition) {
+                    bestPosition = newPosition;
+                }
+            }
         }
+
         return bestPosition;
     }
 

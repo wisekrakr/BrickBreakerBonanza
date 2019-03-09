@@ -6,7 +6,6 @@ import com.wisekrakr.androidmain.factories.EntityFactory;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.Box2dBodyComponent;
 
-import com.wisekrakr.androidmain.components.PlayerComponent;
 import com.wisekrakr.androidmain.factories.LevelFactory;
 import com.wisekrakr.androidmain.helpers.GameHelper;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
@@ -38,8 +37,6 @@ public class LevelModel extends AbstractLevelContext{
         );
     }
 
-
-
     @Override
     public void startLevel(int numberOfLevel, int columns, int rows) {
         constantEntities();
@@ -53,7 +50,7 @@ public class LevelModel extends AbstractLevelContext{
 
         powerImplementation.getPowerContext().init();
 
-        if (entityFactory.getPlayer().getComponent(PlayerComponent.class).lives == 0){
+        if (ScoreKeeper.lives == 0){
             gameOver(numberOfLevel);
         }else {
             for (Entity entity: game.getGameThread().getEntityFactory().getTotalPowers()){
@@ -96,5 +93,7 @@ public class LevelModel extends AbstractLevelContext{
         entityFactory.getTotalObstacles().clear();
         entityFactory.getTotalBalls().clear();
         entityFactory.getTotalPowers().clear();
+
+        LevelFactory.dispatch();
     }
 }

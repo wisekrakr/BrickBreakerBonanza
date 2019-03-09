@@ -28,8 +28,6 @@ public class CollisionSystem extends IteratingSystem {
 
         TypeComponent thisType = ComponentMapper.getFor(TypeComponent.class).get(entity);
 
-        //todo change power part ===> no longer hitPower in powerimplement  but hitball for power
-
         if (thisType.getType().equals(TypeComponent.Type.BALL)){
             if (collidedEntity != null) {
                 TypeComponent typeComponent = collidedEntity.getComponent(TypeComponent.class);
@@ -42,7 +40,6 @@ public class CollisionSystem extends IteratingSystem {
                         case POWER:
                             collisionComponent.setHitPower(true);
                             collisionComponentMapper.get(collidedEntity).setHitBall(true);
-                            System.out.println(StringHelper.ANSI_RED_BACKGROUND + "Ball hit Power" + StringHelper.ANSI_RESET); //todo remove
                             break;
                         case SCENERY:
                             collisionComponent.setHitSurface(true);
@@ -53,7 +50,6 @@ public class CollisionSystem extends IteratingSystem {
                         case PLAYER:
                             collisionComponent.setHitPlayer(true);
                             collisionComponentMapper.get(collidedEntity).setHitBall(true);
-                            System.out.println(StringHelper.ANSI_CYAN_BACKGROUND + "Ball hit Player" + StringHelper.ANSI_RESET);//todo remove
                             break;
                         default:
                             //System.out.println("ball: No matching type found " );
@@ -69,9 +65,8 @@ public class CollisionSystem extends IteratingSystem {
                     if (typeComponent.getType() == TypeComponent.Type.BALL) {
                         collisionComponent.setHitBall(true);
                         collidedEntity.getComponent(CollisionComponent.class).setHitPower(true);
-                        System.out.println(StringHelper.ANSI_GREEN_BACKGROUND + "Power hit Ball" + StringHelper.ANSI_RESET); //todo remove
                     }
-                    collisionComponent.collisionEntity = null;//
+                    collisionComponent.collisionEntity = null;
                 }
             }
         }else if (thisType.getType().equals(TypeComponent.Type.BRICK)) {
@@ -90,8 +85,8 @@ public class CollisionSystem extends IteratingSystem {
                 TypeComponent typeComponent = collidedEntity.getComponent(TypeComponent.class);
                 if (typeComponent != null) {
                     if (typeComponent.getType() == TypeComponent.Type.BALL) {
+                        collisionComponent.setHitBall(true);
                         collisionComponentMapper.get(collidedEntity).setHitPlayer(true);
-                        System.out.println("player hit ball");//todo remove
                     }
                     collisionComponent.collisionEntity = null;
                 }

@@ -17,13 +17,13 @@ import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.GamePreferences;
 
-public class LevelSelectScreen extends ScreenAdapter {
+public class LevelCompleteScreen extends ScreenAdapter {
 
     private final GamePreferences preferences;
     private AndroidGame game;
     private Stage stage;
 
-    public LevelSelectScreen(AndroidGame game) {
+    public LevelCompleteScreen(AndroidGame game) {
         this.game = game;
 
         stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
@@ -40,10 +40,13 @@ public class LevelSelectScreen extends ScreenAdapter {
         table.setFillParent(true);
 
         BitmapFont font = game.assetManager().assetManager.get("font/gamerFont.fnt");
-        font.getData().setScale((GameConstants.WORLD_WIDTH/100)/10);
+        font.getData().setScale(GameConstants.FONT_SCALE);
 
         Skin skin = game.assetManager().assetManager.get(String.valueOf(Gdx.files.internal("font/flat-earth-ui.json")));
 
+        Label highScoreTextLabel = new Label("HIGH SCORE" , new Label.LabelStyle(font, Color.LIME));
+        Label highScoreLabel = new Label(game.getGamePreferences().getHighScore() + " on " +
+                game.getGameThread().getTimeKeeper().getDate(), new Label.LabelStyle(font, Color.LIME));
         Label playAgainLabel = new Label("play another one?", new Label.LabelStyle(font, Color.LIME));
 
         TextButton nextLevel = new TextButton("next level", skin);
@@ -54,7 +57,10 @@ public class LevelSelectScreen extends ScreenAdapter {
         table.add(nextLevel).uniformX();
         table.row();
         table.add(mainMenu).uniformX();
-
+        table.row();
+        table.add(highScoreTextLabel).uniformX().padTop(50);
+        table.row();
+        table.add(highScoreLabel).uniformX().padTop(10);
 
         nextLevel.addListener(new ChangeListener() {
             @Override
@@ -79,10 +85,17 @@ public class LevelSelectScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act();
         stage.draw();
+
+
     }
 
     @Override
     public void resize (int width, int height) {
         stage.getViewport().update(width, height, true);
+    }
+
+    @Override
+    public void dispose() {
+        stage.dispose();
     }
 }

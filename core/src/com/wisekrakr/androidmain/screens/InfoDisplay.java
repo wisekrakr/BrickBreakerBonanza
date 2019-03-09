@@ -14,6 +14,7 @@ import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.CollisionComponent;
 import com.wisekrakr.androidmain.components.PlayerComponent;
+import com.wisekrakr.androidmain.helpers.LabelFormatter;
 import com.wisekrakr.androidmain.helpers.LabelHelper;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 import com.wisekrakr.androidmain.retainers.TimeKeeper;
@@ -28,6 +29,7 @@ public class InfoDisplay implements Disposable {
     private Integer score;
     private Integer bounces;
     private Integer lives;
+
     private Label scoreCountLabel;
     private Label scoreAddedLabel;
     private Label multiplierLabel;
@@ -59,7 +61,7 @@ public class InfoDisplay implements Disposable {
         stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
         BitmapFont font = game.assetManager().assetManager.get("font/gamerFont.fnt");
-        font.getData().setScale((GameConstants.WORLD_WIDTH/100)/5);
+        font.getData().setScale(GameConstants.FONT_SCALE);
 
         levelLabel = LabelHelper.label("Level", font, Color.WHITE);
         levelNumberLabel = LabelHelper.label(levelNumber != null ? levelNumber.toString() : null, font, Color.GOLDENROD);
@@ -134,7 +136,7 @@ public class InfoDisplay implements Disposable {
 
             bounces();
             multiplier();
-            lives();
+            lives(delta);
         }
     }
 
@@ -170,11 +172,15 @@ public class InfoDisplay implements Disposable {
         }
     }
 
-    private void lives(){
-        int b = game.getGameThread().getEntityFactory().getPlayer().getComponent(PlayerComponent.class).lives;
+    private void lives(float delta){
+        LabelFormatter formatter = new LabelFormatter(Integer.toString(ScoreKeeper.lives));
 
-        livesNumberLabel.setText(Integer.toString(b));
+
+        livesNumberLabel.setText(formatter.getText(delta));
+
+
     }
+
 
     @Override
     public void dispose() {

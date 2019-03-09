@@ -3,8 +3,6 @@ package com.wisekrakr.androidmain.components;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
-import com.wisekrakr.androidmain.helpers.GameHelper;
-import com.wisekrakr.androidmain.systems.SystemEntityContext;
 
 public class BrickComponent implements Component, Pool.Poolable {
 
@@ -18,25 +16,24 @@ public class BrickComponent implements Component, Pool.Poolable {
         this.outOfBounds = outOfBounds;
     }
 
-    public enum BrickColor {
-        RED, BLUE, YELLOW, GREEN, PURPLE, ORANGE, CYAN
+    private EntityColor entityColor = null;
+
+    public BrickColorContext getBrickColorContext() {
+        return brickColorContext;
     }
 
-    private static BrickColor[] brickColors = BrickColor.values();
+    private BrickColorContext brickColorContext = new BrickColorContext() {
 
-    public static BrickColor randomBrickColor(){
-        return brickColors[GameHelper.randomGenerator.nextInt(brickColors.length)];
-    }
+        @Override
+        public EntityColor getBrickColor() {
+            return entityColor;
+        }
 
-    private BrickColor brickColor;
-
-    public BrickColor getBrickColor() {
-        return brickColor;
-    }
-
-    public void setBrickColor(BrickColor brickColor) {
-        this.brickColor = brickColor;
-    }
+        @Override
+        public void setBrickColor(EntityColor color) {
+            entityColor = color;
+        }
+    };
 
     public Vector2 position = new Vector2();
 
@@ -45,7 +42,9 @@ public class BrickComponent implements Component, Pool.Poolable {
 
     @Override
     public void reset() {
-        brickColor = null;
+        destroy = false;
+        outOfBounds = false;
+        entityColor = null;
         position = new Vector2();
         width = 0f;
         height = 0f;

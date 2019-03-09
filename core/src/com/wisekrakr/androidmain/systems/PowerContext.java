@@ -7,7 +7,7 @@ public interface PowerContext {
     void init();
     void spawnPower();
     void respite(Entity power);
-    void powerTime();
-    void exit();
+    void powerTime(Entity entity);
+    void exit(Entity entity);
 
 }

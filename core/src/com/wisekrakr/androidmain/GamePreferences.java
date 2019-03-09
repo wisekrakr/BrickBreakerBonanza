@@ -9,8 +9,8 @@ public class GamePreferences {
     private static final String PREF_MUSIC_ENABLED = "music.enabled";
     private static final String PREF_SOUND_ENABLED = "sound.enabled";
     private static final String PREF_SOUND_VOL = "sound";
-    private static final String PREFS_NAME = "bigballs";
-    private static final String HIGH_SCORES = "highscores";
+    private static final String PREFS_NAME = "breakout";
+    private static final String HIGHSCORE = "highscore";
 
     private static final String COMPLETED = "completed";
     private static final String ONGOING = "ongoing";
@@ -64,12 +64,12 @@ public class GamePreferences {
         getPrefs().flush();
     }
 
-    public int getHighScores(){
-        return getPrefs().getInteger(HIGH_SCORES);
+    public int getHighScore(){
+        return getPrefs().getInteger(HIGHSCORE);
     }
 
     public void setHighScore(int score){
-        getPrefs().putInteger(HIGH_SCORES, score);
+        getPrefs().putInteger(HIGHSCORE, score);
         getPrefs().flush();
     }
 

@@ -23,11 +23,10 @@ public class ComponentHelper {
 
 
         @Override
-        public void typeComponent(PooledEngine engine, Entity mainEntity, TypeComponent.Type type, TypeComponent.Tag tag) {
+        public void typeComponent(PooledEngine engine, Entity mainEntity, TypeComponent.Type type) {
             TypeComponent typeComponent = engine.createComponent(TypeComponent.class);
 
             typeComponent.setType(type);
-            typeComponent.tag = tag;
 
             mainEntity.add(typeComponent);
         }
@@ -74,14 +73,14 @@ public class ComponentHelper {
         }
 
         @Override
-        public void brickComponent(PooledEngine engine, Entity mainEntity, Box2dBodyComponent bodyComponent, float width, float height, BrickComponent.BrickColor color) {
+        public void brickComponent(PooledEngine engine, Entity mainEntity, Box2dBodyComponent bodyComponent, float width, float height, EntityColor color) {
             BrickComponent brickComponent = engine.createComponent(BrickComponent.class);
 
             brickComponent.position = bodyComponent.body.getPosition();
             brickComponent.width = width;
             brickComponent.height = height;
 
-            brickComponent.setBrickColor(color);
+            brickComponent.getBrickColorContext().setBrickColor(color);
 
             mainEntity.add(brickComponent);
         }
@@ -100,10 +99,11 @@ public class ComponentHelper {
         }
 
         @Override
-        public void powerUpComponent(PooledEngine engine, Entity mainEntity, Box2dBodyComponent bodyComponent, float velocityX, float velocityY, float radius) {
+        public void powerUpComponent(PooledEngine engine, Entity mainEntity, Box2dBodyComponent bodyComponent, float velocityX, float velocityY, float width, float height) {
             PowerUpComponent powerUpComponent = engine.createComponent(PowerUpComponent.class);
 
-            powerUpComponent.radius = radius;
+            powerUpComponent.width = width;
+            powerUpComponent.height = height;
             powerUpComponent.velocityX = velocityX;
             powerUpComponent.velocityY = velocityY;
             powerUpComponent.position = bodyComponent.body.getPosition();

@@ -8,21 +8,21 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.wisekrakr.androidmain.AndroidGame;
+import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.*;
 import com.wisekrakr.androidmain.controls.Controls;
 import com.wisekrakr.androidmain.helpers.GameHelper;
 
+import java.awt.*;
 import java.util.List;
 
 public class PlayerControlSystem extends IteratingSystem {
 
-    private ComponentMapper<BallComponent>ballComponentMapper;
     private ComponentMapper<PlayerComponent> playerComponentMapper;
     private ComponentMapper<Box2dBodyComponent> box2dBodyComponentMapper;
     private AndroidGame game;
     private Controls controller;
     private OrthographicCamera camera;
-
 
     @SuppressWarnings("unchecked")
     public PlayerControlSystem(AndroidGame game, Controls controls, OrthographicCamera camera) {
@@ -33,7 +33,6 @@ public class PlayerControlSystem extends IteratingSystem {
 
         playerComponentMapper = ComponentMapper.getFor(PlayerComponent.class);
         box2dBodyComponentMapper = ComponentMapper.getFor(Box2dBodyComponent.class);
-        ballComponentMapper = ComponentMapper.getFor(BallComponent.class);
     }
 
     @Override
@@ -54,15 +53,19 @@ public class PlayerControlSystem extends IteratingSystem {
             List<Entity>removeList = game.getGameThread().getEntityFactory().getTotalBricks();
             if (removeList.size() > 0) {
                 for (Entity ent : removeList) {
-                    ent.getComponent(BrickComponent.class).setDestroy(true);
+                    if (ent != null) {
+                        ent.getComponent(BrickComponent.class).setDestroy(true);
+                    }
                 }
             }
         }
 
-        //todo mouse input takes the screenwidth and not worldwidth (1080 not 240)
-
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 
+        if (controller.isRightMouseDown) {
+            System.out.println("X= " + (mousePos.x / 2.5f) + " , Y= " + (mousePos.y / 2.5)); //todo remove
+
+        }
         camera.unproject(mousePos);
 
         float speed = 1000000000f;
@@ -72,7 +75,7 @@ public class PlayerControlSystem extends IteratingSystem {
 
         if (!game.getGameThread().getEntityFactory().getTotalBalls().isEmpty()) {
             if (!playerComponent.hasBall) {
-                if (controller.isLeftMouseDown || Gdx.input.isTouched()) {
+                if (controller.isLeftMouseDown) { // || Gdx.input.isTouched()
                     playerComponent.setHasBall(true);
 
                     float length = (float) Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
@@ -96,13 +99,20 @@ public class PlayerControlSystem extends IteratingSystem {
             }
 
             if (controller.speedUp) { //spacebar
-                game.getGameThread().getEntityFactory().getTotalBalls().get(0).getComponent(
-                        Box2dBodyComponent.class).body.applyForceToCenter(
-                        GameHelper.randomDirection() * speed, GameHelper.randomDirection() * speed, true
-                );
+                if (game.getGameThread().getTimeKeeper().gameClock - game.getGameThread().getTimeKeeper().speedUp > 10) {
+                    game.getGameThread().getTimeKeeper().speedUp = game.getGameThread().getTimeKeeper().gameClock;
+
+                    game.getGameThread().getEntityFactory().getTotalBalls().get(0).getComponent(
+                            Box2dBodyComponent.class).body.applyForceToCenter(
+                            bodyComponent.body.getPosition().x + GameHelper.randomDirection() * speed,
+                            bodyComponent.body.getPosition().y + GameHelper.randomDirection() * speed,
+                            true
+                    );
+                }
+
             }
         }else {
-            System.out.println("no balls to play with");
+            System.out.println(getClass().toString()+  " no balls to play with");
         }
     }
 }

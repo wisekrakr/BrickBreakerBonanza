@@ -38,5 +38,7 @@ public class BallComponent implements Component, Pool.Poolable {
         position = new Vector2();
         radius = 0;
         initialBalls = 1;
+        destroy = false;
+        outOfBounds = false;
     }
 }

@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
+import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 
 public class EndScreen extends ScreenAdapter {
 
@@ -24,7 +25,7 @@ public class EndScreen extends ScreenAdapter {
     public EndScreen(AndroidGame game) {
         this.game = game;
 
-        stage = new Stage(new FitViewport(GameConstants.WORLD_WIDTH, GameConstants.WORLD_HEIGHT));
+        stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
     }
 
     @Override
@@ -36,10 +37,14 @@ public class EndScreen extends ScreenAdapter {
         table.setFillParent(true);
 
         BitmapFont font = game.assetManager().assetManager.get("font/gamerFont.fnt");
-        font.getData().setScale((GameConstants.WORLD_WIDTH/100)/5);
+        font.getData().setScale(GameConstants.FONT_SCALE);
 
         Skin skin = game.assetManager().assetManager.get(String.valueOf(Gdx.files.internal("font/flat-earth-ui.json")));
 
+        Label currentScoreTextLabel = new Label("YOUR SCORE:", new Label.LabelStyle(font, Color.LIME));
+        Label highScoreTextLabel = new Label("HIGH SCORE:", new Label.LabelStyle(font, Color.LIME));
+        Label currentScoreLabel = new Label(Integer.toString(ScoreKeeper.getScore()), new Label.LabelStyle(font, Color.LIME));
+        Label highScoreLabel = new Label(Integer.toString(game.getGamePreferences().getHighScore()), new Label.LabelStyle(font, Color.LIME));
         Label gameOverLabel = new Label("GAME OVER", new Label.LabelStyle(font, Color.RED));
 
         TextButton mainMenu = new TextButton("main menu", skin);
@@ -47,10 +52,17 @@ public class EndScreen extends ScreenAdapter {
 
         table.add(gameOverLabel).expandX();
         table.row();
-
         table.add(mainMenu).uniformX();
         table.row();
         table.add(exit).uniformX();
+        table.row();
+        table.add(currentScoreTextLabel).uniformX().padTop(50);
+        table.row();
+        table.add(currentScoreLabel).uniformX().padTop(10);
+        table.row();
+        table.add(highScoreTextLabel).uniformX().padTop(50);
+        table.row();
+        table.add(highScoreLabel).uniformX().padTop(10);
 
         exit.addListener(new ChangeListener() {
             @Override
@@ -78,6 +90,10 @@ public class EndScreen extends ScreenAdapter {
         stage.draw();
     }
 
+    @Override
+    public void resize(int width, int height) {
+        stage.getViewport().update(width, height);
+    }
 
     @Override
     public void dispose() {
