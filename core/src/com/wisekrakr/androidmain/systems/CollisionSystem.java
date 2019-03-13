@@ -33,10 +33,6 @@ public class CollisionSystem extends IteratingSystem {
                 TypeComponent typeComponent = collidedEntity.getComponent(TypeComponent.class);
                 if (typeComponent != null) {
                     switch (typeComponent.getType()) {
-                        case BRICK:
-                            collisionComponent.setHitEntity(true);
-                            collisionComponentMapper.get(collidedEntity).setHitBall(true);
-                            break;
                         case POWER:
                             collisionComponent.setHitPower(true);
                             collisionComponentMapper.get(collidedEntity).setHitBall(true);
@@ -49,33 +45,21 @@ public class CollisionSystem extends IteratingSystem {
                             break;
                         case PLAYER:
                             collisionComponent.setHitPlayer(true);
-                            collisionComponentMapper.get(collidedEntity).setHitBall(true);
+                            System.out.println(StringHelper.ANSI_RED_BACKGROUND +"Ball hit Player" + StringHelper.ANSI_RESET);
                             break;
                         default:
                             //System.out.println("ball: No matching type found " );
                     }
                     collisionComponent.collisionEntity = null;
-                    collisionComponent.setHitEntity(false);
                 }
             }
         }else if (thisType.getType().equals(TypeComponent.Type.POWER)) {
             if (collidedEntity != null) {
                 TypeComponent typeComponent = collidedEntity.getComponent(TypeComponent.class);
                 if (typeComponent != null) {
-                    if (typeComponent.getType() == TypeComponent.Type.BALL) {
-                        collisionComponent.setHitBall(true);
+                    if (typeComponent.getType() == TypeComponent.Type.PLAYER) {
+                        collisionComponent.setHitPlayer(true);
                         collidedEntity.getComponent(CollisionComponent.class).setHitPower(true);
-                    }
-                    collisionComponent.collisionEntity = null;
-                }
-            }
-        }else if (thisType.getType().equals(TypeComponent.Type.BRICK)) {
-            if (collidedEntity != null) {
-                TypeComponent typeComponent = collidedEntity.getComponent(TypeComponent.class);
-                if (typeComponent != null) {
-                    if (typeComponent.getType() == TypeComponent.Type.BALL) {
-                        collisionComponent.setHitBall(true);
-                        collisionComponentMapper.get(collidedEntity).setHitEntity(true);
                     }
                     collisionComponent.collisionEntity = null;
                 }
@@ -87,6 +71,7 @@ public class CollisionSystem extends IteratingSystem {
                     if (typeComponent.getType() == TypeComponent.Type.BALL) {
                         collisionComponent.setHitBall(true);
                         collisionComponentMapper.get(collidedEntity).setHitPlayer(true);
+                        System.out.println(StringHelper.ANSI_GREEN_BACKGROUND +"Player hit Ball" + StringHelper.ANSI_RESET);
                     }
                     collisionComponent.collisionEntity = null;
                 }

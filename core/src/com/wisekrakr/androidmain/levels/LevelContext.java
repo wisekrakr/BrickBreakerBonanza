@@ -4,7 +4,7 @@ public interface LevelContext {
 
     void init();
 
-    void startLevel(int numberOfLevel, int rows, int columns);
+    void startLevel(int numberOfLevel);
 
     void updateLevel(int numberOfLevel, float delta);
 

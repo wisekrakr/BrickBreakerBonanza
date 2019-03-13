@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.wisekrakr.androidmain.AndroidGame;
@@ -24,6 +25,7 @@ public class PlayScreen extends ScreenAdapter  {
     private Visualizer visualizer;
     private InfoDisplay infoDisplay;
     private TouchControl touchControl;
+
 
 //    private EntityAudio entityAudio;
 
@@ -50,8 +52,9 @@ public class PlayScreen extends ScreenAdapter  {
 
         game.getGameThread().getLevelGenerationSystem().init();
 
+//        game.getEngine().addSystem(new GameObjectSystem(game));
+
         game.getEngine().addSystem(new PlayerSystem(game));
-        game.getEngine().addSystem(new BrickSystem(game));
         game.getEngine().addSystem(new BallSystem(game));
 
         visualizer = new Visualizer(game);
@@ -61,7 +64,7 @@ public class PlayScreen extends ScreenAdapter  {
         game.getEngine().addSystem(new PlayerControlSystem(game, controls, visualizer.getRenderingSystem().getCamera()));
         game.getEngine().addSystem(new CollisionSystem());
 
-        game.getEngine().addSystem(new ObstacleSystem(game));
+//        game.getEngine().addSystem(new ObstacleSystem(game));
 
     }
     private void mapLoading() {
@@ -102,10 +105,10 @@ public class PlayScreen extends ScreenAdapter  {
                 delta
         );
 
-//        visualizer.debugDrawableFilled();
-//        visualizer.debugDrawableLine();
+        visualizer.debugDrawableFilled();
+        visualizer.debugDrawableLine(delta);
 
-        visualizer.draw(delta);
+//        visualizer.draw(delta);
 
 //        entityAudio.audioForAction(controls);
 //        entityAudio.audioForEntity();

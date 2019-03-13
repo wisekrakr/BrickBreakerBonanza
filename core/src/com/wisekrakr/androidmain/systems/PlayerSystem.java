@@ -11,111 +11,99 @@ import com.wisekrakr.androidmain.components.*;
 import com.wisekrakr.androidmain.helpers.PowerHelper;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 
-import java.util.Iterator;
-
 public class PlayerSystem extends IteratingSystem implements SystemEntityContext {
 
     private AndroidGame game;
 
-    private ComponentMapper<Box2dBodyComponent> bodyComponentMapper;
-    private ComponentMapper<PlayerComponent>playerComponentMapper;
-
     @SuppressWarnings("unchecked")
     public PlayerSystem(AndroidGame game){
-        super(Family.all(PlayerComponent.class).get());
+        super(Family.all(PlayerComponent.class, GameObjectComponent.class).get());
         this.game = game;
 
-        bodyComponentMapper = ComponentMapper.getFor(Box2dBodyComponent.class);
-        playerComponentMapper = ComponentMapper.getFor(PlayerComponent.class);
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        PlayerComponent playerComponent = playerComponentMapper.get(entity);
-        Box2dBodyComponent bodyComponent = bodyComponentMapper.get(entity);
+        PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
+        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
+        CollisionComponent collisionComponent = game.getGameThread().getComponentMapperSystem().getCollisionComponentMapper().get(entity);
+        GameObjectComponent gameObjectComponent = game.getGameThread().getComponentMapperSystem().getGameObjectComponentMapper().get(entity);
 
-        Iterator<Entity>iterator = game.getGameThread().getEntityFactory().getTotalBalls().iterator();
-        if (iterator.hasNext()){
-            Entity ent = iterator.next();
-            if (!playerComponent.hasBall) {
-                bodyComponentMapper.get(ent).body.setTransform(new Vector2(
-                        bodyComponent.body.getPosition().x,
-                        bodyComponent.body.getPosition().y + ent.getComponent(BallComponent.class).radius
-                ), 0);
+        if (collisionComponent.hitBall){
+            destroy(entity,bodyComponent, gameObjectComponent);
+            gameObjectComponent.setDestroy(true);
+            for (Entity ball: game.getEngine().getEntities()){
+                if (ball.getComponent(TypeComponent.class).getType()== TypeComponent.Type.BALL) {
+                    ball.getComponent(GameObjectComponent.class).setDestroy(true);
+                }
             }
-        }else {
-            if (game.getGameThread().getEntityFactory().getTotalBalls().size() <= 0) {
-                spawnBall(entity);
-                System.out.println("Player gets new ball");
+            if (gameObjectComponent.destroy && ScoreKeeper.lives > 0){
+                spawnNewPlayer();
+                playerComponent.setMoving(false);
+                collisionComponent.setHitBall(false);
             }
         }
 
-        outOfBounds(entity, bodyComponent);
-        powerHandler(entity, bodyComponent);
+        outOfBounds(entity, bodyComponent, gameObjectComponent);
+        powerHandler(entity, bodyComponent, gameObjectComponent);
     }
 
     @Override
-    public void destroy(Entity entity, Box2dBodyComponent bodyComponent) {
-        PlayerComponent playerComponent = playerComponentMapper.get(entity);
+    public void destroy(Entity entity, Box2dBodyComponent bodyComponent, GameObjectComponent gameObjectComponent) {
+        ScoreKeeper.setLives(ScoreKeeper.lives - 1);
         bodyComponent.isDead = true;
-        playerComponent.setDestroy(true);
+
+        gameObjectComponent.setDestroy(false);
     }
 
     @Override
-    public void outOfBounds(Entity entity, Box2dBodyComponent bodyComponent){
-        PlayerComponent playerComponent = playerComponentMapper.get(entity);
+    public void outOfBounds(Entity entity, Box2dBodyComponent bodyComponent, GameObjectComponent gameObjectComponent){
 
-        if (bodyComponent.body.getPosition().x + (playerComponent.width - playerComponent.width/2) > GameConstants.WORLD_WIDTH || bodyComponent.body.getPosition().x - (playerComponent.width - playerComponent.width/2) < 0){
+        if (bodyComponent.body.getPosition().x + gameObjectComponent.radius > GameConstants.WORLD_WIDTH ||
+                bodyComponent.body.getPosition().x - gameObjectComponent.radius < 0){
             bodyComponent.body.setLinearVelocity(-bodyComponent.body.getLinearVelocity().x, 0);
         }
     }
 
     @Override
-    public void powerHandler(Entity entity, Box2dBodyComponent bodyComponent) {
-        PlayerComponent playerComponent = playerComponentMapper.get(entity);
+    public void powerHandler(Entity entity, Box2dBodyComponent bodyComponent, GameObjectComponent gameObjectComponent) {
 
         Vector2 savedPosition = bodyComponent.body.getPosition();
-        float initialWidth = playerComponent.width;
+        float initialRadius = gameObjectComponent.radius;
 
-        for (Entity power: game.getGameThread().getEntityFactory().getTotalPowers()){
-            if (power.getComponent(CollisionComponent.class).hitBall){
-                switch (PowerHelper.getPower()){
-                    case SHORTEN_PLAYER:
-                        destroy(entity, bodyComponent);
-                        game.getGameThread().getEntityFactory().createPlayer(
-                                savedPosition.x,
-                                savedPosition.y,
-                                initialWidth /1.5f,
-                                GameConstants.PLAYER_HEIGHT
-                        );
-                        playerComponent.width = initialWidth;
-                        break;
-                    case ENLARGE_PLAYER:
-                        destroy(entity, bodyComponent);
-                        game.getGameThread().getEntityFactory().createPlayer(
-                                savedPosition.x,
-                                savedPosition.y,
-                                initialWidth *1.5f,
-                                GameConstants.PLAYER_HEIGHT
-                        );
-                        playerComponent.width = initialWidth;
-                        break;
-                    case EXTRA_LIFE:
-                        ScoreKeeper.setLives(ScoreKeeper.lives + 1);
-                        break;
+        for (Entity power: game.getGameThread().getEntityFactory().getGameObjects()){
+            if (power.getComponent(TypeComponent.class).getType() == TypeComponent.Type.POWER) {
+                if (power.getComponent(CollisionComponent.class).hitBall) {
+                    switch (PowerHelper.getPower()) {
+                        case REDUCE_PLAYER:
+                            destroy(entity, bodyComponent, gameObjectComponent);
+                            game.getGameThread().getEntityFactory().createPlayer(
+                                    savedPosition.x,
+                                    savedPosition.y
+                            );
+                            gameObjectComponent.radius = initialRadius;
+                            break;
+                        case ENLARGE_PLAYER:
+                            destroy(entity, bodyComponent, gameObjectComponent);
+                            game.getGameThread().getEntityFactory().createPlayer(
+                                    savedPosition.x,
+                                    savedPosition.y
+                            );
+                            gameObjectComponent.radius = initialRadius;
+                            break;
+                        case EXTRA_LIFE:
+                            ScoreKeeper.setLives(ScoreKeeper.lives + 1);
+                            break;
+                    }
                 }
             }
         }
 
     }
 
-    private void spawnBall(Entity player){
-        Box2dBodyComponent bodyComponent = bodyComponentMapper.get(player);
-
-        game.getGameThread().getEntityFactory().createBall(
-                bodyComponent.body.getPosition().x,
-                bodyComponent.body.getPosition().y + GameConstants.BALL_RADIUS
+    private void spawnNewPlayer(){
+        game.getGameThread().getEntityFactory().createPlayer(
+                GameConstants.WORLD_WIDTH/2, GameConstants.WORLD_HEIGHT/2
         );
-        player.getComponent(PlayerComponent.class).setHasBall(false);
     }
 }

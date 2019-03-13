@@ -13,8 +13,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.CollisionComponent;
-import com.wisekrakr.androidmain.components.PlayerComponent;
-import com.wisekrakr.androidmain.helpers.LabelFormatter;
 import com.wisekrakr.androidmain.helpers.LabelHelper;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 import com.wisekrakr.androidmain.retainers.TimeKeeper;
@@ -24,26 +22,21 @@ import java.util.Iterator;
 
 public class InfoDisplay implements Disposable {
 
-    private Integer bricksLeft;
+
     private Integer levelNumber;
     private Integer score;
     private Integer bounces;
     private Integer lives;
+    private Integer balls;
 
     private Label scoreCountLabel;
     private Label scoreAddedLabel;
     private Label multiplierLabel;
     private Integer worldTimer;
     private Label timeCountLabel;
-    private Label timeLabel;
-    private Label scoreLabel;
-    private Label levelLabel;
     private Label levelNumberLabel;
-    private Label brickNameLabel;
-    private Label brickNumberLabel;
-    private Label bounceLabel;
+    private Label ballNumberLabel;
     private Label bounceNumberLabel;
-    private Label livesLabel;
     private Label livesNumberLabel;
 
     private AndroidGame game;
@@ -63,19 +56,19 @@ public class InfoDisplay implements Disposable {
         BitmapFont font = game.assetManager().assetManager.get("font/gamerFont.fnt");
         font.getData().setScale(GameConstants.FONT_SCALE);
 
-        levelLabel = LabelHelper.label("Level", font, Color.WHITE);
+        Label levelLabel = LabelHelper.label("Level", font, Color.WHITE);
         levelNumberLabel = LabelHelper.label(levelNumber != null ? levelNumber.toString() : null, font, Color.GOLDENROD);
-        timeLabel = LabelHelper.label("TIME", font, Color.WHITE);
+        Label timeLabel = LabelHelper.label("TIME", font, Color.WHITE);
         timeCountLabel =LabelHelper.label(worldTimer != null ? worldTimer.toString() : null, font, Color.GOLDENROD);
-        scoreLabel = LabelHelper.label("Score", font, Color.WHITE);
+        Label scoreLabel = LabelHelper.label("Score", font, Color.WHITE);
         scoreCountLabel =LabelHelper.label(score != null ? score.toString() : null, font, Color.GOLDENROD);
         scoreAddedLabel =LabelHelper.label(currentScore != null ? currentScore.toString() : null, font, Color.GREEN);
         multiplierLabel = LabelHelper.label(multi != null ? multi.toString() : null, font, Color.PINK);
-        brickNameLabel = LabelHelper.label("Bricks left", font, Color.WHITE);
-        brickNumberLabel = LabelHelper.label(bricksLeft != null ? bricksLeft.toString() : null, font, Color.GOLDENROD);
-        bounceLabel = LabelHelper.label("Bounces", font, Color.WHITE);
+        Label ballNameLabel = LabelHelper.label("Balls to Dodge", font, Color.WHITE);
+        ballNumberLabel = LabelHelper.label(balls != null ? balls.toString() : null, font, Color.GOLDENROD);
+        Label bounceLabel = LabelHelper.label("Bounces", font, Color.WHITE);
         bounceNumberLabel = LabelHelper.label(bounces != null ? bounces.toString() : null, font, Color.GOLDENROD);
-        livesLabel = LabelHelper.label("Lives left", font, Color.WHITE);
+        Label livesLabel = LabelHelper.label("Lives left", font, Color.WHITE);
         livesNumberLabel = LabelHelper.label(lives != null ? lives.toString() : null, font, Color.GOLDENROD);
 
         Table tableLeft = new Table();
@@ -90,9 +83,9 @@ public class InfoDisplay implements Disposable {
         tableRight.row();
         tableRight.add(levelNumberLabel).padTop(2);
         tableRight.row();
-        tableRight.add(brickNameLabel);
+        tableRight.add(ballNameLabel);
         tableRight.row();
-        tableRight.add(brickNumberLabel);
+        tableRight.add(ballNumberLabel);
         tableRight.row();
         tableRight.add(bounceLabel).padBottom(2);
         tableRight.row();
@@ -132,11 +125,11 @@ public class InfoDisplay implements Disposable {
             scoreAdded();
 
             levelNumberLabel.setText(Integer.toString(game.getGameThread().getLevelGenerationSystem().getMainLevel()));
-            brickNumberLabel.setText(Integer.toString(game.getGameThread().getEntityFactory().getTotalBricks().size()));
+            ballNumberLabel.setText(Integer.toString(game.getGameThread().getEntityFactory().getGameObjects().size()));
 
             bounces();
             multiplier();
-            lives(delta);
+            lives();
         }
     }
 
@@ -153,7 +146,7 @@ public class InfoDisplay implements Disposable {
     }
 
     private void bounces(){
-        Iterator<Entity>iterator = game.getGameThread().getEntityFactory().getTotalBalls().iterator();
+        Iterator<Entity>iterator = game.getGameThread().getEntityFactory().getGameObjects().iterator();
         if (iterator.hasNext()){
             bounceNumberLabel.setText(Integer.toString(iterator.next().getComponent(CollisionComponent.class).bounces));
         }else {
@@ -172,13 +165,8 @@ public class InfoDisplay implements Disposable {
         }
     }
 
-    private void lives(float delta){
-        LabelFormatter formatter = new LabelFormatter(Integer.toString(ScoreKeeper.lives));
-
-
-        livesNumberLabel.setText(formatter.getText(delta));
-
-
+    private void lives(){
+        livesNumberLabel.setText(ScoreKeeper.lives);
     }
 
 

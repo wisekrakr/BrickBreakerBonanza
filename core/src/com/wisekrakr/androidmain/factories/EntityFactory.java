@@ -16,8 +16,6 @@ import com.wisekrakr.androidmain.components.Box2dBodyComponent;
 import com.wisekrakr.androidmain.components.EntityColor;
 import com.wisekrakr.androidmain.helpers.ComponentHelper;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.wisekrakr.androidmain.components.TypeComponent.Type.*;
@@ -28,21 +26,16 @@ import static com.wisekrakr.androidmain.components.TypeComponent.Type.*;
  */
 public class EntityFactory {
 
-    private ComponentHelper componentHelper;
+
     private BodyFactory bodyFactory;
     public World world;
     private AndroidGame game;
     private PooledEngine engine;
 
-    private List<Entity> totalBricks = new ArrayList<Entity>();
-    private List<Entity> totalObstacles = new ArrayList<Entity>();
-    private List<Entity> totalBalls = new ArrayList<Entity>();
-    private ConcurrentLinkedQueue<Entity> totalPowers = new ConcurrentLinkedQueue<Entity>();
-
     private TmxMapLoader mapLoader;
     private TiledMap tiledMap;
     private OrthogonalTiledMapRenderer tiledMapRenderer;
-    private Entity player;
+    private ConcurrentLinkedQueue<Entity> gameObjects = new ConcurrentLinkedQueue<Entity>();
 
     /**
      * @param game Class that extends Game
@@ -55,7 +48,7 @@ public class EntityFactory {
         world = new World(new Vector2(0,0), true);
         world.setContactListener(new PhysicalObjectContactListener());
 
-        componentHelper = new ComponentHelper(game);
+
         bodyFactory = BodyFactory.getBodyFactoryInstance(world);
     }
 
@@ -76,17 +69,27 @@ public class EntityFactory {
         Entity entity = engine.createEntity();
 
         Box2dBodyComponent bodyComponent = engine.createComponent(Box2dBodyComponent.class);
-        componentHelper.getComponentInitializer().textureComponent(engine, entity);
-        componentHelper.getComponentInitializer().typeComponent(engine, entity, OBSTACLE);
-        componentHelper.getComponentInitializer().transformComponent(engine, entity, x, y, 0);
-        componentHelper.getComponentInitializer().collisionComponent(engine, entity);
-        componentHelper.getComponentInitializer().obstacleComponent(engine, entity,
-                width, height,
-                velocityX, velocityY,
-                x, y
-        );
+        ComponentHelper.getComponentInitializer().textureComponent(engine, entity);
+        ComponentHelper.getComponentInitializer().typeComponent(engine, entity, OBSTACLE);
+        ComponentHelper.getComponentInitializer().transformComponent(engine, entity, x, y, 0);
+        ComponentHelper.getComponentInitializer().collisionComponent(engine, entity);
+
+//        ComponentHelper.getComponentInitializer().obstacleComponent(engine, entity,
+//                width, height,
+//                velocityX, velocityY,
+//                x, y
+//        );
 
         bodyComponent.body = bodyFactory.makeBoxPolyBody(x, y, width, height, material, bodyType);
+
+        ComponentHelper.getComponentInitializer().gameObjectComponent(
+                engine,
+                entity, bodyComponent,
+                x,
+                y, velocityX,
+                velocityY,
+                0, width, height,
+                0);
 
         bodyComponent.body.setUserData(entity);
 
@@ -94,17 +97,18 @@ public class EntityFactory {
 
         engine.addEntity(entity);
 
-        totalObstacles.add(entity);
+        gameObjects.add(entity);
     }
 
-    public void createBall(float x, float y){
+    public void createBall(float x, float y, EntityColor color){
 
         Entity entity = engine.createEntity();
 
         Box2dBodyComponent bodyComponent = engine.createComponent(Box2dBodyComponent.class);
-        componentHelper.getComponentInitializer().textureComponent(engine, entity);
-        componentHelper.getComponentInitializer().typeComponent(engine, entity, BALL);
-        componentHelper.getComponentInitializer().collisionComponent(engine, entity);
+        ComponentHelper.getComponentInitializer().textureComponent(engine, entity);
+        ComponentHelper.getComponentInitializer().typeComponent(engine, entity, BALL);
+        ComponentHelper.getComponentInitializer().collisionComponent(engine, entity);
+        ComponentHelper.getComponentInitializer().ballComponent(engine, entity, x, y, color);
 
         float radius = GameConstants.BALL_RADIUS;
 
@@ -114,10 +118,12 @@ public class EntityFactory {
                 BodyDef.BodyType.DynamicBody
         );
 
-        componentHelper.getComponentInitializer().transformComponent(engine, entity, x, y, bodyComponent.body.getAngle());
-        componentHelper.getComponentInitializer().ballComponent(engine,
-                entity, bodyComponent,
-                radius);
+        ComponentHelper.getComponentInitializer().gameObjectComponent(
+                engine, entity, bodyComponent, x, y, 0, 0, 0, 0, 0, radius);
+
+        ComponentHelper.getComponentInitializer().transformComponent(engine, entity, x, y, bodyComponent.body.getAngle());
+
+
 
         bodyComponent.body.setBullet(true); // increase physics computation to limit body travelling through other objects
         //BodyFactory.makeAllFixturesSensors(bodyComponent.body); // make bullets sensors so they don't move player
@@ -126,83 +132,38 @@ public class EntityFactory {
 
         entity.add(bodyComponent);
 
-        totalBalls.add(0, entity);
+        gameObjects.add(entity);
 
         engine.addEntity(entity);
 
     }
 
-//    public void createRow(float x, float y, float width, float height, EntityColor color, List<Entity> bricksInRow){
-//        Entity entity = engine.createEntity();
-//
-//        componentHelper.getComponentInitializer().typeComponent(engine, entity, ROW);
-//
-//        componentHelper.getComponentInitializer().rowComponent(engine, entity,
-//                x,y,
-//                width,
-//                height,
-//                color,
-//                bricksInRow);
-//
-//        engine.addEntity(entity);
-//
-//    }
+    public void createPlayer(float x, float y){
 
-
-    public void createBrick(float x, float y, EntityColor color){
-        Entity entity = engine.createEntity();
+        Entity player = engine.createEntity();
 
         Box2dBodyComponent bodyComponent = engine.createComponent(Box2dBodyComponent.class);
-        componentHelper.getComponentInitializer().textureComponent(engine, entity);
-        componentHelper.getComponentInitializer().typeComponent(engine, entity, BRICK);
-        componentHelper.getComponentInitializer().collisionComponent(engine, entity);
+        ComponentHelper.getComponentInitializer().typeComponent(engine, player, PLAYER);
+        ComponentHelper.getComponentInitializer().levelComponent(engine, player);
+        ComponentHelper.getComponentInitializer().collisionComponent(engine, player);
+        ComponentHelper.getComponentInitializer().playerComponent(engine, player);
 
-        float width = GameConstants.BRICK_WIDTH;
-        float height = GameConstants.BRICK_HEIGHT;
+        float radius = GameConstants.PLAYER_RADIUS;
 
-        bodyComponent.body = bodyFactory.makeBoxPolyBody(x, y,
-                width,
-                height,
-                BodyFactory.Material.STONE,
-                BodyDef.BodyType.StaticBody,
-                false
-        );
+        bodyComponent.body = bodyFactory.makeCirclePolyBody(x, y, radius, BodyFactory.Material.WOOD, BodyDef.BodyType.DynamicBody, false);
 
-        componentHelper.getComponentInitializer().transformComponent(engine, entity, x, y, bodyComponent.body.getAngle());
-        componentHelper.getComponentInitializer().brickComponent(engine, entity,
-                bodyComponent,
-                width, height,
-                color
-        );
+        ComponentHelper.getComponentInitializer().gameObjectComponent(
+                engine, player, bodyComponent, x, y, 0, 0, 0, 0, 0, radius);
 
-        bodyComponent.body.setUserData(entity);
-
-        entity.add(bodyComponent);
-
-        engine.addEntity(entity);
-
-        totalBricks.add(entity);
-
-    }
-
-    public void createPlayer(float x, float y, float width, float height){
-
-        player = engine.createEntity();
-
-        Box2dBodyComponent bodyComponent = engine.createComponent(Box2dBodyComponent.class);
-        componentHelper.getComponentInitializer().playerComponent(engine, player, width, height);
-        componentHelper.getComponentInitializer().typeComponent(engine, player, PLAYER);
-        componentHelper.getComponentInitializer().levelComponent(engine, player);
-        componentHelper.getComponentInitializer().collisionComponent(engine, player);
-        componentHelper.getComponentInitializer().transformComponent(engine, player, x, y, 0);
-
-        bodyComponent.body = bodyFactory.makeBoxPolyBody(x, y, width, height, BodyFactory.Material.WOOD, BodyDef.BodyType.KinematicBody, true);
+        ComponentHelper.getComponentInitializer().transformComponent(engine, player, x, y, bodyComponent.body.getAngle());
 
         bodyComponent.body.setBullet(true);
 
         bodyComponent.body.setUserData(player);
 
         player.add(bodyComponent);
+
+        gameObjects.add(player);
 
         engine.addEntity(player);
 
@@ -212,9 +173,9 @@ public class EntityFactory {
         Entity entity = engine.createEntity();
 
         Box2dBodyComponent bodyComponent = engine.createComponent(Box2dBodyComponent.class);
-        componentHelper.getComponentInitializer().textureComponent(engine, entity);
-        componentHelper.getComponentInitializer().typeComponent(engine, entity, SCENERY);
-        componentHelper.getComponentInitializer().collisionComponent(engine, entity);
+        ComponentHelper.getComponentInitializer().textureComponent(engine, entity);
+        ComponentHelper.getComponentInitializer().typeComponent(engine, entity, SCENERY);
+        ComponentHelper.getComponentInitializer().collisionComponent(engine, entity);
 
         bodyComponent.body = bodyFactory.makeBoxPolyBody(x, y, width, height, BodyFactory.Material.STEEL, BodyDef.BodyType.StaticBody);
 
@@ -226,14 +187,17 @@ public class EntityFactory {
 
     }
 
-    public Entity createPower(float x, float y, float velocityX, float velocityY, float width, float height) {
+    public Entity createPower(float x, float y, float velocityX, float velocityY) {
         Entity entity = engine.createEntity();
 
-        componentHelper.getComponentInitializer().collisionComponent(engine, entity);
-        componentHelper.getComponentInitializer().transformComponent(engine, entity, x, y, 0);
-        componentHelper.getComponentInitializer().typeComponent(engine, entity, POWER);
+        ComponentHelper.getComponentInitializer().collisionComponent(engine, entity);
+        ComponentHelper.getComponentInitializer().transformComponent(engine, entity, x, y, 0);
+        ComponentHelper.getComponentInitializer().typeComponent(engine, entity, POWER);
 
         Box2dBodyComponent bodyComponent = engine.createComponent(Box2dBodyComponent.class);
+
+        float width = GameConstants.POWER_WIDTH;
+        float height = GameConstants.POWER_HEIGHT;
 
         bodyComponent.body = bodyFactory.makeBoxPolyBody(x, y,
                 width,
@@ -243,44 +207,38 @@ public class EntityFactory {
                 true
         );
 
+        ComponentHelper.getComponentInitializer().gameObjectComponent(
+                engine,
+                entity, bodyComponent,
+                x,
+                y, velocityX,
+                velocityY,
+                0, width, height,
+                0);
+
         bodyComponent.body.setUserData(entity);
 
         bodyComponent.body.setBullet(true);
 
         entity.add(bodyComponent);
 
-        componentHelper.getComponentInitializer().powerUpComponent(engine, entity,
-                bodyComponent,
-                velocityX, velocityY,
-                width,
-                height
-        );
+//        ComponentHelper.getComponentInitializer().powerUpComponent(engine, entity,
+//                bodyComponent,
+//                velocityX, velocityY,
+//                width,
+//                height
+//        );
 
-        totalPowers.add(entity);
+        gameObjects.add(entity);
 
         engine.addEntity(entity);
 
         return entity;
     }
 
-    public List<Entity> getTotalBricks(){
-        return totalBricks;
-    }
+    public ConcurrentLinkedQueue<Entity> getGameObjects() {
 
-    public List<Entity> getTotalObstacles() {
-        return totalObstacles;
-    }
-
-    public List<Entity> getTotalBalls() {
-        return totalBalls;
-    }
-
-    public ConcurrentLinkedQueue<Entity> getTotalPowers() {
-        return totalPowers;
-    }
-
-    public Entity getPlayer() {
-        return player;
+        return gameObjects;
     }
 
     public OrthogonalTiledMapRenderer getTiledMapRenderer() {

@@ -6,15 +6,12 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.*;
 import com.wisekrakr.androidmain.controls.Controls;
-import com.wisekrakr.androidmain.helpers.GameHelper;
-
-import java.awt.*;
-import java.util.List;
 
 public class PlayerControlSystem extends IteratingSystem {
 
@@ -40,25 +37,7 @@ public class PlayerControlSystem extends IteratingSystem {
         Box2dBodyComponent bodyComponent = box2dBodyComponentMapper.get(entity);
         PlayerComponent playerComponent = playerComponentMapper.get(entity);
 
-        if (controller.left) {
-            bodyComponent.body.setLinearVelocity(-500f, 0);//a
-        }
-        if (controller.right) {
-            bodyComponent.body.setLinearVelocity(500f, 0); //d
-        }
-        if (controller.down) {
-            bodyComponent.body.setLinearVelocity(0, 0); //s
-        }
-        if (controller.nextLevel){ //left alt
-            List<Entity>removeList = game.getGameThread().getEntityFactory().getTotalBricks();
-            if (removeList.size() > 0) {
-                for (Entity ent : removeList) {
-                    if (ent != null) {
-                        ent.getComponent(BrickComponent.class).setDestroy(true);
-                    }
-                }
-            }
-        }
+        movement(entity);
 
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 
@@ -73,46 +52,62 @@ public class PlayerControlSystem extends IteratingSystem {
         float xVelocity = mousePos.x - bodyComponent.body.getPosition().x;
         float yVelocity = mousePos.y - bodyComponent.body.getPosition().y;
 
-        if (!game.getGameThread().getEntityFactory().getTotalBalls().isEmpty()) {
-            if (!playerComponent.hasBall) {
-                if (controller.isLeftMouseDown) { // || Gdx.input.isTouched()
-                    playerComponent.setHasBall(true);
-
-                    float length = (float) Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
-                    if (length != 0) {
-                        xVelocity = xVelocity / length;
-                        yVelocity = yVelocity / length;
-                    }
-
-                    game.getGameThread().getEntityFactory().getTotalBalls().get(0).getComponent(
-                            Box2dBodyComponent.class).body.applyForceToCenter(
-                            xVelocity * speed, yVelocity * speed, true
-                    );
-
-
-                } else if (controller.up) {
-                    game.getGameThread().getEntityFactory().getTotalBalls().get(0).getComponent(
-                            Box2dBodyComponent.class).body.applyForceToCenter(
-                            xVelocity * speed, yVelocity * speed, true
-                    );
-                }
+        if (controller.isLeftMouseDown || Gdx.input.isTouched()){
+            float length = (float) Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
+            if (length != 0) {
+                xVelocity = xVelocity / length;
+                yVelocity = yVelocity / length;
             }
 
-            if (controller.speedUp) { //spacebar
-                if (game.getGameThread().getTimeKeeper().gameClock - game.getGameThread().getTimeKeeper().speedUp > 10) {
-                    game.getGameThread().getTimeKeeper().speedUp = game.getGameThread().getTimeKeeper().gameClock;
+            bodyComponent.body.setLinearVelocity(xVelocity * speed, yVelocity * speed);
 
-                    game.getGameThread().getEntityFactory().getTotalBalls().get(0).getComponent(
-                            Box2dBodyComponent.class).body.applyForceToCenter(
-                            bodyComponent.body.getPosition().x + GameHelper.randomDirection() * speed,
-                            bodyComponent.body.getPosition().y + GameHelper.randomDirection() * speed,
-                            true
-                    );
-                }
-
-            }
-        }else {
-            System.out.println(getClass().toString()+  " no balls to play with");
+            playerComponent.setMoving(true);
         }
+
+        if (controller.speedUp) { //spacebar
+            if (game.getGameThread().getTimeKeeper().gameClock - game.getGameThread().getTimeKeeper().speedUp > 10) {
+                game.getGameThread().getTimeKeeper().speedUp = game.getGameThread().getTimeKeeper().gameClock;
+
+               //todo speed up player
+            }
+
+        }
+
+    }
+
+    private void movement(Entity entity){
+        Box2dBodyComponent bodyComponent = box2dBodyComponentMapper.get(entity);
+        PlayerComponent playerComponent = playerComponentMapper.get(entity);
+
+        if (controller != null) {
+            if (controller.left) {
+                bodyComponent.body.setLinearVelocity(-500f, 0);//a
+
+                bodyComponent.body.setTransform(bodyComponent.body.getPosition(), MathUtils.PI);
+                playerComponent.setMoving(true);
+            }
+            if (controller.right) {
+                bodyComponent.body.setLinearVelocity(500f, 0); //d
+                bodyComponent.body.setTransform(bodyComponent.body.getPosition(), 0);
+                playerComponent.setMoving(true);
+            }
+            if (controller.down) {
+                bodyComponent.body.setLinearVelocity(0, -500); //s
+
+                bodyComponent.body.setTransform(bodyComponent.body.getPosition(), -MathUtils.PI/2);
+                playerComponent.setMoving(true);
+            }
+            if (controller.up) {
+                bodyComponent.body.setLinearVelocity(0, 500); //w
+
+                bodyComponent.body.setTransform(bodyComponent.body.getPosition(), MathUtils.PI/2);
+                playerComponent.setMoving(true);
+            }
+            if (controller.nextLevel) { //left alt
+                game.getGameThread().getTimeKeeper().setTime(0);
+            }
+            System.out.println(bodyComponent.body.getAngle());
+        }
+
     }
 }

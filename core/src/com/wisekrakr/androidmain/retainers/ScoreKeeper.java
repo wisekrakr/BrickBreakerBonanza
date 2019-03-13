@@ -8,6 +8,16 @@ public class ScoreKeeper {
         ScoreKeeper.lives = lives;
     }
 
+    private static int initialBalls;
+
+    public static void setInitialBalls(int initialBalls) {
+        ScoreKeeper.initialBalls = initialBalls;
+    }
+
+    public static int getInitialBalls() {
+        return initialBalls;
+    }
+
     private static int score = 0;
 
     public static void setScore(int scores){

@@ -1,5 +1,6 @@
 package com.wisekrakr.androidmain.audiovisuals;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -22,80 +23,61 @@ public class EntityVisuals implements EntityVisualsContext {
     }
 
     @Override
-    public void visualizeColoredEntity(Entity entity, TypeComponent.Type type) {
+    public void visualizeColoredEntity(Entity entity) {
+
         if (entity != null) {
-            switch (entity.getComponent(BrickComponent.class).getBrickColorContext().getBrickColor()) {
-                case RED:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "07-Breakout-Tiles",
-                            entity.getComponent(BrickComponent.class).width, entity.getComponent(BrickComponent.class).height);
-                    break;
-                case BLUE:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "01-Breakout-Tiles",
-                            entity.getComponent(BrickComponent.class).width, entity.getComponent(BrickComponent.class).height);
-                    break;
-                case WHITE:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "17-Breakout-Tiles",
-                            entity.getComponent(BrickComponent.class).width, entity.getComponent(BrickComponent.class).height);
-                    break;
-                case GREEN:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "03-Breakout-Tiles",
-                            entity.getComponent(BrickComponent.class).width, entity.getComponent(BrickComponent.class).height);
-                    break;
-                case PURPLE:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "05-Breakout-Tiles",
-                            entity.getComponent(BrickComponent.class).width, entity.getComponent(BrickComponent.class).height);
-                    break;
-                case GOLD:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "13-Breakout-Tiles",
-                            entity.getComponent(BrickComponent.class).width, entity.getComponent(BrickComponent.class).height);
-                    break;
-                case ORANGE:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "09-Breakout-Tiles",
-                            entity.getComponent(BrickComponent.class).width, entity.getComponent(BrickComponent.class).height);
-                    break;
+            TypeComponent.Type type = ComponentMapper.getFor(TypeComponent.class).get(entity).getType();
+            if (type == TypeComponent.Type.BALL) {
+                switch (entity.getComponent(BallComponent.class).getBallColorContext().getBallColor()) {
+                    case RED:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "07-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
+                        break;
+                    case BLUE:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "01-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
+                        break;
+                    case WHITE:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "17-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
+                        break;
+                    case GREEN:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "03-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
+                        break;
+                    case PURPLE:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "05-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
+                        break;
+                    case GOLD:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "13-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
+                        break;
+                    case ORANGE:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "09-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
+                        break;
+                }
+            }else if (type == TypeComponent.Type.POWER){
+                switch (PowerHelper.getPower()) {
+                    case ENLARGE_PLAYER:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "22-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).width, entity.getComponent(GameObjectComponent.class).height);
+                        break;
+                    case REDUCE_PLAYER:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "21-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).width, entity.getComponent(GameObjectComponent.class).height);
+                        break;
+                    case BIGGER_BALL:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "23-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).width, entity.getComponent(GameObjectComponent.class).height);
+                        break;
+                    case EXTRA_LIFE:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "25-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).width, entity.getComponent(GameObjectComponent.class).height);
+                        break;
+                }
             }
-
-
-        }else {
-            System.out.println("No Bricks to draw");
-        }
-    }
-
-    @Override
-    public void visualizePower(Entity entity) {
-        if (entity != null) {
-            switch (PowerHelper.getPower()) {
-                case THEY_LIVE:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "27-Breakout-Tiles",
-                            entity.getComponent(PowerUpComponent.class).width, entity.getComponent(PowerUpComponent.class).height);
-                    break;
-                case NUKE:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "26-Breakout-Tiles",
-                            entity.getComponent(PowerUpComponent.class).width, entity.getComponent(PowerUpComponent.class).height);
-                    break;
-                case MORE_BRICKS:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "24-Breakout-Tiles",
-                            entity.getComponent(PowerUpComponent.class).width, entity.getComponent(PowerUpComponent.class).height);
-                    break;
-                case ENLARGE_PLAYER:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "22-Breakout-Tiles",
-                            entity.getComponent(PowerUpComponent.class).width, entity.getComponent(PowerUpComponent.class).height);
-                    break;
-                case SHORTEN_PLAYER:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "21-Breakout-Tiles",
-                            entity.getComponent(PowerUpComponent.class).width, entity.getComponent(PowerUpComponent.class).height);
-                    break;
-                case BIGGER_BALL:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "23-Breakout-Tiles",
-                            entity.getComponent(PowerUpComponent.class).width, entity.getComponent(PowerUpComponent.class).height);
-                    break;
-                case EXTRA_LIFE:
-                    drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "25-Breakout-Tiles",
-                            entity.getComponent(PowerUpComponent.class).width, entity.getComponent(PowerUpComponent.class).height);
-                    break;
-            }
-        }else {
-            System.out.println("No Powers to draw" + PowerHelper.getPower());
         }
     }
 

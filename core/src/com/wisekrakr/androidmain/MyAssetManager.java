@@ -1,5 +1,6 @@
 package com.wisekrakr.androidmain;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.ParticleEffectLoader;
 import com.badlogic.gdx.assets.loaders.SkinLoader;
@@ -98,7 +99,8 @@ public class MyAssetManager implements Disposable {
 
     public void loadParticleEffects(){
         ParticleEffectLoader.ParticleEffectParameter effectParameter = new ParticleEffectLoader.ParticleEffectParameter();
-        effectParameter.imagesDir = new FileHandle("images/particles/exhaust.party");
+        effectParameter.imagesDir = Gdx.files.internal("images/particles/exhaust.party");
+
         assetManager.load("images/particles/exhaust.party", ParticleEffect.class);
 
     }
