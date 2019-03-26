@@ -12,12 +12,15 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
-import com.wisekrakr.androidmain.components.CollisionComponent;
+import com.wisekrakr.androidmain.components.PenisComponent;
+import com.wisekrakr.androidmain.components.TypeComponent;
 import com.wisekrakr.androidmain.helpers.LabelHelper;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 import com.wisekrakr.androidmain.retainers.TimeKeeper;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 
 public class InfoDisplay implements Disposable {
@@ -25,9 +28,9 @@ public class InfoDisplay implements Disposable {
 
     private Integer levelNumber;
     private Integer score;
-    private Integer bounces;
+    private Integer penisLength;
     private Integer lives;
-    private Integer balls;
+    private Integer enemies;
 
     private Label scoreCountLabel;
     private Label scoreAddedLabel;
@@ -35,8 +38,8 @@ public class InfoDisplay implements Disposable {
     private Integer worldTimer;
     private Label timeCountLabel;
     private Label levelNumberLabel;
-    private Label ballNumberLabel;
-    private Label bounceNumberLabel;
+    private Label enemyNumberLabel;
+    private Label penisLengthLabel;
     private Label livesNumberLabel;
 
     private AndroidGame game;
@@ -64,10 +67,10 @@ public class InfoDisplay implements Disposable {
         scoreCountLabel =LabelHelper.label(score != null ? score.toString() : null, font, Color.GOLDENROD);
         scoreAddedLabel =LabelHelper.label(currentScore != null ? currentScore.toString() : null, font, Color.GREEN);
         multiplierLabel = LabelHelper.label(multi != null ? multi.toString() : null, font, Color.PINK);
-        Label ballNameLabel = LabelHelper.label("Balls to Dodge", font, Color.WHITE);
-        ballNumberLabel = LabelHelper.label(balls != null ? balls.toString() : null, font, Color.GOLDENROD);
-        Label bounceLabel = LabelHelper.label("Bounces", font, Color.WHITE);
-        bounceNumberLabel = LabelHelper.label(bounces != null ? bounces.toString() : null, font, Color.GOLDENROD);
+        Label enemyNameLabel = LabelHelper.label("Balls to Dodge", font, Color.WHITE);
+        enemyNumberLabel = LabelHelper.label(enemies != null ? enemies.toString() : null, font, Color.GOLDENROD);
+        Label penisLabel = LabelHelper.label("Penis length", font, Color.WHITE);
+        penisLengthLabel = LabelHelper.label(penisLength != null ? penisLength.toString() : null, font, Color.GOLDENROD);
         Label livesLabel = LabelHelper.label("Lives left", font, Color.WHITE);
         livesNumberLabel = LabelHelper.label(lives != null ? lives.toString() : null, font, Color.GOLDENROD);
 
@@ -83,13 +86,13 @@ public class InfoDisplay implements Disposable {
         tableRight.row();
         tableRight.add(levelNumberLabel).padTop(2);
         tableRight.row();
-        tableRight.add(ballNameLabel);
+        tableRight.add(enemyNameLabel);
         tableRight.row();
-        tableRight.add(ballNumberLabel);
+        tableRight.add(enemyNumberLabel);
         tableRight.row();
-        tableRight.add(bounceLabel).padBottom(2);
+        tableRight.add(penisLabel).padBottom(2);
         tableRight.row();
-        tableRight.add(bounceNumberLabel).padBottom(2);
+        tableRight.add(penisLengthLabel).padBottom(2);
 
         tableLeft.add(livesLabel).padTop(2);
         tableLeft.row();
@@ -103,7 +106,7 @@ public class InfoDisplay implements Disposable {
         tableLeft.row();
         tableLeft.add(scoreCountLabel).padBottom(2);
         tableLeft.add(scoreAddedLabel).padBottom(2).padLeft(scoreCountLabel.getWidth());
-        tableLeft.add(multiplierLabel).padBottom(2).padLeft(scoreCountLabel.getWidth() + scoreAddedLabel.getWidth());
+//        tableLeft.add(multiplierLabel).padBottom(2).padLeft(scoreCountLabel.getWidth() + scoreAddedLabel.getWidth());
 
         stage.addActor(tableLeft);
         stage.addActor(tableRight);
@@ -125,12 +128,22 @@ public class InfoDisplay implements Disposable {
             scoreAdded();
 
             levelNumberLabel.setText(Integer.toString(game.getGameThread().getLevelGenerationSystem().getMainLevel()));
-            ballNumberLabel.setText(Integer.toString(game.getGameThread().getEntityFactory().getGameObjects().size()));
+            enemyNumber();
 
-            bounces();
+            penisLength();
             multiplier();
             lives();
         }
+    }
+
+    private void enemyNumber(){
+        List<Entity>balls = new ArrayList<Entity>();
+        for (Entity entity: game.getEngine().getEntities()){
+            if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.ENEMY){
+                balls.add(entity);
+            }
+        }
+        enemyNumberLabel.setText(Integer.toString(balls.size()));
     }
 
     private void scoreAdded(){
@@ -145,12 +158,17 @@ public class InfoDisplay implements Disposable {
         }
     }
 
-    private void bounces(){
-        Iterator<Entity>iterator = game.getGameThread().getEntityFactory().getGameObjects().iterator();
+    private void penisLength(){
+        Iterator<Entity>iterator = game.getEngine().getEntities().iterator();
         if (iterator.hasNext()){
-            bounceNumberLabel.setText(Integer.toString(iterator.next().getComponent(CollisionComponent.class).bounces));
-        }else {
-            bounceNumberLabel.setText("");
+            Entity entity = iterator.next();
+            if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PENIS) {
+                PenisComponent penisComponent = game.getGameThread().getComponentMapperSystem().getPenisComponentMapper().get(entity);
+                float length = penisComponent.getWidth() - 10;
+
+                penisLengthLabel.setText(length + " cm /" + length/2.54f + " in");
+
+            }
         }
     }
 

@@ -11,7 +11,8 @@ public class CollisionComponent implements Component, Pool.Poolable {
     public boolean hitObstacle = false;
     public boolean hitPower = false;
     public boolean hitPlayer = false;
-    public boolean hitBall = false;
+    public boolean hitEnemy = false;
+    public boolean hitPenis = false;
 
     public void setHitSurface(boolean hitSurface) {
         this.hitSurface = hitSurface;
@@ -25,16 +26,17 @@ public class CollisionComponent implements Component, Pool.Poolable {
     public void setHitPlayer(boolean hitPlayer) {
         this.hitPlayer = hitPlayer;
     }
-    public void setHitBall(boolean hitBall) {
-        this.hitBall = hitBall;
+    public void setHitEnemy(boolean hitEnemy) {
+        this.hitEnemy = hitEnemy;
     }
-
-    public int bounces = 0;
+    public void setHitPenis(boolean hitPenis) {
+        this.hitPenis = hitPenis;
+    }
 
     @Override
     public void reset() {
 
         collisionEntity = null;
-        bounces = 0;
+
     }
 }

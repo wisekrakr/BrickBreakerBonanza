@@ -19,8 +19,8 @@ public class EntityAudio implements EntityAudioContext {
     public void audioForEntity() {
         for (Entity entity: game.getEngine().getEntities()) {
             if (entity != null) {
-                if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.BALL) {
-                    if (entity.getComponent(GameObjectComponent.class).destroy) {
+                if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.ENEMY) {
+                    if (entity.getComponent(EnemyComponent.class).isDestroy()) {
                         addSound("sounds/secret.wav");
                     } else {
                         if (entity.getComponent(CollisionComponent.class).hitSurface ||
@@ -31,10 +31,10 @@ public class EntityAudio implements EntityAudioContext {
                     }
                 }
                 if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.POWER) {
-                    if (entity.getComponent(GameObjectComponent.class).destroy){
+                    if (entity.getComponent(EnemyComponent.class).isDestroy()){
                         if (PowerHelper.getPower() == PowerHelper.Power.EXTRA_LIFE){
                             addSound("sounds/powerup_extratime.wav");
-                        }else if (PowerHelper.getPower() == PowerHelper.Power.BIGGER_BALL){
+                        }else if (PowerHelper.getPower() == PowerHelper.Power.ENLARGE_ENEMY){
                             addSound("sounds/powerdown_moreballs.wav");
                         }else if (PowerHelper.getPower() == PowerHelper.Power.ENLARGE_PLAYER){
                             addSound("sounds/powerup_freeze.wav");

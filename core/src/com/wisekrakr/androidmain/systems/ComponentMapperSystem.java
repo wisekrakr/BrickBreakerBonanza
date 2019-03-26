@@ -5,33 +5,39 @@ import com.wisekrakr.androidmain.components.*;
 
 public class ComponentMapperSystem {
 
-    private ComponentMapper<BallComponent> ballComponentMapper;
+    private ComponentMapper<EnemyComponent> enemyComponentMapper;
     private ComponentMapper<Box2dBodyComponent> bodyComponentMapper;
     private ComponentMapper<CollisionComponent> collisionComponentMapper;
-    private ComponentMapper<GameObjectComponent> gameObjectComponentMapper;
+    private ComponentMapper<PowerUpComponent> powerUpComponentMapper;
+    private ComponentMapper<ObstacleComponent> obstacleComponentMapper;
     private ComponentMapper<LevelComponent> levelComponentMapper;
     private ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
     private ComponentMapper<PlayerComponent> playerComponentMapper;
     private ComponentMapper<TextureComponent> textureComponentMapper;
     private ComponentMapper<TransformComponent> transformComponentMapper;
     private ComponentMapper<TypeComponent> typeComponentMapper;
+    private ComponentMapper<WallComponent> wallComponentMapper;
+    private ComponentMapper<PenisComponent> penisComponentMapper;
 
     public ComponentMapperSystem() {
 
-        ballComponentMapper = ComponentMapper.getFor(BallComponent.class);
+        enemyComponentMapper = ComponentMapper.getFor(EnemyComponent.class);
         bodyComponentMapper = ComponentMapper.getFor(Box2dBodyComponent.class);
         collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
-        gameObjectComponentMapper = ComponentMapper.getFor(GameObjectComponent.class);
+        powerUpComponentMapper = ComponentMapper.getFor(PowerUpComponent.class);
+        obstacleComponentMapper = ComponentMapper.getFor(ObstacleComponent.class);
         levelComponentMapper = ComponentMapper.getFor(LevelComponent.class);
         particleEffectComponentMapper = ComponentMapper.getFor(ParticleEffectComponent.class);
         playerComponentMapper = ComponentMapper.getFor(PlayerComponent.class);
         textureComponentMapper = ComponentMapper.getFor(TextureComponent.class);
         transformComponentMapper = ComponentMapper.getFor(TransformComponent.class);
         typeComponentMapper = ComponentMapper.getFor(TypeComponent.class);
+        wallComponentMapper = ComponentMapper.getFor(WallComponent.class);
+        penisComponentMapper = ComponentMapper.getFor(PenisComponent.class);
     }
 
-    public ComponentMapper<BallComponent> getBallComponentMapper() {
-        return ballComponentMapper;
+    public ComponentMapper<EnemyComponent> getEnemyComponentMapper() {
+        return enemyComponentMapper;
     }
 
     public ComponentMapper<Box2dBodyComponent> getBodyComponentMapper() {
@@ -42,8 +48,12 @@ public class ComponentMapperSystem {
         return collisionComponentMapper;
     }
 
-    public ComponentMapper<GameObjectComponent> getGameObjectComponentMapper() {
-        return gameObjectComponentMapper;
+    public ComponentMapper<PowerUpComponent> getPowerUpComponentMapper() {
+        return powerUpComponentMapper;
+    }
+
+    public ComponentMapper<ObstacleComponent> getObstacleComponentMapper() {
+        return obstacleComponentMapper;
     }
 
     public ComponentMapper<LevelComponent> getLevelComponentMapper() {
@@ -68,5 +78,13 @@ public class ComponentMapperSystem {
 
     public ComponentMapper<TypeComponent> getTypeComponentMapper() {
         return typeComponentMapper;
+    }
+
+    public ComponentMapper<WallComponent> getWallComponentMapper() {
+        return wallComponentMapper;
+    }
+
+    public ComponentMapper<PenisComponent> getPenisComponentMapper() {
+        return penisComponentMapper;
     }
 }

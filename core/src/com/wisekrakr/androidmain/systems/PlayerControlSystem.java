@@ -7,16 +7,16 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.*;
 import com.wisekrakr.androidmain.controls.Controls;
+import com.wisekrakr.androidmain.helpers.GameHelper;
 
 public class PlayerControlSystem extends IteratingSystem {
 
-    private ComponentMapper<PlayerComponent> playerComponentMapper;
-    private ComponentMapper<Box2dBodyComponent> box2dBodyComponentMapper;
     private AndroidGame game;
     private Controls controller;
     private OrthographicCamera camera;
@@ -27,86 +27,57 @@ public class PlayerControlSystem extends IteratingSystem {
         this.game = game;
         controller = controls;
         this.camera = camera;
-
-        playerComponentMapper = ComponentMapper.getFor(PlayerComponent.class);
-        box2dBodyComponentMapper = ComponentMapper.getFor(Box2dBodyComponent.class);
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        Box2dBodyComponent bodyComponent = box2dBodyComponentMapper.get(entity);
-        PlayerComponent playerComponent = playerComponentMapper.get(entity);
+        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
+        PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
 
-        movement(entity);
+//        movement(entity); //todo keyboard input if ever wanted
 
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 
-        if (controller.isRightMouseDown) {
-            System.out.println("X= " + (mousePos.x / 2.5f) + " , Y= " + (mousePos.y / 2.5)); //todo remove
-
-        }
         camera.unproject(mousePos);
 
-        float speed = 1000000000f;
-
-        float xVelocity = mousePos.x - bodyComponent.body.getPosition().x;
-        float yVelocity = mousePos.y - bodyComponent.body.getPosition().y;
+        float angle = GameHelper.angleBetween(bodyComponent.body.getPosition(), new Vector2(mousePos.x, mousePos.y));
+        bodyComponent.body.setTransform(bodyComponent.body.getPosition(), angle);
 
         if (controller.isLeftMouseDown || Gdx.input.isTouched()){
-            float length = (float) Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
-            if (length != 0) {
-                xVelocity = xVelocity / length;
-                yVelocity = yVelocity / length;
-            }
-
-            bodyComponent.body.setLinearVelocity(xVelocity * speed, yVelocity * speed);
-
+            bodyComponent.body.setLinearVelocity(
+                    bodyComponent.body.getLinearVelocity().x + GameConstants.PLAYER_SPEED * MathUtils.cos(angle),
+                    bodyComponent.body.getLinearVelocity().y + GameConstants.PLAYER_SPEED * MathUtils.sin(angle)
+            );
             playerComponent.setMoving(true);
         }
-
-        if (controller.speedUp) { //spacebar
-            if (game.getGameThread().getTimeKeeper().gameClock - game.getGameThread().getTimeKeeper().speedUp > 10) {
-                game.getGameThread().getTimeKeeper().speedUp = game.getGameThread().getTimeKeeper().gameClock;
-
-               //todo speed up player
-            }
-
-        }
-
     }
 
     private void movement(Entity entity){
-        Box2dBodyComponent bodyComponent = box2dBodyComponentMapper.get(entity);
-        PlayerComponent playerComponent = playerComponentMapper.get(entity);
+        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
+        PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
+
+        float speed = GameConstants.PLAYER_SPEED;
 
         if (controller != null) {
             if (controller.left) {
-                bodyComponent.body.setLinearVelocity(-500f, 0);//a
-
-                bodyComponent.body.setTransform(bodyComponent.body.getPosition(), MathUtils.PI);
+                bodyComponent.body.setLinearVelocity(-speed, 0);//a
                 playerComponent.setMoving(true);
             }
             if (controller.right) {
-                bodyComponent.body.setLinearVelocity(500f, 0); //d
-                bodyComponent.body.setTransform(bodyComponent.body.getPosition(), 0);
+                bodyComponent.body.setLinearVelocity(speed, 0); //d
                 playerComponent.setMoving(true);
             }
             if (controller.down) {
-                bodyComponent.body.setLinearVelocity(0, -500); //s
-
-                bodyComponent.body.setTransform(bodyComponent.body.getPosition(), -MathUtils.PI/2);
+                bodyComponent.body.setLinearVelocity(0, -speed); //s
                 playerComponent.setMoving(true);
             }
             if (controller.up) {
-                bodyComponent.body.setLinearVelocity(0, 500); //w
-
-                bodyComponent.body.setTransform(bodyComponent.body.getPosition(), MathUtils.PI/2);
+                bodyComponent.body.setLinearVelocity(0, speed); //w
                 playerComponent.setMoving(true);
             }
             if (controller.nextLevel) { //left alt
                 game.getGameThread().getTimeKeeper().setTime(0);
             }
-            System.out.println(bodyComponent.body.getAngle());
         }
 
     }

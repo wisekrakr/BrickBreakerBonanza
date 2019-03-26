@@ -2,10 +2,11 @@ package com.wisekrakr.androidmain.systems;
 
 import com.badlogic.ashley.core.Entity;
 import com.wisekrakr.androidmain.components.Box2dBodyComponent;
-import com.wisekrakr.androidmain.components.GameObjectComponent;
 
 public interface SystemEntityContext {
-    void outOfBounds(Entity entity, Box2dBodyComponent bodyComponent, GameObjectComponent gameObjectComponent);
-    void powerHandler(Entity entity, Box2dBodyComponent bodyComponent, GameObjectComponent gameObjectComponent);
-    void destroy(Entity entity, Box2dBodyComponent bodyComponent, GameObjectComponent gameObjectComponent);
+
+    void bodyHandler(Entity entity, Box2dBodyComponent bodyComponent); // informational -> get body info and set to entity
+    void powerHandler(Entity entity); // handle every power for specific entity
+    void destroy(Entity entity); // destroy body and entity
+    void outOfBounds(Entity entity);
 }

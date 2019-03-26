@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.components.*;
-import com.wisekrakr.androidmain.helpers.PowerHelper;
 import com.wisekrakr.androidmain.helpers.SpriteHelper;
 
 public class EntityVisuals implements EntityVisualsContext {
@@ -27,57 +26,78 @@ public class EntityVisuals implements EntityVisualsContext {
 
         if (entity != null) {
             TypeComponent.Type type = ComponentMapper.getFor(TypeComponent.class).get(entity).getType();
-            if (type == TypeComponent.Type.BALL) {
-                switch (entity.getComponent(BallComponent.class).getBallColorContext().getBallColor()) {
+            if (type == TypeComponent.Type.ENEMY) {
+                EnemyComponent enemyComponent = game.getGameThread().getComponentMapperSystem().getEnemyComponentMapper().get(entity);
+
+                switch (enemyComponent.getEnemyColorContext().getEnemyColor()) {
                     case RED:
-                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "07-Breakout-Tiles",
-                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
+                        drawObjectViaAtlas(entity,
+                                "images/deez/balls.atlas", "redball",
+                                enemyComponent.getRadius(),
+                                enemyComponent.getRadius()
+                        );
                         break;
                     case BLUE:
-                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "01-Breakout-Tiles",
-                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
-                        break;
-                    case WHITE:
-                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "17-Breakout-Tiles",
-                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
+                        drawObjectViaAtlas(entity,
+                                "images/deez/balls.atlas", "blueball",
+                                enemyComponent.getRadius(),
+                                enemyComponent.getRadius()
+                        );
                         break;
                     case GREEN:
-                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "03-Breakout-Tiles",
-                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
+                        drawObjectViaAtlas(entity,
+                                "images/deez/balls.atlas", "greenball",
+                                enemyComponent.getRadius(),
+                                enemyComponent.getRadius()
+                        );
                         break;
                     case PURPLE:
-                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "05-Breakout-Tiles",
-                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
+                        drawObjectViaAtlas(entity,
+                                "images/deez/balls.atlas", "purpleball",
+                                enemyComponent.getRadius(),
+                                enemyComponent.getRadius()
+                        );
                         break;
                     case GOLD:
-                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "13-Breakout-Tiles",
-                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
-                        break;
-                    case ORANGE:
-                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "09-Breakout-Tiles",
-                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
+                        drawObjectViaAtlas(entity,
+                                "images/deez/balls.atlas", "goldball",
+                                enemyComponent.getRadius(),
+                                enemyComponent.getRadius()
+                        );
                         break;
                 }
             }else if (type == TypeComponent.Type.POWER){
-                switch (PowerHelper.getPower()) {
-                    case ENLARGE_PLAYER:
-                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "22-Breakout-Tiles",
-                                entity.getComponent(GameObjectComponent.class).width, entity.getComponent(GameObjectComponent.class).height);
-                        break;
-                    case REDUCE_PLAYER:
-                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "21-Breakout-Tiles",
-                                entity.getComponent(GameObjectComponent.class).width, entity.getComponent(GameObjectComponent.class).height);
-                        break;
-                    case BIGGER_BALL:
-                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "23-Breakout-Tiles",
-                                entity.getComponent(GameObjectComponent.class).width, entity.getComponent(GameObjectComponent.class).height);
-                        break;
-                    case EXTRA_LIFE:
-                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "25-Breakout-Tiles",
-                                entity.getComponent(GameObjectComponent.class).width, entity.getComponent(GameObjectComponent.class).height);
-                        break;
-                }
+                PowerUpComponent powerUpComponent = game.getGameThread().getComponentMapperSystem().getPowerUpComponentMapper().get(entity);
+
+                drawObjectViaAtlas(entity, "images/others/others.atlas","power",
+                        powerUpComponent.getWidth(), powerUpComponent.getHeight()
+                );
+
+            }else if (type == TypeComponent.Type.OBSTACLE){
+                ObstacleComponent obstacleComponent = game.getGameThread().getComponentMapperSystem().getObstacleComponentMapper().get(entity);
+
+                drawObjectViaAtlas(entity, "images/others/others.atlas", "platform",
+                        obstacleComponent.getWidth(), obstacleComponent.getHeight()
+                );
+
+            }else if (type == TypeComponent.Type.PLAYER){
+                PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
+
+                drawObjectViaAtlas(entity,
+                        "images/player/player.atlas", "cool",
+                        playerComponent.getRadius(), playerComponent.getRadius()
+                );
+
+            }else if (type == TypeComponent.Type.PENIS){
+                PenisComponent penisComponent = game.getGameThread().getComponentMapperSystem().getPenisComponentMapper().get(entity);
+
+                drawObjectViaAtlas(entity,
+                        "images/others/others.atlas", "penis",
+                        penisComponent.getWidth(), penisComponent.getHeight()
+                );
+
             }
+
         }
     }
 
@@ -111,7 +131,8 @@ public class EntityVisuals implements EntityVisualsContext {
                     regionPath,
                     entity.getComponent(Box2dBodyComponent.class).body,
                     spriteBatch,
-                    width, height);
+                    width, height
+            );
         }
     }
 
@@ -120,7 +141,8 @@ public class EntityVisuals implements EntityVisualsContext {
         if (entity != null){
             SpriteHelper.entitySprite(game.assetManager(),
                     fileName,
-                    width, height);
+                    width, height
+            );
         }
     }
 }

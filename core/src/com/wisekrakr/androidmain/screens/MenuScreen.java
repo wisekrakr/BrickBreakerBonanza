@@ -2,6 +2,7 @@ package com.wisekrakr.androidmain.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -23,6 +24,7 @@ public class MenuScreen extends ScreenAdapter {
     private Stage stage;
     private AndroidGame game;
     private TextureRegion textureRegion;
+    private TextureRegion textureRegionSean;
     private Label formatLabel;
 
     public MenuScreen(AndroidGame game) {
@@ -43,10 +45,13 @@ public class MenuScreen extends ScreenAdapter {
         TextButton newGame = new TextButton("start", skin);
         TextButton preferences = new TextButton("preferences", skin);
         TextButton exit = new TextButton("exit", skin);
+        TextButton reset = new TextButton("reset levels", skin);
 
         table.add(newGame).expandX();
         table.row();
         table.add(preferences).expandX();
+        table.row();
+        table.add(reset).expandX();
         table.row();
         table.add(exit).expandX();
 
@@ -72,8 +77,20 @@ public class MenuScreen extends ScreenAdapter {
             }
         });
 
+        reset.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.getGameThread().startNewLevelGeneration();
+            }
+        });
+
         Texture texture = new Texture("images/background/mainbg.jpg");
         textureRegion = new TextureRegion(texture);
+        Texture texSean = new Texture("images/others/seanA.png");
+        textureRegionSean = new TextureRegion(texSean);
+
+        Sound sound = game.assetManager().assetManager.get("sounds/titleA.wav", Sound.class);
+        sound.play(game.getGamePreferences().getSoundVolume());
 
         stage.addActor(table);
     }
@@ -89,8 +106,10 @@ public class MenuScreen extends ScreenAdapter {
         stage.getBatch().draw(textureRegion, Gdx.graphics.getWidth()/2f - Gdx.graphics.getWidth()/2f,
                 Gdx.graphics.getHeight()/2f - Gdx.graphics.getHeight()/2f,
                 Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        stage.getBatch().draw(textureRegionSean, 0,0);
         stage.getBatch().end();
         stage.draw();
+
 
     }
 

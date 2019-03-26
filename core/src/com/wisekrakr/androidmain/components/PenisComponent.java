@@ -1,11 +1,12 @@
 package com.wisekrakr.androidmain.components;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
 
 
-public class ObstacleComponent implements Component, Pool.Poolable{
+public class PenisComponent implements Component, Pool.Poolable{
 
     private Vector2 position = new Vector2();
     private float velocityX = 0;
@@ -15,8 +16,24 @@ public class ObstacleComponent implements Component, Pool.Poolable{
     private float height = 0;
     private float direction = 0;
 
-    private boolean outOfBoundsX = false;
-    private boolean outOfBoundsY = false;
+    private int health = 100;
+    private Entity attachedEntity;
+
+    public Entity getAttachedEntity() {
+        return attachedEntity;
+    }
+
+    public void setAttachedEntity(Entity attachedEntity) {
+        this.attachedEntity = attachedEntity;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
 
     public Vector2 getPosition() {
         return position;
@@ -74,22 +91,6 @@ public class ObstacleComponent implements Component, Pool.Poolable{
         this.direction = direction;
     }
 
-    public boolean isOutOfBoundsX() {
-        return outOfBoundsX;
-    }
-
-    public void setOutOfBoundsX(boolean outOfBoundsX) {
-        this.outOfBoundsX = outOfBoundsX;
-    }
-
-    public boolean isOutOfBoundsY() {
-        return outOfBoundsY;
-    }
-
-    public void setOutOfBoundsY(boolean outOfBoundsY) {
-        this.outOfBoundsY = outOfBoundsY;
-    }
-
     @Override
     public void reset() {
         position = new Vector2();
@@ -102,7 +103,8 @@ public class ObstacleComponent implements Component, Pool.Poolable{
 
         direction = 0;
 
-        outOfBoundsX = false;
-        outOfBoundsY = false;
+        health = 100;
+
+        attachedEntity = null;
     }
 }

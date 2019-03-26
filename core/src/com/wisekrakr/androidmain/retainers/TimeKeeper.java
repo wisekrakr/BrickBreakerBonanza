@@ -17,8 +17,8 @@ public class TimeKeeper {
 
     public float gameClock = 0;
 
-    public float speedUp = -1000;
     public float timeToChase = 0;
+    public float powerTime = 5f;
 
     public float getTimeToChase() {
         return timeToChase;
@@ -30,7 +30,8 @@ public class TimeKeeper {
 
     public void reset(){
         time = 60f;
-        speedUp = -1000;
+        powerTime = 22f;
+        timeToChase = 0;
     }
 
 

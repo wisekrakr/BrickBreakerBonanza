@@ -33,7 +33,8 @@ public class MyAssetManager implements Disposable {
         assetManager.load("sounds/secret.wav", Sound.class);
         assetManager.load("sounds/gameover.wav", Sound.class);
         assetManager.load("sounds/levelcomplete.wav", Sound.class);
-
+        assetManager.load("sounds/titleA.wav", Sound.class);
+        assetManager.load("sounds/titleB.wav", Sound.class);
 
         assetManager.finishLoading();
     }
@@ -49,13 +50,7 @@ public class MyAssetManager implements Disposable {
 
         assetManager.finishLoading();
     }
-    /*
-     * All the Videos loaded in the the AssetManager
-     */
-    public void loadVideos() {
 
-        assetManager.finishLoading();
-    }
     /*
      * All the Skins loaded in the the AssetManager
      */
@@ -74,6 +69,8 @@ public class MyAssetManager implements Disposable {
      */
     public void loadTextures() {
         assetManager.load("images/background/mainbg.jpg", Texture.class);
+        assetManager.load("images/others/seanA.png", Texture.class);
+
         assetManager.finishLoading();
     }
 
@@ -86,8 +83,9 @@ public class MyAssetManager implements Disposable {
     }
 
     public void queueGameImages(){
-        assetManager.load("images/breakout/breakout.atlas", TextureAtlas.class);
+        assetManager.load("images/deez/balls.atlas", TextureAtlas.class);
         assetManager.load("images/player/player.atlas", TextureAtlas.class);
+        assetManager.load("images/others/others.atlas", TextureAtlas.class);
 
     }
 
@@ -109,9 +107,5 @@ public class MyAssetManager implements Disposable {
     public void dispose() {
         assetManager.dispose();
     }
-
-
-
-
 
 }
