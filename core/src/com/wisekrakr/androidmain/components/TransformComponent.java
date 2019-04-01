@@ -12,7 +12,6 @@ public class TransformComponent implements Component, Pool.Poolable {
     public float rotation = 0.0f;
     public boolean isHidden = false;
 
-
     @Override
     public void reset() {
         rotation = 0.0f;

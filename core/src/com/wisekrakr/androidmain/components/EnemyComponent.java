@@ -1,6 +1,8 @@
 package com.wisekrakr.androidmain.components;
 
 import com.badlogic.ashley.core.Component;
+
+
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
@@ -8,8 +10,7 @@ import com.badlogic.gdx.utils.Pool;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlayerComponent implements Component, Pool.Poolable {
-
+public class EnemyComponent implements Component, Pool.Poolable {
     private Vector2 position = new Vector2();
     private float velocityX = 0;
     private float velocityY = 0;
@@ -17,9 +18,20 @@ public class PlayerComponent implements Component, Pool.Poolable {
     private float width = 0;
     private float height = 0;
     private float direction = 0;
-    private float speed = 0;
     private float penisLength = 0;
     private float penisGirth = 0;
+
+    private Vector2 initialPosition = new Vector2();
+    private int bounces = 0;
+
+    private float speed;
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    public List<Vector2>initialPositions = new ArrayList<Vector2>();
+
+    public float chaseInterval = 0;
 
     private EntityStyle entityStyle = null;
 
@@ -38,23 +50,7 @@ public class PlayerComponent implements Component, Pool.Poolable {
         public void setEntityStyle(EntityStyle style) {
             entityStyle = style;
         }
-
-
     };
-
-    public boolean isMoving = false;
-
-    public void setMoving(boolean moving) {
-        isMoving = moving;
-    }
-
-    public float getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(float speed) {
-        this.speed = speed;
-    }
 
     public Vector2 getPosition() {
         return position;
@@ -62,6 +58,14 @@ public class PlayerComponent implements Component, Pool.Poolable {
 
     public void setPosition(Vector2 position) {
         this.position = position;
+    }
+
+    public Vector2 getInitialPosition() {
+        return initialPosition;
+    }
+
+    public void setInitialPosition(Vector2 position) {
+        this.initialPosition = position;
     }
 
     public float getVelocityX() {
@@ -112,6 +116,18 @@ public class PlayerComponent implements Component, Pool.Poolable {
         this.direction = direction;
     }
 
+    public int getBounces() {
+        return bounces;
+    }
+
+    public void setBounces(int bounces) {
+        this.bounces = bounces;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
     public float getPenisLength() {
         return penisLength;
     }
@@ -149,10 +165,13 @@ public class PlayerComponent implements Component, Pool.Poolable {
         height = 0;
         direction = 0;
 
+        initialPositions = new ArrayList<Vector2>();
+        chaseInterval = 0;
+
         penisLength = 0;
         penisGirth = 0;
 
-        isMoving = false;
+        bounces = 0;
 
         attachedEntities = new ArrayList<Entity>();
     }

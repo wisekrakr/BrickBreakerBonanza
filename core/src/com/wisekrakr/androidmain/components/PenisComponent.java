@@ -1,22 +1,30 @@
 package com.wisekrakr.androidmain.components;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
 
 
-public class ObstacleComponent implements Component, Pool.Poolable{
+public class PenisComponent implements Component, Pool.Poolable{
 
     private Vector2 position = new Vector2();
     private float velocityX = 0;
     private float velocityY = 0;
     private boolean destroy;
-    private float width = 0;
-    private float height = 0;
+    private float length = 0;
+    private float girth = 0;
     private float direction = 0;
 
-    private boolean outOfBoundsX = false;
-    private boolean outOfBoundsY = false;
+    private Entity attachedEntity;
+
+    public Entity getAttachedEntity() {
+        return attachedEntity;
+    }
+
+    public void setAttachedEntity(Entity attachedEntity) {
+        this.attachedEntity = attachedEntity;
+    }
 
     public Vector2 getPosition() {
         return position;
@@ -50,20 +58,20 @@ public class ObstacleComponent implements Component, Pool.Poolable{
         this.destroy = destroy;
     }
 
-    public float getWidth() {
-        return width;
+    public float getLength() {
+        return length;
     }
 
-    public void setWidth(float width) {
-        this.width = width;
+    public void setLength(float length) {
+        this.length = length;
     }
 
-    public float getHeight() {
-        return height;
+    public float getGirth() {
+        return girth;
     }
 
-    public void setHeight(float height) {
-        this.height = height;
+    public void setGirth(float girth) {
+        this.girth = girth;
     }
 
     public float getDirection() {
@@ -74,22 +82,6 @@ public class ObstacleComponent implements Component, Pool.Poolable{
         this.direction = direction;
     }
 
-    public boolean isOutOfBoundsX() {
-        return outOfBoundsX;
-    }
-
-    public void setOutOfBoundsX(boolean outOfBoundsX) {
-        this.outOfBoundsX = outOfBoundsX;
-    }
-
-    public boolean isOutOfBoundsY() {
-        return outOfBoundsY;
-    }
-
-    public void setOutOfBoundsY(boolean outOfBoundsY) {
-        this.outOfBoundsY = outOfBoundsY;
-    }
-
     @Override
     public void reset() {
         position = new Vector2();
@@ -97,12 +89,11 @@ public class ObstacleComponent implements Component, Pool.Poolable{
         velocityY = 0;
         destroy = false;
 
-        width = 0;
-        height = 0;
+        length = 0;
+        girth = 0;
 
         direction = 0;
 
-        outOfBoundsX = false;
-        outOfBoundsY = false;
+        attachedEntity = null;
     }
 }

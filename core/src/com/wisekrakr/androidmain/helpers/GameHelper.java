@@ -28,8 +28,8 @@ public class GameHelper {
 
     public static Vector2 randomPosition() {
 
-        return new Vector2(randomGenerator.nextFloat() * GameConstants.WORLD_WIDTH, //todo change
-                randomGenerator.nextFloat() * GameConstants.WORLD_HEIGHT
+        return new Vector2(10 + randomGenerator.nextFloat() *  (GameConstants.WORLD_WIDTH - 20), //todo change
+                10 + randomGenerator.nextFloat() * (GameConstants.WORLD_HEIGHT - 20)
         );
     }
 
@@ -40,14 +40,16 @@ public class GameHelper {
         Vector2 bestPosition = new Vector2();
 
         for (Entity entity: game.getEngine().getEntities()){
-            Vector2 filledPosition = entity.getComponent(Box2dBodyComponent.class).body.getPosition();
-            positions.add(filledPosition);
+            if (entity != null) {
+                Vector2 filledPosition = entity.getComponent(Box2dBodyComponent.class).body.getPosition();
+                positions.add(filledPosition);
 
-            for (int i = positions.size() - 1; i > 0; i--) {
+                for (int i = positions.size() - 1; i > 0; i--) {
 //                System.out.println(entity.getComponent(TypeComponent.class).getType() + " - position: " + positions.get(i));
 
-                if (positions.get(i) != newPosition) {
-                    bestPosition = newPosition;
+                    if (positions.get(i) != newPosition) {
+                        bestPosition = newPosition;
+                    }
                 }
             }
         }

@@ -4,17 +4,25 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
-import com.wisekrakr.androidmain.systems.SystemEntityContext;
 
-import java.util.ArrayList;
 
-public class PowerUpComponent implements Component, Pool.Poolable{
+public class TesticleComponent implements Component, Pool.Poolable{
+
     private Vector2 position = new Vector2();
     private float velocityX = 0;
     private float velocityY = 0;
     private boolean destroy;
-    private float width = 0;
-    private float height = 0;
+    private float radius = 0;
+
+    private Entity attachedEntity;
+
+    public Entity getAttachedEntity() {
+        return attachedEntity;
+    }
+
+    public void setAttachedEntity(Entity attachedEntity) {
+        this.attachedEntity = attachedEntity;
+    }
 
     public Vector2 getPosition() {
         return position;
@@ -48,31 +56,25 @@ public class PowerUpComponent implements Component, Pool.Poolable{
         this.destroy = destroy;
     }
 
-    public float getWidth() {
-        return width;
+    public float getRadius() {
+        return radius;
     }
 
-    public void setWidth(float width) {
-        this.width = width;
+    public void setRadius(float radius) {
+        this.radius = radius;
     }
 
-    public float getHeight() {
-        return height;
-    }
 
-    public void setHeight(float height) {
-        this.height = height;
-    }
 
     @Override
     public void reset() {
-
         position = new Vector2();
         velocityX = 0;
         velocityY = 0;
         destroy = false;
 
-        width = 0;
-        height = 0;
+        radius = 0;
+
+        attachedEntity = null;
     }
 }

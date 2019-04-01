@@ -2,24 +2,19 @@ package com.wisekrakr.androidmain.helpers;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
-import com.wisekrakr.androidmain.AndroidGame;
+import com.badlogic.gdx.math.Vector2;
 import com.wisekrakr.androidmain.ComponentInitializer;
 import com.wisekrakr.androidmain.components.*;
 
+import java.util.List;
+
 public class ComponentHelper {
 
-
-    private AndroidGame game;
-
-    public ComponentHelper(AndroidGame game) {
-        this.game = game;
-    }
-
-    public ComponentInitializer getComponentInitializer() {
+    public static ComponentInitializer getComponentInitializer() {
         return componentInitializer;
     }
 
-    private ComponentInitializer componentInitializer = new ComponentInitializer() {
+    private static ComponentInitializer componentInitializer = new ComponentInitializer() {
 
 
         @Override
@@ -55,70 +50,107 @@ public class ComponentHelper {
             mainEntity.add(textureComponent);
         }
 
-        @Override
-        public void levelComponent(PooledEngine engine, Entity mainEntity) {
-            LevelComponent levelComponent = engine.createComponent(LevelComponent.class);
 
-            mainEntity.add(levelComponent);
+        @Override
+        public void enemyComponent(PooledEngine engine, Entity mainEntity, float initialX, float initialY, float width, float height, EntityStyle entityStyle, List<Entity> attachedEntities, float penisLength, float penisGirth) {
+            EnemyComponent enemyComponent = engine.createComponent(EnemyComponent.class);
+
+            enemyComponent.getEntityStyleContext().setEntityStyle(entityStyle);
+
+            enemyComponent.setWidth(width);
+            enemyComponent.setHeight(height);
+
+            enemyComponent.setInitialPosition(new Vector2(initialX, initialY));
+            enemyComponent.initialPositions.add(enemyComponent.getInitialPosition());
+
+            enemyComponent.setAttachedEntities(attachedEntities);
+            enemyComponent.setPenisLength(penisLength);
+            enemyComponent.setPenisGirth(penisGirth);
+
+            mainEntity.add(enemyComponent);
         }
 
-        @Override
-        public void ballComponent(PooledEngine engine, Entity mainEntity, Box2dBodyComponent bodyComponent, float radius) {
-            BallComponent ballComponent = engine.createComponent(BallComponent.class);
-
-            ballComponent.radius = radius;
-            ballComponent.position = bodyComponent.body.getPosition();
-
-            mainEntity.add(ballComponent);
-        }
 
         @Override
-        public void brickComponent(PooledEngine engine, Entity mainEntity, Box2dBodyComponent bodyComponent, float width, float height, EntityColor color) {
-            BrickComponent brickComponent = engine.createComponent(BrickComponent.class);
-
-            brickComponent.position = bodyComponent.body.getPosition();
-            brickComponent.width = width;
-            brickComponent.height = height;
-
-            brickComponent.getBrickColorContext().setBrickColor(color);
-
-            mainEntity.add(brickComponent);
-        }
-
-        @Override
-        public void obstacleComponent(PooledEngine engine, Entity mainEntity, float width, float height, float velocityX, float velocityY, float x, float y) {
+        public void obstacleComponent(PooledEngine engine, Entity mainEntity, float x, float y, float velocityX, float velocityY, float width, float height) {
             ObstacleComponent obstacleComponent = engine.createComponent(ObstacleComponent.class);
 
-            obstacleComponent.width = width;
-            obstacleComponent.height = height;
-            obstacleComponent.velocityX = velocityX;
-            obstacleComponent.velocityY = velocityY;
-            obstacleComponent.position.set(x,y);
+            obstacleComponent.setWidth(width);
+            obstacleComponent.setHeight(height);
+            obstacleComponent.setVelocityX(velocityX);
+            obstacleComponent.setVelocityY(velocityY);
+            obstacleComponent.setPosition(new Vector2(x,y));
 
             mainEntity.add(obstacleComponent);
         }
 
         @Override
-        public void powerUpComponent(PooledEngine engine, Entity mainEntity, Box2dBodyComponent bodyComponent, float velocityX, float velocityY, float width, float height) {
+        public void powerUpComponent(PooledEngine engine, Entity mainEntity, float x, float y, float velocityX, float velocityY, float width, float height, PowerHelper.Power power) {
             PowerUpComponent powerUpComponent = engine.createComponent(PowerUpComponent.class);
 
-            powerUpComponent.width = width;
-            powerUpComponent.height = height;
-            powerUpComponent.velocityX = velocityX;
-            powerUpComponent.velocityY = velocityY;
-            powerUpComponent.position = bodyComponent.body.getPosition();
+            powerUpComponent.setWidth(width);
+            powerUpComponent.setHeight(height);
+            powerUpComponent.setVelocityX(velocityX);
+            powerUpComponent.setVelocityY(velocityY);
+            powerUpComponent.setPosition(new Vector2(x,y));
+            PowerHelper.setPowerUp(mainEntity, power);
 
             mainEntity.add(powerUpComponent);
         }
 
         @Override
-        public void playerComponent(PooledEngine engine, Entity mainEntity, float width, float height) {
+        public void penisComponent(PooledEngine engine, Entity mainEntity, Entity attachedEntity, float velocityX, float velocityY, float length, float girth, float direction) {
+            PenisComponent penisComponent = engine.createComponent(PenisComponent.class);
+
+            penisComponent.setLength(length);
+            penisComponent.setGirth(girth);
+            penisComponent.setDirection(direction);
+            penisComponent.setVelocityX(velocityX);
+            penisComponent.setVelocityY(velocityY);
+            penisComponent.setAttachedEntity(attachedEntity);
+
+            mainEntity.add(penisComponent);
+        }
+
+
+        @Override
+        public void testicleComponent(PooledEngine engine, Entity mainEntity, Entity attachedEntity, float velocityX, float velocityY, float radius) {
+            TesticleComponent testicleComponent = engine.createComponent(TesticleComponent.class);
+
+            testicleComponent.setRadius(radius);
+            testicleComponent.setVelocityX(velocityX);
+            testicleComponent.setVelocityY(velocityY);
+            testicleComponent.setAttachedEntity(attachedEntity);
+
+            mainEntity.add(testicleComponent);
+        }
+
+        @Override
+        public void playerComponent(PooledEngine engine, Entity mainEntity, float x, float y, float width, float height, List<Entity> attachedEntities, float penisLength, float penisGirth, EntityStyle entityStyle) {
             PlayerComponent playerComponent = engine.createComponent(PlayerComponent.class);
 
-            playerComponent.width = width;
-            playerComponent.height = height;
+            playerComponent.setPosition(new Vector2(x,y));
+            playerComponent.setWidth(width);
+            playerComponent.setHeight(height);
+            playerComponent.setAttachedEntities(attachedEntities);
+            playerComponent.setPenisLength(penisLength);
+            playerComponent.setPenisGirth(penisGirth);
+
+            playerComponent.getEntityStyleContext().setEntityStyle(entityStyle);
 
             mainEntity.add(playerComponent);
+        }
+
+
+        @Override
+        public void wallComponent(PooledEngine engine, Entity mainEntity, float x, float y, float width, float height) {
+            WallComponent wallComponent = engine.createComponent(WallComponent.class);
+
+            wallComponent.setPosition(new Vector2(x, y));
+            wallComponent.setWidth(width);
+            wallComponent.setHeight(height);
+
+            mainEntity.add(wallComponent);
         }
     };
 

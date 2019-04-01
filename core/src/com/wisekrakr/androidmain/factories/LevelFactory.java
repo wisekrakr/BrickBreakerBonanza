@@ -1,272 +1,341 @@
 package com.wisekrakr.androidmain.factories;
 
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
-import com.wisekrakr.androidmain.components.EntityColor;
-import com.wisekrakr.androidmain.components.RowComponent;
-import com.wisekrakr.androidmain.helpers.EntityColorHelper;
+import com.wisekrakr.androidmain.components.EntityStyle;
+import com.wisekrakr.androidmain.helpers.EntityStyleHelper;
 import com.wisekrakr.androidmain.helpers.GameHelper;
 import com.wisekrakr.androidmain.levels.LevelNumber;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 
 public class LevelFactory {
 
     private static float width = GameConstants.WORLD_WIDTH;
     private static float height = GameConstants.WORLD_HEIGHT;
-    private static float brickWidth = GameConstants.BRICK_WIDTH;
-    private static float brickHeight = GameConstants.BRICK_HEIGHT;
-    private static RowComponent rowComponent;
-    private static List<RowComponent>rowList = new ArrayList<RowComponent>();
-    private static List<EntityColor>colorList = new ArrayList<EntityColor>();
 
-    //TODO: create blocks with different attributes....blocks that need four hits to break
+    private AndroidGame game;
 
-    public static void getLevel(LevelNumber levelNumber, EntityFactory entityFactory, int columns, int rows){
+    public LevelFactory(AndroidGame game) {
+        this.game = game;
+    }
+
+    public void getLevel(LevelNumber levelNumber, EntityFactory entityFactory){
 
         switch (levelNumber){
             case ONE:
-                colorList.add(EntityColor.RED);
-                colorList.add(EntityColor.WHITE);
-                colorList.add(EntityColor.BLUE);
-
-                System.out.println("Making level 1");
-                for (int i = 0; i < rows; i++){
-                    rowComponent = new RowComponent(new Vector2(
-                            brickWidth/2,
-                            height - (brickHeight * i)),
-                            columns,
-                            chosenColors()
+                for (int i = 0; i < 1; i++) {
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
-                    rowList.add(rowComponent);
                 }
-                for (int i = rowComponent.getNumberOfBricks()-1; i > 0; i--) {
-                    for (int j = rows -1; j > 0;j--) {
-                        entityFactory.createBrick(
-                                rowList.get(j).getPosition().x + (i * brickWidth),
-                                rowList.get(j).getPosition().y ,
-                                rowList.get(j).getRowColor()
-                        );
-                    }
-                }
+                ScoreKeeper.setInitialEnemies(1);
+
                 break;
             case TWO:
-                System.out.println("Making level 2");
-                colorList.add(EntityColor.RED);
-                colorList.add(EntityColor.GOLD);
+                for (int i = 0; i < 2; i++) {
 
-                for (int i = 0; i < rows; i++){
-                    rowComponent = new RowComponent(new Vector2(
-                            brickWidth/2,
-                            height - (brickHeight * i)),
-                            columns,
-                            chosenColors()
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
-                    rowList.add(rowComponent);
                 }
-                for (int i = rowComponent.getNumberOfBricks()-1; i > 0; i--) {
-                    for (int j = rows -1; j > 0;j--) {
-                        entityFactory.createBrick(
-                                rowList.get(j).getPosition().x + (i * brickWidth),
-                                rowList.get(j).getPosition().y ,
-                                rowList.get(j).getRowColor()
-                        );
-                    }
-                }
+                ScoreKeeper.setInitialEnemies(2);
+
+                game.getGameThread().getEntityFactory().createObstacle(
+                        200, 50, -200, 0, 30, 10, BodyFactory.Material.RUBBER, BodyDef.BodyType.KinematicBody
+                );
+                game.getGameThread().getEntityFactory().createObstacle(
+                        50, height - 50, 200, 0, 30, 10, BodyFactory.Material.RUBBER, BodyDef.BodyType.KinematicBody
+                );
                 break;
             case THREE:
-                System.out.println("Making level 3");
+                for (int i = 0; i < 3; i++) {
 
-                for (int i = 0; i < rows; i++){
-                    rowComponent = new RowComponent(new Vector2(
-                            brickWidth/2,
-                            height - (brickHeight * i)),
-                            columns,
-                            EntityColorHelper.randomEntityColor()
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
-                    rowList.add(rowComponent);
                 }
-                for (int i = rowComponent.getNumberOfBricks()-1; i > 0; i--) {
-                    for (int j = rows -1; j > 0;j--) {
-                        entityFactory.createBrick(
-                                rowList.get(j).getPosition().x + (i * brickWidth),
-                                rowList.get(j).getPosition().y ,
-                                rowList.get(j).getRowColor()
-                        );
-                    }
-                }
-
-                entityFactory.createObstacle(width/2,height/2,
-                        150f,0,
-                        40f, 3f,
-                        BodyFactory.Material.STEEL,
-                        BodyDef.BodyType.KinematicBody
+                ScoreKeeper.setInitialEnemies(3);
+                game.getGameThread().getEntityFactory().createObstacle(
+                        200, 50, -200, 0, 30, 10, BodyFactory.Material.RUBBER, BodyDef.BodyType.KinematicBody
                 );
-
+                game.getGameThread().getEntityFactory().createObstacle(
+                        50, height - 50, 200, 0, 30, 10, BodyFactory.Material.RUBBER, BodyDef.BodyType.KinematicBody
+                );
+                game.getGameThread().getEntityFactory().createObstacle(
+                        width/2 - 15, height - 100, 0, 100, 10, 30, BodyFactory.Material.RUBBER, BodyDef.BodyType.KinematicBody
+                );
                 break;
             case FOUR:
-                System.out.println("Making level 4");
-                for (int i = 0; i < rows; i++){
-                    rowComponent = new RowComponent(new Vector2(
-                            brickWidth/2,
-                            height - (brickHeight * i)),
-                            columns,
-                            EntityColorHelper.randomEntityColor()
+                for (int i = 0; i < 4; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
-                    rowList.add(rowComponent);
                 }
-                for (int i = rowComponent.getNumberOfBricks()-1; i > 0; i--) {
-                    for (int j = rows -1; j > 0;j--) {
-                        entityFactory.createBrick(
-                                rowList.get(j).getPosition().x + (i * brickWidth),
-                                rowList.get(j).getPosition().y ,
-                                rowList.get(j).getRowColor()
-                        );
-                    }
-                }
+                ScoreKeeper.setInitialEnemies(4);
                 break;
             case FIVE:
-                System.out.println("Making level 5");
-                for (int i = 0; i < rows; i++){
-                    rowComponent = new RowComponent(new Vector2(
-                            brickWidth/2,
-                            height - (brickHeight * i)),
-                            columns,
-                            EntityColorHelper.randomEntityColor()
+                for (int i = 0; i < 4; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
-                    rowList.add(rowComponent);
                 }
-                for (int i = rowComponent.getNumberOfBricks()-1; i > 0; i--) {
-                    for (int j = rows -1; j > 0;j--) {
-                        entityFactory.createBrick(
-                                rowList.get(j).getPosition().x + (i * brickWidth),
-                                rowList.get(j).getPosition().y ,
-                                rowList.get(j).getRowColor()
-                        );
-                    }
-                }
+                ScoreKeeper.setInitialEnemies(4);
+
+                game.getGameThread().getEntityFactory().createObstacle(
+                        200, 50, -200, 0, 30, 10, BodyFactory.Material.RUBBER, BodyDef.BodyType.KinematicBody
+                );
+                game.getGameThread().getEntityFactory().createObstacle(
+                        50, height - 50, 200, 0, 30, 10, BodyFactory.Material.RUBBER, BodyDef.BodyType.KinematicBody
+                );
                 break;
             case SIX:
-                System.out.println("Making level 6");
-                for (int i = 0; i < rows; i++){
-                    rowComponent = new RowComponent(new Vector2(
-                            brickWidth/2,
-                            height - (brickHeight * i)),
-                            columns,
-                            EntityColorHelper.randomEntityColor()
-                    );
-                    rowList.add(rowComponent);
-                }
-                for (int i = rowComponent.getNumberOfBricks()-1; i > 0; i--) {
-                    for (int j = rows -1; j > 0;j--) {
-                        entityFactory.createBrick(
-                                rowList.get(j).getPosition().x + (i * brickWidth),
-                                rowList.get(j).getPosition().y ,
-                                rowList.get(j).getRowColor()
-                        );
-                    }
-                }
+                for (int i = 0; i < 4; i++) {
 
-                entityFactory.createObstacle(500,10,
-                        0,150f,
-                        40f, 3f,
-                        BodyFactory.Material.STEEL,
-                        BodyDef.BodyType.KinematicBody
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(4);
+
+                game.getGameThread().getEntityFactory().createObstacle(
+                        200, 50, -200, 0, 30, 10, BodyFactory.Material.RUBBER, BodyDef.BodyType.KinematicBody
                 );
-                entityFactory.createObstacle(width - 50,10,
-                        0,150f,
-                        40f, 3f,
-                        BodyFactory.Material.STEEL,
-                        BodyDef.BodyType.KinematicBody
+                game.getGameThread().getEntityFactory().createObstacle(
+                        50, height - 50, 200, 0, 30, 10, BodyFactory.Material.RUBBER, BodyDef.BodyType.KinematicBody
+                );
+                game.getGameThread().getEntityFactory().createObstacle(
+                        width/2 - 15, height - 100, 100, 100, 10, 30, BodyFactory.Material.RUBBER, BodyDef.BodyType.KinematicBody
                 );
                 break;
             case SEVEN:
-                System.out.println("Making level 7");
-                for (int k = 0; k < columns -1; k++) {
-                    for (int j = 1; j < rows; j++) {
-                        entityFactory.createBrick(
-                                (width/columns) + k * brickWidth,
-                                height - j *  brickHeight,
-                                EntityColorHelper.randomEntityColor());
-                    }
+                for (int i = 0; i < 5; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
                 }
+                ScoreKeeper.setInitialEnemies(5);
                 break;
             case EIGHT:
-                System.out.println("Making level 8");
-                for (int k = 0; k < columns - 1; k++) {
-                    for (int j = 1; j < rows; j++) {
-                        entityFactory.createBrick(
-                                (width/columns)  + k * brickWidth,
-                                height - j *  brickHeight,
-                                EntityColorHelper.randomEntityColor());
-                    }
-                }
-                entityFactory.createObstacle(width/2,height/2,
-                        100f,0,
-                        40f, 3f,
-                        BodyFactory.Material.STEEL,
-                        BodyDef.BodyType.KinematicBody);
+                for (int i = 0; i < 5; i++) {
 
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(5);
                 break;
             case NINE:
-                System.out.println("Making level 9");
-                for (int k = 0; k < columns - 1; k++) {
-                    for (int j = 1; j < rows; j++) {
-                        entityFactory.createBrick(
-                                (width/columns) + k * brickWidth,
-                                height - j *  brickHeight,
-                                EntityColorHelper.randomEntityColor());
-                    }
+                for (int i = 0; i < 5; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
                 }
+                ScoreKeeper.setInitialEnemies(5);
                 break;
             case TEN:
+                for (int i = 0; i < 6; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(6);
                 break;
             case ELEVEN:
+                for (int i = 0; i < 6; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(6);
                 break;
             case TWELVE:
+                for (int i = 0; i < 6; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(6);
                 break;
             case THIRTEEN:
+                for (int i = 0; i < 7; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(7);
                 break;
             case FOURTEEN:
+                for (int i = 0; i < 7; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(7);
                 break;
             case FIFTEEN:
+                for (int i = 0; i < 7; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(7);
                 break;
             case SIXTEEN:
+                for (int i = 0; i < 8; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(8);
                 break;
             case SEVENTEEN:
+                for (int i = 0; i < 8; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(8);
                 break;
             case EIGHTEEN:
+                for (int i = 0; i < 8; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(8);
                 break;
             case NINETEEN:
+                for (int i = 0; i < 9; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(9);
                 break;
             case TWENTY:
+                for (int i = 0; i < 9; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(9);
                 break;
             case TWENTY_ONE:
-                break;
-            case TWENTY_TWO:
-                break;
-            case TWENTY_THREE:
-                break;
-            case TWENTY_FOUR:
-                break;
-            case TWENTY_FIVE:
+                for (int i = 0; i < 9; i++) {
+
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
+                }
+                ScoreKeeper.setInitialEnemies(9);
                 break;
         }
-        System.out.println("ROWLIST= " + (getRowList().size() -1));
+
     }
 
-    public static void dispatch(){
-        rowList.clear();
-        colorList.clear();
+    public void dispatch(){
+
     }
 
-    private static EntityColor chosenColors(){
-        return colorList.get(GameHelper.randomGenerator.nextInt(colorList.size()));
-    }
 
-    private static List<RowComponent> getRowList() {
-        return rowList;
-    }
 }

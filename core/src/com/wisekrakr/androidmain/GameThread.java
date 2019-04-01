@@ -4,7 +4,7 @@ package com.wisekrakr.androidmain;
 import com.badlogic.ashley.core.PooledEngine;
 import com.wisekrakr.androidmain.factories.EntityFactory;
 import com.wisekrakr.androidmain.retainers.TimeKeeper;
-import com.wisekrakr.androidmain.systems.LevelGenerationSystem;
+import com.wisekrakr.androidmain.systems.ComponentMapperSystem;
 import com.wisekrakr.androidmain.systems.PhysicsSystem;
 
 public class GameThread {
@@ -14,6 +14,7 @@ public class GameThread {
     private AndroidGame game;
     private PooledEngine engine;
     private TimeKeeper timeKeeper;
+    private ComponentMapperSystem componentMapperSystem;
 
     protected GameThread(AndroidGame game) {
         this.game = game;
@@ -23,9 +24,15 @@ public class GameThread {
         engine = game.getEngine();
 
         entityFactory = new EntityFactory(game, engine);
-        levelGenerationSystem = new LevelGenerationSystem(game, entityFactory);
+        startNewLevelGeneration();
+        componentMapperSystem = new ComponentMapperSystem();
 
         init();
+
+    }
+
+    public void startNewLevelGeneration(){
+        levelGenerationSystem = new LevelGenerationSystem(game, entityFactory);
     }
 
     private void init() {
@@ -40,4 +47,7 @@ public class GameThread {
         return timeKeeper;
     }
 
+    public ComponentMapperSystem getComponentMapperSystem() {
+        return componentMapperSystem;
+    }
 }

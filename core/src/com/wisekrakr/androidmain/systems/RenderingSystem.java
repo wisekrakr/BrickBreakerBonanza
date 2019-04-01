@@ -5,10 +5,12 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.wisekrakr.androidmain.GameConstants;
+import com.wisekrakr.androidmain.components.ParticleEffectComponent;
 import com.wisekrakr.androidmain.components.TextureComponent;
 import com.wisekrakr.androidmain.components.TransformComponent;
 
@@ -31,16 +33,18 @@ public class RenderingSystem extends SortedIteratingSystem {
 
     private ComponentMapper<TextureComponent> textureComponentMapper;
     private ComponentMapper<TransformComponent> transformComponentMapper;
+    private ComponentMapper<ParticleEffectComponent>particleEffectComponentMapper;
 
     @SuppressWarnings("unchecked")
     public RenderingSystem(SpriteBatch batch) {
 
-        super(Family.all(TransformComponent.class, TextureComponent.class).get(), new ZComparator());
+        super(Family.all(TransformComponent.class, TextureComponent.class, ParticleEffectComponent.class).get(),new ZComparator());
 
         this.batch = batch;
 
         textureComponentMapper = ComponentMapper.getFor(TextureComponent.class);
         transformComponentMapper = ComponentMapper.getFor(TransformComponent.class);
+        particleEffectComponentMapper = ComponentMapper.getFor(ParticleEffectComponent.class);
 
         renderQueue = new Array<Entity>();
 
@@ -62,6 +66,7 @@ public class RenderingSystem extends SortedIteratingSystem {
         for (Entity entity : renderQueue) {
             TextureComponent tex = textureComponentMapper.get(entity);
             TransformComponent t = transformComponentMapper.get(entity);
+            ParticleEffectComponent p = particleEffectComponentMapper.get(entity);
 
             if (tex.region == null || t.isHidden) {
                 continue;
@@ -78,8 +83,11 @@ public class RenderingSystem extends SortedIteratingSystem {
                     originX, originY,
                     width, height,
                     PixelsToMeters(t.scale.x), PixelsToMeters(t.scale.y),
-                    t.rotation);
+                    t.rotation
+            );
+            p.effect.draw(batch, deltaTime);
         }
+        batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
         batch.end();
         renderQueue.clear();

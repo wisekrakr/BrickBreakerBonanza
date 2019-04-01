@@ -41,7 +41,7 @@ public class PhysicsSystem extends IteratingSystem {
         accumulator += frameTime;
 
         if(accumulator >= MAX_STEP_TIME) {
-            world.step(MAX_STEP_TIME, 2, 2);
+            world.step(MAX_STEP_TIME, 2, 6);
             accumulator -= MAX_STEP_TIME;
 
             for (Entity entity : bodiesQueue) {
@@ -57,7 +57,6 @@ public class PhysicsSystem extends IteratingSystem {
                 if (bodyComponent.isDead){
                     world.destroyBody(bodyComponent.body);
                     getEngine().removeEntity(entity);
-
                     System.out.println("removed entity: " + entity.getComponent(TypeComponent.class).getType()); //todo remove
                 }
             }

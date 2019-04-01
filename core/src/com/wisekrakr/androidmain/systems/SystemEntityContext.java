@@ -4,7 +4,9 @@ import com.badlogic.ashley.core.Entity;
 import com.wisekrakr.androidmain.components.Box2dBodyComponent;
 
 public interface SystemEntityContext {
-    void outOfBounds(Entity entity, Box2dBodyComponent bodyComponent);
-    void powerHandler(Entity entity, Box2dBodyComponent bodyComponent);
-    void destroy(Entity entity, Box2dBodyComponent bodyComponent);
+
+    void bodyHandler(Entity entity, Box2dBodyComponent bodyComponent); // informational -> get body info and set to entity
+
+    void destroy(Entity entity); // destroy body and entity
+    void outOfBounds(Entity entity);
 }

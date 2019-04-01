@@ -1,10 +1,14 @@
-package com.wisekrakr.androidmain.systems;
+package com.wisekrakr.androidmain;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.factories.EntityFactory;
-import com.wisekrakr.androidmain.GameConstants;
+import com.wisekrakr.androidmain.helpers.GameHelper;
 import com.wisekrakr.androidmain.levels.LevelModel;
 import com.wisekrakr.androidmain.levels.LevelNumber;
+import com.wisekrakr.androidmain.retainers.ScoreKeeper;
+import com.wisekrakr.androidmain.screens.SuperEndScreen;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -81,23 +85,29 @@ public class LevelGenerationSystem {
     private void building(){
 
         if (!game.getGamePreferences().levelGoing(mainLevel)) {
-            if (mainLevel > 0 && mainLevel <=3) {
-                levelModel.startLevel(mainLevel,
-                       (int) ((GameConstants.WORLD_WIDTH - GameConstants.BRICK_WIDTH) / GameConstants.BRICK_WIDTH),
-                        (int) ((GameConstants.WORLD_HEIGHT - 200) / GameConstants.BRICK_HEIGHT)
-                );
-            }
-            if (mainLevel > 3 && mainLevel <= 6) {
-                levelModel.startLevel(mainLevel,
-                        (int) ((GameConstants.WORLD_WIDTH - GameConstants.BRICK_WIDTH) / GameConstants.BRICK_WIDTH),
-                        (int) ((GameConstants.WORLD_HEIGHT - 100) / GameConstants.BRICK_HEIGHT)
-                );
-            }
-            if (mainLevel >6 && mainLevel <= 9) {
-                levelModel.startLevel(mainLevel,
-                        (int) ((GameConstants.WORLD_WIDTH - GameConstants.BRICK_WIDTH) / GameConstants.BRICK_WIDTH),
-                        (int) ((GameConstants.WORLD_HEIGHT) / GameConstants.BRICK_HEIGHT)
-                );
+            if (mainLevel > 0 && mainLevel <= 3) {
+                levelModel.startLevel(mainLevel);
+                game.getGameThread().getTimeKeeper().setTimeToChase(2f);
+            }else if (mainLevel > 3 && mainLevel <= 6) {
+                levelModel.startLevel(mainLevel);
+                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(1.5f,1.75f));
+            }else if (mainLevel > 6 && mainLevel <= 9) {
+                levelModel.startLevel(mainLevel);
+                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(1.25f,1.5f));
+            }else if (mainLevel > 9 && mainLevel <= 12) {
+                levelModel.startLevel(mainLevel);
+                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(1f,1.25f));
+            }else if (mainLevel > 12 && mainLevel <= 15) {
+                levelModel.startLevel(mainLevel);
+                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(0.75f,2f));
+            }else if (mainLevel > 15 && mainLevel <= 18) {
+                levelModel.startLevel(mainLevel);
+                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(0.5f,0.75f));
+            }else if (mainLevel > 18 && mainLevel <= 21) {
+                levelModel.startLevel(mainLevel);
+                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(0.25f,0.5f));
+            }else if (mainLevel > 21 ) {
+                game.changeScreen(AndroidGame.SUPERENDGAME); //todo fix how to end the game
             }
 
             game.getGamePreferences().setLevelGoing(mainLevel, true);

@@ -17,13 +17,13 @@ import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 
-public class EndScreen extends ScreenAdapter {
+public class SuperEndScreen extends ScreenAdapter {
 
-    private AndroidGame game;
     private Stage stage;
+    private AndroidGame game;
     private Label highScoreLabel;
 
-    public EndScreen(AndroidGame game) {
+    public SuperEndScreen(AndroidGame game) {
         this.game = game;
 
         stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
@@ -46,7 +46,7 @@ public class EndScreen extends ScreenAdapter {
         Label highScoreTextLabel = new Label("HIGH SCORE:", new Label.LabelStyle(font, Color.LIME));
         Label currentScoreLabel = new Label(Integer.toString(ScoreKeeper.getScore()), new Label.LabelStyle(font, Color.LIME));
         highScoreLabel = new Label(Integer.toString(game.getGamePreferences().getHighScore()), new Label.LabelStyle(font, Color.LIME));
-        Label gameOverLabel = new Label("GAME OVER", new Label.LabelStyle(font, Color.RED));
+        Label gameOverLabel = new Label("YOU DID IT!", new Label.LabelStyle(font, Color.GREEN));
 
         TextButton mainMenu = new TextButton("main menu", skin);
         TextButton exit = new TextButton("exit", skin);
@@ -84,7 +84,6 @@ public class EndScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
-
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act();
@@ -93,10 +92,6 @@ public class EndScreen extends ScreenAdapter {
         highScoreLabel.setText(game.getGamePreferences().getHighScore());
     }
 
-    @Override
-    public void resize(int width, int height) {
-        stage.getViewport().update(width, height);
-    }
 
     @Override
     public void dispose() {

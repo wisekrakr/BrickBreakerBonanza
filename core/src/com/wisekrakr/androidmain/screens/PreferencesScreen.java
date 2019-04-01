@@ -102,6 +102,8 @@ public class PreferencesScreen extends ScreenAdapter {
             }
         });
 
+
+
         table.add(titleLabel);
         table.row();
         table.add(volumeMusicLabel);

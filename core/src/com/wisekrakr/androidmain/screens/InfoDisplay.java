@@ -12,38 +12,35 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
-import com.wisekrakr.androidmain.components.CollisionComponent;
+import com.wisekrakr.androidmain.components.PenisComponent;
 import com.wisekrakr.androidmain.components.PlayerComponent;
-import com.wisekrakr.androidmain.helpers.LabelFormatter;
+import com.wisekrakr.androidmain.components.TypeComponent;
 import com.wisekrakr.androidmain.helpers.LabelHelper;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 import com.wisekrakr.androidmain.retainers.TimeKeeper;
 
-import java.util.Iterator;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class InfoDisplay implements Disposable {
 
-    private Integer bricksLeft;
+
     private Integer levelNumber;
     private Integer score;
-    private Integer bounces;
+    private Integer penisLength;
     private Integer lives;
+    private Integer enemies;
 
     private Label scoreCountLabel;
     private Label scoreAddedLabel;
     private Label multiplierLabel;
     private Integer worldTimer;
     private Label timeCountLabel;
-    private Label timeLabel;
-    private Label scoreLabel;
-    private Label levelLabel;
     private Label levelNumberLabel;
-    private Label brickNameLabel;
-    private Label brickNumberLabel;
-    private Label bounceLabel;
-    private Label bounceNumberLabel;
-    private Label livesLabel;
+    private Label enemyNumberLabel;
+    private Label penisLengthLabel;
     private Label livesNumberLabel;
 
     private AndroidGame game;
@@ -63,19 +60,19 @@ public class InfoDisplay implements Disposable {
         BitmapFont font = game.assetManager().assetManager.get("font/gamerFont.fnt");
         font.getData().setScale(GameConstants.FONT_SCALE);
 
-        levelLabel = LabelHelper.label("Level", font, Color.WHITE);
+        Label levelLabel = LabelHelper.label("Level", font, Color.WHITE);
         levelNumberLabel = LabelHelper.label(levelNumber != null ? levelNumber.toString() : null, font, Color.GOLDENROD);
-        timeLabel = LabelHelper.label("TIME", font, Color.WHITE);
-        timeCountLabel =LabelHelper.label(worldTimer != null ? worldTimer.toString() : null, font, Color.GOLDENROD);
-        scoreLabel = LabelHelper.label("Score", font, Color.WHITE);
-        scoreCountLabel =LabelHelper.label(score != null ? score.toString() : null, font, Color.GOLDENROD);
-        scoreAddedLabel =LabelHelper.label(currentScore != null ? currentScore.toString() : null, font, Color.GREEN);
+        Label timeLabel = LabelHelper.label("TIME", font, Color.WHITE);
+        timeCountLabel = LabelHelper.label(worldTimer != null ? worldTimer.toString() : null, font, Color.GOLDENROD);
+        Label scoreLabel = LabelHelper.label("Score", font, Color.WHITE);
+        scoreCountLabel = LabelHelper.label(score != null ? score.toString() : null, font, Color.GOLDENROD);
+        scoreAddedLabel = LabelHelper.label(currentScore != null ? currentScore.toString() : null, font, null);
         multiplierLabel = LabelHelper.label(multi != null ? multi.toString() : null, font, Color.PINK);
-        brickNameLabel = LabelHelper.label("Bricks left", font, Color.WHITE);
-        brickNumberLabel = LabelHelper.label(bricksLeft != null ? bricksLeft.toString() : null, font, Color.GOLDENROD);
-        bounceLabel = LabelHelper.label("Bounces", font, Color.WHITE);
-        bounceNumberLabel = LabelHelper.label(bounces != null ? bounces.toString() : null, font, Color.GOLDENROD);
-        livesLabel = LabelHelper.label("Lives left", font, Color.WHITE);
+        Label enemyNameLabel = LabelHelper.label("Libidos", font, Color.WHITE);
+        enemyNumberLabel = LabelHelper.label(enemies != null ? enemies.toString() : null, font, Color.GOLDENROD);
+        Label penisLabel = LabelHelper.label("Penis length", font, Color.WHITE);
+        penisLengthLabel = LabelHelper.label(penisLength != null ? penisLength.toString() : null, font, Color.GOLDENROD);
+        Label livesLabel = LabelHelper.label("Lives left", font, Color.WHITE);
         livesNumberLabel = LabelHelper.label(lives != null ? lives.toString() : null, font, Color.GOLDENROD);
 
         Table tableLeft = new Table();
@@ -90,13 +87,13 @@ public class InfoDisplay implements Disposable {
         tableRight.row();
         tableRight.add(levelNumberLabel).padTop(2);
         tableRight.row();
-        tableRight.add(brickNameLabel);
+        tableRight.add(enemyNameLabel);
         tableRight.row();
-        tableRight.add(brickNumberLabel);
+        tableRight.add(enemyNumberLabel);
         tableRight.row();
-        tableRight.add(bounceLabel).padBottom(2);
+        tableRight.add(penisLabel).padBottom(2);
         tableRight.row();
-        tableRight.add(bounceNumberLabel).padBottom(2);
+        tableRight.add(penisLengthLabel).padBottom(2);
 
         tableLeft.add(livesLabel).padTop(2);
         tableLeft.row();
@@ -110,7 +107,7 @@ public class InfoDisplay implements Disposable {
         tableLeft.row();
         tableLeft.add(scoreCountLabel).padBottom(2);
         tableLeft.add(scoreAddedLabel).padBottom(2).padLeft(scoreCountLabel.getWidth());
-        tableLeft.add(multiplierLabel).padBottom(2).padLeft(scoreCountLabel.getWidth() + scoreAddedLabel.getWidth());
+//        tableLeft.add(multiplierLabel).padBottom(2).padLeft(scoreCountLabel.getRadius() + scoreAddedLabel.getRadius());
 
         stage.addActor(tableLeft);
         stage.addActor(tableRight);
@@ -132,32 +129,62 @@ public class InfoDisplay implements Disposable {
             scoreAdded();
 
             levelNumberLabel.setText(Integer.toString(game.getGameThread().getLevelGenerationSystem().getMainLevel()));
-            brickNumberLabel.setText(Integer.toString(game.getGameThread().getEntityFactory().getTotalBricks().size()));
+            enemyNumber();
 
-            bounces();
+            penisLength();
             multiplier();
-            lives(delta);
+            lives();
         }
+    }
+
+    private void enemyNumber(){
+        List<Entity>balls = new ArrayList<Entity>();
+        for (Entity entity: game.getEngine().getEntities()){
+            if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.ENEMY){
+                balls.add(entity);
+            }
+        }
+        enemyNumberLabel.setText(Integer.toString(balls.size()));
     }
 
     private void scoreAdded(){
         int newScore = ScoreKeeper.getScore();
 
         if (newScore > currentScore) {
-
+            scoreAddedLabel.setColor(Color.GREEN);
             scoreAddedLabel.setText(" +" + ScoreKeeper.getPointsToGive() * ScoreKeeper.getMultiplier());
             scoreAddedLabel.addAction(Actions.sequence(Actions.fadeIn(0.5f), Actions.fadeOut(0.5f)));
 
             currentScore = newScore;
+        }else if (newScore < currentScore){
+            scoreAddedLabel.setColor(Color.RED);
+            scoreAddedLabel.setText(" -" + ScoreKeeper.getPointsToGive() * ScoreKeeper.getMultiplier());
+            scoreAddedLabel.addAction(Actions.sequence(Actions.fadeIn(0.5f), Actions.fadeOut(0.5f)));
+
+            currentScore = newScore;
+        }else {
+            scoreAddedLabel.setText("");
         }
     }
 
-    private void bounces(){
-        Iterator<Entity>iterator = game.getGameThread().getEntityFactory().getTotalBalls().iterator();
-        if (iterator.hasNext()){
-            bounceNumberLabel.setText(Integer.toString(iterator.next().getComponent(CollisionComponent.class).bounces));
-        }else {
-            bounceNumberLabel.setText("");
+    private void penisLength(){
+
+        for (Entity entity: game.getEngine().getEntities()){
+            if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PLAYER){
+                PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
+
+                for (Entity ent: playerComponent.getAttachedEntities()){
+                    if (ent.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PENIS) {
+                        PenisComponent penisComponent = game.getGameThread().getComponentMapperSystem().getPenisComponentMapper().get(ent);
+
+                        float length = penisComponent.getLength();
+                        int inches = (int) (length / 2.54f);
+                        DecimalFormat inchFormat = new DecimalFormat("#.00");
+
+                        penisLengthLabel.setText(length + " cm /" + inchFormat.format(inches) + " in");
+                    }
+                }
+            }
         }
     }
 
@@ -172,13 +199,8 @@ public class InfoDisplay implements Disposable {
         }
     }
 
-    private void lives(float delta){
-        LabelFormatter formatter = new LabelFormatter(Integer.toString(ScoreKeeper.lives));
-
-
-        livesNumberLabel.setText(formatter.getText(delta));
-
-
+    private void lives(){
+        livesNumberLabel.setText(ScoreKeeper.lives);
     }
 
 

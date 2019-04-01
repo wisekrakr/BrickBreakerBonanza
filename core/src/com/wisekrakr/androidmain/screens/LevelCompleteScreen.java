@@ -19,16 +19,12 @@ import com.wisekrakr.androidmain.GamePreferences;
 
 public class LevelCompleteScreen extends ScreenAdapter {
 
-    private final GamePreferences preferences;
     private AndroidGame game;
     private Stage stage;
 
     public LevelCompleteScreen(AndroidGame game) {
         this.game = game;
-
         stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
-
-        preferences = game.getGamePreferences();
     }
 
     @Override
@@ -85,8 +81,6 @@ public class LevelCompleteScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act();
         stage.draw();
-
-
     }
 
     @Override

@@ -9,7 +9,7 @@ import java.util.GregorianCalendar;
 
 public class TimeKeeper {
 
-    public float time = 0;
+    public float time = 60;
 
     public void setTime(float time) {
         this.time = time;
@@ -17,11 +17,23 @@ public class TimeKeeper {
 
     public float gameClock = 0;
 
-    public float speedUp = -1000;
+    public float timeToChase = 0;
+    public float powerTime = 23f;
+    public float spawnInterval = 2f;
+
+    public float getTimeToChase() {
+        return timeToChase;
+    }
+
+    public void setTimeToChase(float timeToChase) {
+        this.timeToChase = timeToChase;
+    }
 
     public void reset(){
-        time = 0f;
-        speedUp = -1000;
+        time = 60f;
+        powerTime = 23f;
+        timeToChase = 0;
+        spawnInterval = 2f;
     }
 
 

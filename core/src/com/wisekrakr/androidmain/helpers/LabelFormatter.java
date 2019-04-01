@@ -27,7 +27,7 @@ public class LabelFormatter {
                     textBuilder.append('\n');
                 }
             } else {
-                textBuilder.append(row.substring(0, row.length() + current));
+                textBuilder.append(row, 0, row.length() + current);
 
                 // Back fill spaces for partial line
                 for (int i = 0; i < -current; i++) {
