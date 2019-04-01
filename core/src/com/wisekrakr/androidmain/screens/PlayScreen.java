@@ -1,13 +1,18 @@
 package com.wisekrakr.androidmain.screens;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
 
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
+import com.wisekrakr.androidmain.components.TypeComponent;
 import com.wisekrakr.androidmain.controls.Controls;
 import com.wisekrakr.androidmain.helpers.GameHelper;
 import com.wisekrakr.androidmain.systems.*;
@@ -47,7 +52,7 @@ public class PlayScreen extends ScreenAdapter  {
 
 
     /**
-     * Add remaining systems we did not need to add to the Gamethread.
+     * Add remaining systems we did not need to add to GameThread.
      */
     private void addSystems() {
 
@@ -56,7 +61,9 @@ public class PlayScreen extends ScreenAdapter  {
         game.getEngine().addSystem(new PlayerSystem(game));
         game.getEngine().addSystem(new EnemySystem(game));
         game.getEngine().addSystem(new PenisSystem(game));
-        game.getEngine().addSystem(new PowerUpSystem(game)); //todo implement power ups or not?
+        game.getEngine().addSystem(new TesticleSystem(game));
+        game.getEngine().addSystem(new PowerUpSystem(game));
+        game.getEngine().addSystem(new ObstacleSystem(game));
 
         visualizer = new Visualizer(game);
         controls = new Controls();
@@ -64,8 +71,6 @@ public class PlayScreen extends ScreenAdapter  {
 
         game.getEngine().addSystem(new PlayerControlSystem(game, controls, visualizer.getRenderingSystem().getCamera()));
         game.getEngine().addSystem(new CollisionSystem(game));
-
-        game.getEngine().addSystem(new ObstacleSystem(game));
 
     }
 
@@ -87,13 +92,11 @@ public class PlayScreen extends ScreenAdapter  {
 
         game.getGameThread().getTimeKeeper().gameClock += delta;
 
-        visualizer.backgroundColorClear();
+        Gdx.gl.glClearColor(0,0,0,1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         game.getEngine().update(delta);
         visualizer.getRenderingSystem().getCamera().update();
-
-//        game.getGameThread().getEntityCreator().getTiledMapRenderer().setView(visualizer.getRenderingSystem().getCamera());
-//        game.getGameThread().getEntityCreator().getTiledMapRenderer().render();
 
         game.getGameThread().getLevelGenerationSystem().updateLevels(delta);
 
@@ -103,7 +106,7 @@ public class PlayScreen extends ScreenAdapter  {
         );
 
 //        visualizer.debugDrawableFilled();
-        visualizer.debugDrawableLine(delta);
+//        visualizer.debugDrawableLine(delta);
 
         visualizer.draw(delta);
 

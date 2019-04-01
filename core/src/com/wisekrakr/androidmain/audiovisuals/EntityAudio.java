@@ -34,7 +34,7 @@ public class EntityAudio implements EntityAudioContext {
                     if (entity.getComponent(EnemyComponent.class).isDestroy()){
                         if (PowerHelper.getPower() == PowerHelper.Power.EXTRA_LIFE){
                             addSound("sounds/powerup_extratime.wav");
-                        }else if (PowerHelper.getPower() == PowerHelper.Power.ENLARGE_ENEMY){
+                        }else if (PowerHelper.getPower() == PowerHelper.Power.SPEED_BOOST){
                             addSound("sounds/powerdown_moreballs.wav");
                         }else if (PowerHelper.getPower() == PowerHelper.Power.ENLARGE_PLAYER){
                             addSound("sounds/powerup_freeze.wav");

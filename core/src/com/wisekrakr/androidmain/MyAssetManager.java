@@ -47,7 +47,9 @@ public class MyAssetManager implements Disposable {
         assetManager.load("font/myFontBlack.fnt", BitmapFont.class);
         assetManager.load("font/achievementFont.fnt", BitmapFont.class);
         assetManager.load("font/gamerFont.fnt", BitmapFont.class);
-
+        assetManager.load("font/cocksureFont.fnt", BitmapFont.class);
+        assetManager.load("font/penisFont.fnt", BitmapFont.class);
+        assetManager.load("font/penisBlackFont.fnt", BitmapFont.class);
         assetManager.finishLoading();
     }
 
@@ -68,9 +70,21 @@ public class MyAssetManager implements Disposable {
      * All the Textures loaded in the the AssetManager
      */
     public void loadTextures() {
+        assetManager.load("images/others/penisicon.png", Texture.class);
         assetManager.load("images/background/mainbg.jpg", Texture.class);
         assetManager.load("images/others/seanA.png", Texture.class);
-
+        assetManager.load("images/others/seanB.png", Texture.class);
+        assetManager.load("images/others/seanC.png", Texture.class);
+        assetManager.load("images/background/penisPattern01.jpg", Texture.class);
+        assetManager.load("images/background/penisPattern02.jpg", Texture.class);
+        assetManager.load("images/background/penisPattern03.png", Texture.class);
+        assetManager.load("images/background/penisPattern04.jpg", Texture.class);
+        assetManager.load("images/background/penisPattern05.jpg", Texture.class);
+        assetManager.load("images/background/penisPattern06.jpeg", Texture.class);
+        assetManager.load("images/background/penisPattern07.jpg", Texture.class);
+        assetManager.load("images/background/The Penis Mightier title card.jpg", Texture.class);
+        assetManager.load("images/background/title_penis.png", Texture.class);
+        assetManager.load("images/background/drops.png", Texture.class);
         assetManager.finishLoading();
     }
 
@@ -83,8 +97,9 @@ public class MyAssetManager implements Disposable {
     }
 
     public void queueGameImages(){
-        assetManager.load("images/deez/balls.atlas", TextureAtlas.class);
-        assetManager.load("images/player/player.atlas", TextureAtlas.class);
+        assetManager.load("images/players/players.atlas", TextureAtlas.class);
+        assetManager.load("images/cockandballs/cockandballs.atlas", TextureAtlas.class);
+        assetManager.load("images/powerups/powerups.atlas", TextureAtlas.class);
         assetManager.load("images/others/others.atlas", TextureAtlas.class);
 
     }

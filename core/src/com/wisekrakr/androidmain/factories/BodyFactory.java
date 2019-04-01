@@ -139,31 +139,6 @@ public class BodyFactory {
         return triangleBody;
     }
 
-    Body makeCrazyPolyBody(float positionX, float positionY, float width, float height, Material material, BodyDef.BodyType bodyType, boolean fixedRotation){
-
-        BodyDef triangleBodyDef = new BodyDef();
-        triangleBodyDef.type = bodyType;
-        triangleBodyDef.position.x = positionX;
-        triangleBodyDef.position.y = positionY;
-        triangleBodyDef.fixedRotation = fixedRotation;
-
-        Body triangleBody = world.createBody(triangleBodyDef);
-        PolygonShape poly = new PolygonShape();
-
-        Vector2[]vector2s = new Vector2[5];
-        vector2s[0] = new Vector2(0, height);
-        vector2s[1] = new Vector2(-width/2, 0);
-        vector2s[2] = new Vector2(width/2, 0);
-        vector2s[3] = new Vector2(0, height/2);
-        vector2s[4] = new Vector2(width/2, height);
-
-        poly.set(vector2s);
-
-        triangleBody.createFixture(makeDefaultFixture(material,poly));
-        poly.dispose();
-
-        return triangleBody;
-    }
 
     void makeConeSensor(Body body, float viewRadius){
 

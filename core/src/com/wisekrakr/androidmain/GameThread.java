@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.wisekrakr.androidmain.factories.EntityFactory;
 import com.wisekrakr.androidmain.retainers.TimeKeeper;
 import com.wisekrakr.androidmain.systems.ComponentMapperSystem;
-import com.wisekrakr.androidmain.systems.LevelGenerationSystem;
 import com.wisekrakr.androidmain.systems.PhysicsSystem;
 
 public class GameThread {
@@ -29,6 +28,7 @@ public class GameThread {
         componentMapperSystem = new ComponentMapperSystem();
 
         init();
+
     }
 
     public void startNewLevelGeneration(){

@@ -8,7 +8,7 @@ public class ScoreKeeper {
         ScoreKeeper.lives = lives;
     }
 
-    private static int initialEnemies = 3;
+    private static int initialEnemies = 0;
 
     private static int initialPowerUps = 0;
 

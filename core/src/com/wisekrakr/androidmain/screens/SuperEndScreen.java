@@ -21,6 +21,7 @@ public class SuperEndScreen extends ScreenAdapter {
 
     private Stage stage;
     private AndroidGame game;
+    private Label highScoreLabel;
 
     public SuperEndScreen(AndroidGame game) {
         this.game = game;
@@ -44,8 +45,8 @@ public class SuperEndScreen extends ScreenAdapter {
         Label currentScoreTextLabel = new Label("YOUR SCORE:", new Label.LabelStyle(font, Color.LIME));
         Label highScoreTextLabel = new Label("HIGH SCORE:", new Label.LabelStyle(font, Color.LIME));
         Label currentScoreLabel = new Label(Integer.toString(ScoreKeeper.getScore()), new Label.LabelStyle(font, Color.LIME));
-        Label highScoreLabel = new Label(Integer.toString(game.getGamePreferences().getHighScore()), new Label.LabelStyle(font, Color.LIME));
-        Label gameOverLabel = new Label("YOU DID IT!", new Label.LabelStyle(font, Color.RED));
+        highScoreLabel = new Label(Integer.toString(game.getGamePreferences().getHighScore()), new Label.LabelStyle(font, Color.LIME));
+        Label gameOverLabel = new Label("YOU DID IT!", new Label.LabelStyle(font, Color.GREEN));
 
         TextButton mainMenu = new TextButton("main menu", skin);
         TextButton exit = new TextButton("exit", skin);
@@ -87,6 +88,8 @@ public class SuperEndScreen extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         stage.act();
         stage.draw();
+
+        highScoreLabel.setText(game.getGamePreferences().getHighScore());
     }
 
 

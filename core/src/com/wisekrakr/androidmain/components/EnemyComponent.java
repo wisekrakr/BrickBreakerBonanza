@@ -15,7 +15,8 @@ public class EnemyComponent implements Component, Pool.Poolable {
     private float velocityX = 0;
     private float velocityY = 0;
     private boolean destroy;
-    private float radius = 0;
+    private float width = 0;
+    private float height = 0;
     private float direction = 0;
     private float penisLength = 0;
     private float penisGirth = 0;
@@ -32,22 +33,22 @@ public class EnemyComponent implements Component, Pool.Poolable {
 
     public float chaseInterval = 0;
 
-    private EntityColor entityColor = null;
+    private EntityStyle entityStyle = null;
 
-    public EnemyColorContext getEnemyColorContext() {
-        return enemyColorContext;
+    public EntityStyleContext getEntityStyleContext() {
+        return entityStyleContext;
     }
 
-    private EnemyColorContext enemyColorContext = new EnemyColorContext() {
+    private EntityStyleContext entityStyleContext = new EntityStyleContext() {
 
         @Override
-        public EntityColor getEnemyColor() {
-            return entityColor;
+        public EntityStyle getEntityStyle() {
+            return entityStyle;
         }
 
         @Override
-        public void setEnemyColor(EntityColor color) {
-            entityColor = color;
+        public void setEntityStyle(EntityStyle style) {
+            entityStyle = style;
         }
     };
 
@@ -91,12 +92,20 @@ public class EnemyComponent implements Component, Pool.Poolable {
         this.destroy = destroy;
     }
 
-    public float getRadius() {
-        return radius;
+    public float getWidth() {
+        return width;
     }
 
-    public void setRadius(float radius) {
-        this.radius = radius;
+    public void setWidth(float width) {
+        this.width = width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
     }
 
     public float getDirection() {
@@ -135,14 +144,14 @@ public class EnemyComponent implements Component, Pool.Poolable {
         this.penisGirth = penisGirth;
     }
 
-    private Entity attachedEntity;
+    private List<Entity> attachedEntities;
 
-    public Entity getAttachedEntity() {
-        return attachedEntity;
+    public List<Entity> getAttachedEntities() {
+        return attachedEntities;
     }
 
-    public void setAttachedEntity(Entity attachedEntity) {
-        this.attachedEntity = attachedEntity;
+    public void setAttachedEntities(List<Entity> attachedEntities) {
+        this.attachedEntities = attachedEntities;
     }
 
     @Override
@@ -152,7 +161,8 @@ public class EnemyComponent implements Component, Pool.Poolable {
         velocityY = 0;
         destroy = false;
 
-        radius = 0;
+        width = 0;
+        height = 0;
         direction = 0;
 
         initialPositions = new ArrayList<Vector2>();
@@ -163,6 +173,6 @@ public class EnemyComponent implements Component, Pool.Poolable {
 
         bounces = 0;
 
-        attachedEntity = null;
+        attachedEntities = new ArrayList<Entity>();
     }
 }

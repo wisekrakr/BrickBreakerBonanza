@@ -6,7 +6,6 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.*;
-import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 
 public class PenisSystem extends IteratingSystem implements SystemEntityContext {
 
@@ -24,22 +23,9 @@ public class PenisSystem extends IteratingSystem implements SystemEntityContext 
         CollisionComponent collisionComponent = game.getGameThread().getComponentMapperSystem().getCollisionComponentMapper().get(entity);
 
         if (collisionComponent.hitEnemy){
-            ScoreKeeper.setPointsToGive(50);
             collisionComponent.setHitEnemy(false);
         }else if (collisionComponent.hitPlayer){
-            ScoreKeeper.setPointsToGive(-10);
             collisionComponent.setHitPlayer(false);
-        }
-//        ScoreKeeper.setScore(ScoreKeeper.getPointsToGive());
-
-        if (collisionComponent.hitPenis){
-            //todo do something fun
-//            penisComponent.getAttachedEntity().getComponent(Box2dBodyComponent.class).body.
-//                    setLinearVelocity(
-//                            -penisComponent.getAttachedEntity().getComponent(Box2dBodyComponent.class).body.getLinearVelocity().x,
-//                            -penisComponent.getAttachedEntity().getComponent(Box2dBodyComponent.class).body.getLinearVelocity().y
-//                    );
-            collisionComponent.setHitPenis(false);
         }
 
         outOfBounds(entity);
@@ -58,11 +44,6 @@ public class PenisSystem extends IteratingSystem implements SystemEntityContext 
     }
 
     @Override
-    public void powerHandler(Entity entity) {
-
-    }
-
-    @Override
     public void destroy(Entity entity) {
         Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
 
@@ -74,11 +55,11 @@ public class PenisSystem extends IteratingSystem implements SystemEntityContext 
         PenisComponent penisComponent = game.getGameThread().getComponentMapperSystem().getPenisComponentMapper().get(entity);
         Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
 
-        if (penisComponent.getPosition().x + penisComponent.getWidth()/2 > GameConstants.WORLD_WIDTH ||
-                penisComponent.getPosition().x - penisComponent.getWidth()/2 < 0){
+        if (penisComponent.getPosition().x + penisComponent.getLength()/2 > GameConstants.WORLD_WIDTH ||
+                penisComponent.getPosition().x - penisComponent.getLength()/2 < 0){
             bodyComponent.body.setLinearVelocity(-penisComponent.getVelocityX(), penisComponent.getVelocityY());
-        }else if (penisComponent.getPosition().y + penisComponent.getHeight()/2 > GameConstants.WORLD_HEIGHT ||
-                penisComponent.getPosition().y - penisComponent.getHeight()/2 < 0){
+        }else if (penisComponent.getPosition().y + penisComponent.getGirth()/2 > GameConstants.WORLD_HEIGHT ||
+                penisComponent.getPosition().y - penisComponent.getGirth()/2 < 0){
             bodyComponent.body.setLinearVelocity(penisComponent.getVelocityX(), -penisComponent.getVelocityY());
         }
     }

@@ -10,7 +10,6 @@ public class ComponentMapperSystem {
     private ComponentMapper<CollisionComponent> collisionComponentMapper;
     private ComponentMapper<PowerUpComponent> powerUpComponentMapper;
     private ComponentMapper<ObstacleComponent> obstacleComponentMapper;
-    private ComponentMapper<LevelComponent> levelComponentMapper;
     private ComponentMapper<ParticleEffectComponent> particleEffectComponentMapper;
     private ComponentMapper<PlayerComponent> playerComponentMapper;
     private ComponentMapper<TextureComponent> textureComponentMapper;
@@ -18,6 +17,7 @@ public class ComponentMapperSystem {
     private ComponentMapper<TypeComponent> typeComponentMapper;
     private ComponentMapper<WallComponent> wallComponentMapper;
     private ComponentMapper<PenisComponent> penisComponentMapper;
+    private ComponentMapper<TesticleComponent> testicleComponentMapper;
 
     public ComponentMapperSystem() {
 
@@ -26,7 +26,6 @@ public class ComponentMapperSystem {
         collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
         powerUpComponentMapper = ComponentMapper.getFor(PowerUpComponent.class);
         obstacleComponentMapper = ComponentMapper.getFor(ObstacleComponent.class);
-        levelComponentMapper = ComponentMapper.getFor(LevelComponent.class);
         particleEffectComponentMapper = ComponentMapper.getFor(ParticleEffectComponent.class);
         playerComponentMapper = ComponentMapper.getFor(PlayerComponent.class);
         textureComponentMapper = ComponentMapper.getFor(TextureComponent.class);
@@ -34,6 +33,7 @@ public class ComponentMapperSystem {
         typeComponentMapper = ComponentMapper.getFor(TypeComponent.class);
         wallComponentMapper = ComponentMapper.getFor(WallComponent.class);
         penisComponentMapper = ComponentMapper.getFor(PenisComponent.class);
+        testicleComponentMapper = ComponentMapper.getFor(TesticleComponent.class);
     }
 
     public ComponentMapper<EnemyComponent> getEnemyComponentMapper() {
@@ -54,10 +54,6 @@ public class ComponentMapperSystem {
 
     public ComponentMapper<ObstacleComponent> getObstacleComponentMapper() {
         return obstacleComponentMapper;
-    }
-
-    public ComponentMapper<LevelComponent> getLevelComponentMapper() {
-        return levelComponentMapper;
     }
 
     public ComponentMapper<ParticleEffectComponent> getParticleEffectComponentMapper() {
@@ -86,5 +82,9 @@ public class ComponentMapperSystem {
 
     public ComponentMapper<PenisComponent> getPenisComponentMapper() {
         return penisComponentMapper;
+    }
+
+    public ComponentMapper<TesticleComponent> getTesticleComponentMapper() {
+        return testicleComponentMapper;
     }
 }

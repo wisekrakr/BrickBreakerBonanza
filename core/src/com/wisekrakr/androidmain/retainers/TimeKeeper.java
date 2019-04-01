@@ -18,7 +18,8 @@ public class TimeKeeper {
     public float gameClock = 0;
 
     public float timeToChase = 0;
-    public float powerTime = 5f;
+    public float powerTime = 23f;
+    public float spawnInterval = 2f;
 
     public float getTimeToChase() {
         return timeToChase;
@@ -30,8 +31,9 @@ public class TimeKeeper {
 
     public void reset(){
         time = 60f;
-        powerTime = 22f;
+        powerTime = 23f;
         timeToChase = 0;
+        spawnInterval = 2f;
     }
 
 

@@ -45,18 +45,22 @@ public class PlayerControlSystem extends IteratingSystem {
 
         if (controller.isLeftMouseDown || Gdx.input.isTouched()){
             bodyComponent.body.setLinearVelocity(
-                    bodyComponent.body.getLinearVelocity().x + GameConstants.PLAYER_SPEED * MathUtils.cos(angle),
-                    bodyComponent.body.getLinearVelocity().y + GameConstants.PLAYER_SPEED * MathUtils.sin(angle)
+                    bodyComponent.body.getLinearVelocity().x + playerComponent.getSpeed() * MathUtils.cos(angle),
+                    bodyComponent.body.getLinearVelocity().y + playerComponent.getSpeed() * MathUtils.sin(angle)
             );
             playerComponent.setMoving(true);
+        }else if (controller.nextLevel) { //left alt
+//            game.getGameThread().getTimeKeeper().setTime(0);
+            game.changeScreen(AndroidGame.SUPERENDGAME);
         }
+
     }
 
     private void movement(Entity entity){
         Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
         PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
 
-        float speed = GameConstants.PLAYER_SPEED;
+        float speed = playerComponent.getSpeed();
 
         if (controller != null) {
             if (controller.left) {
@@ -75,9 +79,7 @@ public class PlayerControlSystem extends IteratingSystem {
                 bodyComponent.body.setLinearVelocity(0, speed); //w
                 playerComponent.setMoving(true);
             }
-            if (controller.nextLevel) { //left alt
-                game.getGameThread().getTimeKeeper().setTime(0);
-            }
+
         }
 
     }

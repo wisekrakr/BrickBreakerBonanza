@@ -37,6 +37,11 @@ public class CollisionComponent implements Component, Pool.Poolable {
     public void reset() {
 
         collisionEntity = null;
+        hitPenis = false;
+        hitPlayer = false;
+        hitSurface = false;
+        hitObstacle = false;
+        hitEnemy = false;
 
     }
 }

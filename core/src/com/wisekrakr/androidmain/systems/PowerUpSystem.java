@@ -3,13 +3,12 @@ package com.wisekrakr.androidmain.systems;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.*;
 import com.wisekrakr.androidmain.helpers.PowerHelper;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
+import com.wisekrakr.androidmain.retainers.SelectedCharacter;
 
 public class PowerUpSystem extends IteratingSystem implements SystemEntityContext {
 
@@ -24,11 +23,22 @@ public class PowerUpSystem extends IteratingSystem implements SystemEntityContex
     protected void processEntity(Entity entity, float deltaTime) {
         PowerUpComponent powerUpComponent = game.getGameThread().getComponentMapperSystem().getPowerUpComponentMapper().get(entity);
         Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
+        CollisionComponent collisionComponent = game.getGameThread().getComponentMapperSystem().getCollisionComponentMapper().get(entity);
 
         bodyComponent.body.setLinearVelocity(powerUpComponent.getVelocityX(), powerUpComponent.getVelocityY());
 
+        if (collisionComponent.hitPlayer){
+            powerHandler(entity);
+            if (powerUpComponent.isDestroy()){
+                destroy(entity);
+            }
+        }
+
+
+
+
+
         outOfBounds(entity);
-        powerHandler(entity);
         bodyHandler(entity, bodyComponent);
     }
 
@@ -39,89 +49,82 @@ public class PowerUpSystem extends IteratingSystem implements SystemEntityContex
         powerUpComponent.setPosition(bodyComponent.body.getPosition());
         powerUpComponent.setVelocityX(bodyComponent.body.getLinearVelocity().x);
         powerUpComponent.setVelocityY(bodyComponent.body.getLinearVelocity().y);
+
     }
 
-    @Override
-    public void powerHandler(Entity entity) {
+    private void powerHandler(Entity entity) {
         CollisionComponent collisionComponent = game.getGameThread().getComponentMapperSystem().getCollisionComponentMapper().get(entity);
+        PowerUpComponent powerUpComponent = game.getGameThread().getComponentMapperSystem().getPowerUpComponentMapper().get(entity);
 
-        System.out.println(PowerHelper.getPowerUpMap()); //todo remove
+        switch (PowerHelper.getPower()){
+            case ENLARGE_PLAYER:
+                for (Entity player: game.getEngine().getEntities()) {
+                    if (player.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PLAYER) {
+                        PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(player);
 
-        if (collisionComponent.hitPlayer){
-            switch (PowerHelper.getPower()){
+                        float length = playerComponent.getPenisLength();
+                        float girth = playerComponent.getPenisGirth();
 
-                case ENLARGE_PLAYER:
-                    for (Entity player: game.getEngine().getEntities()) {
-                        if (player.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PLAYER) {
-                            PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(player);
+                        playerComponent.setPenisLength(length + (length/5));
+                        playerComponent.setPenisGirth(girth + (girth/5));
 
-                            float length = playerComponent.getPenisLength();
-                            float girth = playerComponent.getPenisGirth();
+                        SelectedCharacter.setPenisLengthGirth(playerComponent.getPenisLength(), playerComponent.getPenisGirth());
 
-                            playerComponent.setPenisLength(length + (length/5));
-                            playerComponent.setPenisGirth(girth + (girth/5));
-
-                            playerComponent.setDestroy(true);
-                        }
+                        playerComponent.setDestroy(true);
                     }
-                    break;
-                case REDUCE_PLAYER:
-                    for (Entity player: game.getEngine().getEntities()) {
-                        if (player.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PLAYER) {
+                }
+                break;
+            case REDUCE_PLAYER:
+                for (Entity player: game.getEngine().getEntities()) {
+                    if (player.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PLAYER) {
 
-                            PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(player);
+                        PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(player);
 
-                            float length = playerComponent.getPenisLength();
-                            float girth = playerComponent.getPenisGirth();
+                        float length = playerComponent.getPenisLength();
+                        float girth = playerComponent.getPenisGirth();
 
-                            playerComponent.setPenisLength(length - (length/5));
-                            playerComponent.setPenisGirth(girth - (girth/5));
+                        playerComponent.setPenisLength(length - (length/5));
+                        playerComponent.setPenisGirth(girth - (girth/5));
 
-                            playerComponent.setDestroy(true);
-                        }
+                        SelectedCharacter.setPenisLengthGirth(playerComponent.getPenisLength(), playerComponent.getPenisGirth());
+
+                        playerComponent.setDestroy(true);
                     }
-                    break;
-                case ENLARGE_ENEMY:
-                    for (Entity enemy: game.getEngine().getEntities()) {
-                        if (enemy.getComponent(TypeComponent.class).getType() == TypeComponent.Type.ENEMY) {
-                            EnemyComponent enemyComponent = game.getGameThread().getComponentMapperSystem().getEnemyComponentMapper().get(enemy);
+                }
+                break;
+            case SPEED_BOOST:
+                for (Entity enemy: game.getEngine().getEntities()) {
+                    if (enemy.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PLAYER) {
+                        PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(enemy);
 
-                            float length = enemyComponent.getPenisLength();
-                            float girth = enemyComponent.getPenisGirth();
-
-                            enemyComponent.setPenisLength(length + (length/5));
-                            enemyComponent.setPenisGirth(girth + (girth/5));
-
-                            enemyComponent.setDestroy(true);
-                        }
+                        playerComponent.setSpeed(playerComponent.getSpeed() * 2);
                     }
-                    break;
-                case REDUCE_ENEMY:
-                    for (Entity enemy: game.getEngine().getEntities()) {
-                        if (enemy.getComponent(TypeComponent.class).getType() == TypeComponent.Type.ENEMY) {
-                            EnemyComponent enemyComponent = game.getGameThread().getComponentMapperSystem().getEnemyComponentMapper().get(enemy);
+                }
+                break;
+            case SLOW_MO:
+                for (Entity enemy: game.getEngine().getEntities()) {
+                    if (enemy.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PLAYER) {
+                        PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(enemy);
 
-                            float length = enemyComponent.getPenisLength();
-                            float girth = enemyComponent.getPenisGirth();
-
-                            enemyComponent.setPenisLength(length - (length/5));
-                            enemyComponent.setPenisGirth(girth - (girth/5));
-
-                            enemyComponent.setDestroy(true);
-                        }
+                        playerComponent.setSpeed(playerComponent.getSpeed() / 2);
                     }
-                    break;
-                case EXTRA_LIFE:
-                    ScoreKeeper.setLives(ScoreKeeper.lives + 1);
-                    break;
-            }
-            destroy(entity);
+                }
+                break;
+            case EXTRA_LIFE:
+                ScoreKeeper.setLives(ScoreKeeper.lives + 1);
+                break;
         }
+        powerUpComponent.setDestroy(true);
+        collisionComponent.setHitPlayer(false);
+
     }
 
     @Override
     public void destroy(Entity entity) {
         Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
+        PowerUpComponent powerUpComponent = game.getGameThread().getComponentMapperSystem().getPowerUpComponentMapper().get(entity);
+
+        powerUpComponent.setDestroy(false);
 
         bodyComponent.isDead = true;
 

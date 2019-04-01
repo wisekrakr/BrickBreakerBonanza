@@ -4,8 +4,9 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
-import com.wisekrakr.androidmain.GameConstants;
-import com.wisekrakr.androidmain.systems.SystemEntityContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PlayerComponent implements Component, Pool.Poolable {
 
@@ -13,15 +14,46 @@ public class PlayerComponent implements Component, Pool.Poolable {
     private float velocityX = 0;
     private float velocityY = 0;
     private boolean destroy;
-    private float radius = 0;
+    private float width = 0;
+    private float height = 0;
     private float direction = 0;
+    private float speed = 0;
     private float penisLength = 0;
     private float penisGirth = 0;
+
+    private EntityStyle entityStyle = null;
+
+    public EntityStyleContext getEntityStyleContext() {
+        return entityStyleContext;
+    }
+
+    private EntityStyleContext entityStyleContext = new EntityStyleContext() {
+
+        @Override
+        public EntityStyle getEntityStyle() {
+            return entityStyle;
+        }
+
+        @Override
+        public void setEntityStyle(EntityStyle style) {
+            entityStyle = style;
+        }
+
+
+    };
 
     public boolean isMoving = false;
 
     public void setMoving(boolean moving) {
         isMoving = moving;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
     }
 
     public Vector2 getPosition() {
@@ -56,12 +88,20 @@ public class PlayerComponent implements Component, Pool.Poolable {
         this.destroy = destroy;
     }
 
-    public float getRadius() {
-        return radius;
+    public float getWidth() {
+        return width;
     }
 
-    public void setRadius(float radius) {
-        this.radius = radius;
+    public void setWidth(float width) {
+        this.width = width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
     }
 
     public float getDirection() {
@@ -88,14 +128,14 @@ public class PlayerComponent implements Component, Pool.Poolable {
         this.penisGirth = penisGirth;
     }
 
-    private Entity attachedEntity;
+    private List<Entity> attachedEntities;
 
-    public Entity getAttachedEntity() {
-        return attachedEntity;
+    public List<Entity> getAttachedEntities() {
+        return attachedEntities;
     }
 
-    public void setAttachedEntity(Entity attachedEntity) {
-        this.attachedEntity = attachedEntity;
+    public void setAttachedEntities(List<Entity> attachedEntities) {
+        this.attachedEntities = attachedEntities;
     }
 
     @Override
@@ -105,7 +145,8 @@ public class PlayerComponent implements Component, Pool.Poolable {
         velocityY = 0;
         destroy = false;
 
-        radius = 0;
+        width = 0;
+        height = 0;
         direction = 0;
 
         penisLength = 0;
@@ -113,6 +154,6 @@ public class PlayerComponent implements Component, Pool.Poolable {
 
         isMoving = false;
 
-        attachedEntity = null;
+        attachedEntities = new ArrayList<Entity>();
     }
 }

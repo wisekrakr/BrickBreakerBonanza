@@ -6,15 +6,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Pool;
 
 
-public class PenisComponent implements Component, Pool.Poolable{
+public class TesticleComponent implements Component, Pool.Poolable{
 
     private Vector2 position = new Vector2();
     private float velocityX = 0;
     private float velocityY = 0;
     private boolean destroy;
-    private float length = 0;
-    private float girth = 0;
-    private float direction = 0;
+    private float radius = 0;
 
     private Entity attachedEntity;
 
@@ -58,29 +56,15 @@ public class PenisComponent implements Component, Pool.Poolable{
         this.destroy = destroy;
     }
 
-    public float getLength() {
-        return length;
+    public float getRadius() {
+        return radius;
     }
 
-    public void setLength(float length) {
-        this.length = length;
+    public void setRadius(float radius) {
+        this.radius = radius;
     }
 
-    public float getGirth() {
-        return girth;
-    }
 
-    public void setGirth(float girth) {
-        this.girth = girth;
-    }
-
-    public float getDirection() {
-        return direction;
-    }
-
-    public void setDirection(float direction) {
-        this.direction = direction;
-    }
 
     @Override
     public void reset() {
@@ -89,10 +73,7 @@ public class PenisComponent implements Component, Pool.Poolable{
         velocityY = 0;
         destroy = false;
 
-        length = 0;
-        girth = 0;
-
-        direction = 0;
+        radius = 0;
 
         attachedEntity = null;
     }

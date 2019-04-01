@@ -121,7 +121,7 @@ public class LoadingScreen extends ScreenAdapter {
                 currentLoadingStage = 6;
 
                 if (countDown <= 0){
-                    game.changeScreen(AndroidGame.MENU);
+                    game.changeScreen(AndroidGame.TITLE);
                 }
             }
         }

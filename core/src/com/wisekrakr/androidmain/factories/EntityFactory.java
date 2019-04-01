@@ -2,20 +2,23 @@ package com.wisekrakr.androidmain.factories;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.joints.RopeJointDef;
 import com.badlogic.gdx.physics.box2d.joints.WeldJointDef;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.PhysicalObjectContactListener;
 import com.wisekrakr.androidmain.components.Box2dBodyComponent;
 
-import com.wisekrakr.androidmain.components.EntityColor;
-import com.wisekrakr.androidmain.components.PenisComponent;
+import com.wisekrakr.androidmain.components.EntityStyle;
 import com.wisekrakr.androidmain.helpers.ComponentHelper;
 import com.wisekrakr.androidmain.helpers.PowerHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.wisekrakr.androidmain.components.TypeComponent.Type.*;
 
@@ -55,7 +58,6 @@ public class EntityFactory {
      * @param bodyType static/dynamic/kinematic
      */
 
-
     public void createObstacle(float x, float y, float velocityX, float velocityY, float width, float height, BodyFactory.Material material, BodyDef.BodyType bodyType){
         Entity entity = engine.createEntity();
 
@@ -85,7 +87,7 @@ public class EntityFactory {
         engine.addEntity(entity);
     }
 
-    public void createEnemy(float x, float y, EntityColor color, float penisLength, float penisGirth){
+    public void createEnemy(float x, float y, EntityStyle style, float penisLength, float penisGirth){
 
         Entity entity = engine.createEntity();
 
@@ -94,9 +96,10 @@ public class EntityFactory {
         ComponentHelper.getComponentInitializer().typeComponent(engine, entity, ENEMY);
         ComponentHelper.getComponentInitializer().collisionComponent(engine, entity);
 
-        float radius = GameConstants.ENEMY_RADIUS;
+        float width = GameConstants.PLAYER_WIDTH;
+        float height = GameConstants.PLAYER_HEIGHT;
 
-        bodyComponent.body = bodyFactory.makeCirclePolyBody(x, y, radius, BodyFactory.Material.RUBBER, BodyDef.BodyType.DynamicBody);
+        bodyComponent.body = bodyFactory.makeBoxPolyBody(x, y, width, height, BodyFactory.Material.RUBBER, BodyDef.BodyType.DynamicBody);
 
         ComponentHelper.getComponentInitializer().transformComponent(engine, entity, x, y, bodyComponent.body.getAngle());
 
@@ -106,41 +109,43 @@ public class EntityFactory {
 
         entity.add(bodyComponent);
 
+        List<Entity>entities = new ArrayList<Entity>();
+
         Entity penis = createPenis(
-                x + radius * MathUtils.cos(bodyComponent.body.getAngle()),
-                y + radius * MathUtils.sin(bodyComponent.body.getAngle()),
+                x, y,
                 bodyComponent.body.getLinearVelocity().x, bodyComponent.body.getLinearVelocity().y,
                 penisLength,penisGirth,
                 bodyComponent.body.getAngle(),
                 entity
         );
+        entities.add(penis);
 
-        WeldJointDef weldJointDef = new WeldJointDef();
-        weldJointDef.bodyA = bodyComponent.body;
-        weldJointDef.bodyB = penis.getComponent(Box2dBodyComponent.class).body;
-        weldJointDef.localAnchorA.set(new Vector2(x + radius, y + radius));
-        weldJointDef.localAnchorA.set(new Vector2(
-                penis.getComponent(PenisComponent.class).getPosition().x + penis.getComponent(PenisComponent.class).getWidth()/2,
-                penis.getComponent(PenisComponent.class).getPosition().y + penis.getComponent(PenisComponent.class).getHeight()/3
-        ));
+        for (int i = 0; i < 2; i++){
+            Entity testicle = createTesticle(
+                    x - (i * GameConstants.TESTICLE_RADIUS),
+                    y - height/1.5f,
+                    bodyComponent.body.getLinearVelocity().x, bodyComponent.body.getLinearVelocity().y,
+                    GameConstants.TESTICLE_RADIUS,
+                    entity
+            );
 
-        world.createJoint(weldJointDef);
+            entities.add(testicle);
+        }
 
-        ComponentHelper.getComponentInitializer().enemyComponent(engine, entity, x, y, radius, color, penis, penisLength, penisGirth);
+        ComponentHelper.getComponentInitializer().enemyComponent(engine, entity, x, y, width, height, style, entities, penisLength, penisGirth);
 
         engine.addEntity(entity);
     }
 
-    public void createPlayer(float x, float y, float radius, float penisLength, float penisGirth){
+    public void createPlayer(float x, float y, float width, float height, float penisLength, float penisGirth, EntityStyle style){
 
         Entity player = engine.createEntity();
 
         Box2dBodyComponent bodyComponent = engine.createComponent(Box2dBodyComponent.class);
         ComponentHelper.getComponentInitializer().typeComponent(engine, player, PLAYER);
-        ComponentHelper.getComponentInitializer().levelComponent(engine, player);
         ComponentHelper.getComponentInitializer().collisionComponent(engine, player);
 
-        bodyComponent.body = bodyFactory.makeCirclePolyBody(x, y, radius, BodyFactory.Material.WOOD, BodyDef.BodyType.DynamicBody, true);
+        bodyComponent.body = bodyFactory.makeBoxPolyBody(x, y, width, height, BodyFactory.Material.WOOD, BodyDef.BodyType.DynamicBody, true);
 
         ComponentHelper.getComponentInitializer().transformComponent(engine, player, x, y, bodyComponent.body.getAngle());
 
@@ -150,31 +155,34 @@ public class EntityFactory {
 
         player.add(bodyComponent);
 
+        List<Entity>entities = new ArrayList<Entity>();
+
         Entity penis = createPenis(
-                x + radius * MathUtils.cos(bodyComponent.body.getAngle()),
-                y + radius * MathUtils.sin(bodyComponent.body.getAngle()),
+                x, y,
                 bodyComponent.body.getLinearVelocity().x, bodyComponent.body.getLinearVelocity().y,
                 penisLength,penisGirth,
                 bodyComponent.body.getAngle(),
                 player
         );
 
-        WeldJointDef weldJointDef = new WeldJointDef();
-        weldJointDef.bodyA = bodyComponent.body;
-        weldJointDef.bodyB = penis.getComponent(Box2dBodyComponent.class).body;
-        weldJointDef.localAnchorA.set(new Vector2(x + radius, y + radius));
-        weldJointDef.localAnchorA.set(new Vector2(
-                penis.getComponent(PenisComponent.class).getPosition().x + penis.getComponent(PenisComponent.class).getWidth()/2,
-                penis.getComponent(PenisComponent.class).getPosition().y + penis.getComponent(PenisComponent.class).getHeight()/3
-        ));
+        entities.add(penis);
 
-        world.createJoint(weldJointDef);
+        for (int i = 0; i < 2; i++){
+            Entity testicle = createTesticle(
+                    x - (i * GameConstants.TESTICLE_RADIUS),
+                    y - height/1.5f,
+                    bodyComponent.body.getLinearVelocity().x, bodyComponent.body.getLinearVelocity().y,
+                    GameConstants.TESTICLE_RADIUS,
+                    player
+            );
 
-        ComponentHelper.getComponentInitializer().playerComponent(engine, player,
-                x,y, radius, penis, penisLength, penisGirth
-        );
+            entities.add(testicle);
+        }
+
+        ComponentHelper.getComponentInitializer().playerComponent(engine, player, x,y, width, height, entities, penisLength, penisGirth, style);
 
         engine.addEntity(player);
+
     }
 
     public void createWalls(float x, float y, float width, float height) {
@@ -206,7 +214,6 @@ public class EntityFactory {
         Entity entity = engine.createEntity();
 
         ComponentHelper.getComponentInitializer().collisionComponent(engine, entity);
-        ComponentHelper.getComponentInitializer().transformComponent(engine, entity, x, y, 0);
         ComponentHelper.getComponentInitializer().typeComponent(engine, entity, POWER);
 
         Box2dBodyComponent bodyComponent = engine.createComponent(Box2dBodyComponent.class);
@@ -214,23 +221,11 @@ public class EntityFactory {
         float width = GameConstants.POWER_WIDTH;
         float height = GameConstants.POWER_HEIGHT;
 
-        bodyComponent.body = bodyFactory.makeTrianglePolyBody(x, y,
-                width,
-                height,
-                BodyFactory.Material.STONE,
-                BodyDef.BodyType.KinematicBody,
-                false
-        );
+        bodyComponent.body = bodyFactory.makeBoxPolyBody(x, y,width, height, BodyFactory.Material.STONE, BodyDef.BodyType.KinematicBody);
 
-        ComponentHelper.getComponentInitializer().powerUpComponent(
-                engine,
-                entity,
-                bodyComponent.body.getPosition().x,
-                bodyComponent.body.getPosition().y,
-                velocityX, velocityY,
-                width, height,
-                power
-        );
+        ComponentHelper.getComponentInitializer().transformComponent(engine, entity, x, y, bodyComponent.body.getAngle());
+
+        ComponentHelper.getComponentInitializer().powerUpComponent(engine, entity, x, y, velocityX, velocityY,  width, height, power);
 
         bodyComponent.body.setUserData(entity);
 
@@ -240,30 +235,67 @@ public class EntityFactory {
 
         engine.addEntity(entity);
 
-
     }
 
-    private Entity createPenis(float x, float y, float velocityX, float velocityY, float width, float height, float direction, Entity attachedEntity) {
+    private Entity createPenis(float x, float y, float velocityX, float velocityY, float length, float girth, float direction, Entity attachedEntity) {
         Entity entity = engine.createEntity();
 
         Box2dBodyComponent bodyComponent = engine.createComponent(Box2dBodyComponent.class);
         ComponentHelper.getComponentInitializer().textureComponent(engine, entity);
         ComponentHelper.getComponentInitializer().typeComponent(engine, entity, PENIS);
         ComponentHelper.getComponentInitializer().collisionComponent(engine, entity);
-        ComponentHelper.getComponentInitializer().transformComponent(engine,entity,x,y,0); //todo needed?
+        ComponentHelper.getComponentInitializer().transformComponent(engine,entity,x,y,direction);
 
-        bodyComponent.body = bodyFactory.makeBoxPolyBody(x, y, width, height, BodyFactory.Material.RUBBER, BodyDef.BodyType.DynamicBody);
+        bodyComponent.body = bodyFactory.makeBoxPolyBody(x, y, length, girth, BodyFactory.Material.WOOD, BodyDef.BodyType.DynamicBody);
+
+//        bodyComponent.body.setBullet(true);
+
+        bodyComponent.body.setUserData(entity);
+
+        entity.add(bodyComponent);
 
         ComponentHelper.getComponentInitializer().penisComponent(
                 engine,
                 entity,
                 attachedEntity,
                 velocityX, velocityY,
-                width, height,
+                length, girth,
                 direction
         );
 
-        bodyComponent.body.setBullet(true);
+        engine.addEntity(entity);
+
+        //Weld penis to attachedEntity
+        WeldJointDef def = new WeldJointDef();
+        def.bodyA = attachedEntity.getComponent(Box2dBodyComponent.class).body;
+        def.bodyB = bodyComponent.body;
+        def.localAnchorA.set(0,-GameConstants.PLAYER_HEIGHT/2);
+        def.localAnchorB.set(-GameConstants.PLAYER_WIDTH,0);
+
+        world.createJoint(def);
+
+        return entity;
+    }
+
+
+
+    private Entity createTesticle(float x, float y, float velocityX, float velocityY, float radius,  Entity attachedEntity) {
+        Entity entity = engine.createEntity();
+
+        Box2dBodyComponent bodyComponent = engine.createComponent(Box2dBodyComponent.class);
+        ComponentHelper.getComponentInitializer().textureComponent(engine, entity);
+        ComponentHelper.getComponentInitializer().typeComponent(engine, entity, TESTICLE);
+        ComponentHelper.getComponentInitializer().transformComponent(engine,entity,x,y,0);
+
+        bodyComponent.body = bodyFactory.makeCirclePolyBody(x, y, radius, BodyFactory.Material.RUBBER, BodyDef.BodyType.DynamicBody);
+
+        ComponentHelper.getComponentInitializer().testicleComponent(
+                engine,
+                entity,
+                attachedEntity,
+                velocityX, velocityY,
+                radius
+        );
 
         bodyComponent.body.setUserData(entity);
 
@@ -271,6 +303,16 @@ public class EntityFactory {
 
         engine.addEntity(entity);
 
+        RopeJointDef def = new RopeJointDef();
+        def.bodyA = attachedEntity.getComponent(Box2dBodyComponent.class).body;
+        def.bodyB = bodyComponent.body;
+        def.localAnchorA.set(0,-GameConstants.PLAYER_HEIGHT/1.5f);
+        def.localAnchorB.set(radius/2, 0);
+
+        world.createJoint(def);
+
         return entity;
     }
+
+
 }

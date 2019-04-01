@@ -13,13 +13,14 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.PenisComponent;
+import com.wisekrakr.androidmain.components.PlayerComponent;
 import com.wisekrakr.androidmain.components.TypeComponent;
 import com.wisekrakr.androidmain.helpers.LabelHelper;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 import com.wisekrakr.androidmain.retainers.TimeKeeper;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -62,12 +63,12 @@ public class InfoDisplay implements Disposable {
         Label levelLabel = LabelHelper.label("Level", font, Color.WHITE);
         levelNumberLabel = LabelHelper.label(levelNumber != null ? levelNumber.toString() : null, font, Color.GOLDENROD);
         Label timeLabel = LabelHelper.label("TIME", font, Color.WHITE);
-        timeCountLabel =LabelHelper.label(worldTimer != null ? worldTimer.toString() : null, font, Color.GOLDENROD);
+        timeCountLabel = LabelHelper.label(worldTimer != null ? worldTimer.toString() : null, font, Color.GOLDENROD);
         Label scoreLabel = LabelHelper.label("Score", font, Color.WHITE);
-        scoreCountLabel =LabelHelper.label(score != null ? score.toString() : null, font, Color.GOLDENROD);
-        scoreAddedLabel =LabelHelper.label(currentScore != null ? currentScore.toString() : null, font, Color.GREEN);
+        scoreCountLabel = LabelHelper.label(score != null ? score.toString() : null, font, Color.GOLDENROD);
+        scoreAddedLabel = LabelHelper.label(currentScore != null ? currentScore.toString() : null, font, null);
         multiplierLabel = LabelHelper.label(multi != null ? multi.toString() : null, font, Color.PINK);
-        Label enemyNameLabel = LabelHelper.label("Balls to Dodge", font, Color.WHITE);
+        Label enemyNameLabel = LabelHelper.label("Libidos", font, Color.WHITE);
         enemyNumberLabel = LabelHelper.label(enemies != null ? enemies.toString() : null, font, Color.GOLDENROD);
         Label penisLabel = LabelHelper.label("Penis length", font, Color.WHITE);
         penisLengthLabel = LabelHelper.label(penisLength != null ? penisLength.toString() : null, font, Color.GOLDENROD);
@@ -106,7 +107,7 @@ public class InfoDisplay implements Disposable {
         tableLeft.row();
         tableLeft.add(scoreCountLabel).padBottom(2);
         tableLeft.add(scoreAddedLabel).padBottom(2).padLeft(scoreCountLabel.getWidth());
-//        tableLeft.add(multiplierLabel).padBottom(2).padLeft(scoreCountLabel.getWidth() + scoreAddedLabel.getWidth());
+//        tableLeft.add(multiplierLabel).padBottom(2).padLeft(scoreCountLabel.getRadius() + scoreAddedLabel.getRadius());
 
         stage.addActor(tableLeft);
         stage.addActor(tableRight);
@@ -150,24 +151,39 @@ public class InfoDisplay implements Disposable {
         int newScore = ScoreKeeper.getScore();
 
         if (newScore > currentScore) {
-
+            scoreAddedLabel.setColor(Color.GREEN);
             scoreAddedLabel.setText(" +" + ScoreKeeper.getPointsToGive() * ScoreKeeper.getMultiplier());
             scoreAddedLabel.addAction(Actions.sequence(Actions.fadeIn(0.5f), Actions.fadeOut(0.5f)));
 
             currentScore = newScore;
+        }else if (newScore < currentScore){
+            scoreAddedLabel.setColor(Color.RED);
+            scoreAddedLabel.setText(" -" + ScoreKeeper.getPointsToGive() * ScoreKeeper.getMultiplier());
+            scoreAddedLabel.addAction(Actions.sequence(Actions.fadeIn(0.5f), Actions.fadeOut(0.5f)));
+
+            currentScore = newScore;
+        }else {
+            scoreAddedLabel.setText("");
         }
     }
 
     private void penisLength(){
-        Iterator<Entity>iterator = game.getEngine().getEntities().iterator();
-        if (iterator.hasNext()){
-            Entity entity = iterator.next();
-            if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PENIS) {
-                PenisComponent penisComponent = game.getGameThread().getComponentMapperSystem().getPenisComponentMapper().get(entity);
-                float length = penisComponent.getWidth() - 10;
 
-                penisLengthLabel.setText(length + " cm /" + length/2.54f + " in");
+        for (Entity entity: game.getEngine().getEntities()){
+            if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PLAYER){
+                PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
 
+                for (Entity ent: playerComponent.getAttachedEntities()){
+                    if (ent.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PENIS) {
+                        PenisComponent penisComponent = game.getGameThread().getComponentMapperSystem().getPenisComponentMapper().get(ent);
+
+                        float length = penisComponent.getLength();
+                        int inches = (int) (length / 2.54f);
+                        DecimalFormat inchFormat = new DecimalFormat("#.00");
+
+                        penisLengthLabel.setText(length + " cm /" + inchFormat.format(inches) + " in");
+                    }
+                }
             }
         }
     }

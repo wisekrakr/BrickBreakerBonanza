@@ -1,8 +1,12 @@
 package com.wisekrakr.androidmain;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Game;
 import com.wisekrakr.androidmain.screens.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AndroidGame extends Game {
 
@@ -11,6 +15,7 @@ public class AndroidGame extends Game {
 	private MyAssetManager myAssetManager;
 	private GamePreferences gamePreferences;
 
+	private TitleScreen titleScreen;
 	private PreferencesScreen preferencesScreen;
 	private MenuScreen menuScreen;
 	private LevelCompleteScreen levelCompleteScreen;
@@ -18,15 +23,15 @@ public class AndroidGame extends Game {
 	private EndScreen endScreen;
 	private SuperEndScreen superEndScreen;
 
-	public final static int MENU = 0;
-	public final static int PREFERENCES = 1;
-	public final static int LEVELSELECTION = 2;
-	public final static int APPLICATION = 3;
-	public final static int ENDGAME = 4;
-	public final static int SUPERENDGAME = 5;
+	public final static int TITLE = 0;
+	public final static int MENU = 1;
+	public final static int PREFERENCES = 2;
+	public final static int LEVELSELECTION = 3;
+	public final static int APPLICATION = 4;
+	public final static int ENDGAME = 5;
+	public final static int SUPERENDGAME = 6;
 
 	private GameThread gameThread;
-
 
 	@Override
 	public void create() {
@@ -43,10 +48,15 @@ public class AndroidGame extends Game {
 		setScreen(new LoadingScreen(this));
 
 		gameThread = new GameThread(this);
+
 	}
 
 	public void changeScreen(int screen){
 		switch(screen){
+			case TITLE:
+				if(titleScreen == null) titleScreen = new TitleScreen(this);
+				this.setScreen(titleScreen);
+				break;
 			case MENU:
 				if(menuScreen == null) menuScreen = new MenuScreen(this);
 				this.setScreen(menuScreen);

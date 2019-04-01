@@ -1,5 +1,7 @@
-package com.wisekrakr.androidmain.systems;
+package com.wisekrakr.androidmain;
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.factories.EntityFactory;
 import com.wisekrakr.androidmain.helpers.GameHelper;
@@ -143,7 +145,6 @@ public class LevelGenerationSystem {
     }
 
     private void resetLevels(){
-
         levelsToDo.addAll(Arrays.asList(LevelNumber.values()));
     }
 
@@ -151,4 +152,7 @@ public class LevelGenerationSystem {
         return mainLevel;
     }
 
+    public LevelModel getLevelModel() {
+        return levelModel;
+    }
 }

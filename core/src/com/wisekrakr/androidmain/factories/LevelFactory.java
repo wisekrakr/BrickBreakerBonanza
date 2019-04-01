@@ -3,7 +3,8 @@ package com.wisekrakr.androidmain.factories;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
-import com.wisekrakr.androidmain.helpers.EntityColorHelper;
+import com.wisekrakr.androidmain.components.EntityStyle;
+import com.wisekrakr.androidmain.helpers.EntityStyleHelper;
 import com.wisekrakr.androidmain.helpers.GameHelper;
 import com.wisekrakr.androidmain.levels.LevelNumber;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
@@ -23,31 +24,30 @@ public class LevelFactory {
 
         switch (levelNumber){
             case ONE:
-                for (int i = 0; i < 3; i++) {
-
-//                    entityFactory.createEnemy(
-//                            GameHelper.notFilledPosition(game).x,
-//                            GameHelper.notFilledPosition(game).y,
-//                            EntityColorHelper.randomEntityColor(),
-//                            GameConstants.PENIS_WIDTH,
-//                            GameConstants.PENIS_HEIGHT
-//                    );
+                for (int i = 0; i < 1; i++) {
+                    entityFactory.createEnemy(
+                            GameHelper.notFilledPosition(game).x,
+                            GameHelper.notFilledPosition(game).y,
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
+                    );
                 }
-                ScoreKeeper.setInitialEnemies(3);
+                ScoreKeeper.setInitialEnemies(1);
 
                 break;
             case TWO:
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < 2; i++) {
 
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
-                ScoreKeeper.setInitialEnemies(3);
+                ScoreKeeper.setInitialEnemies(2);
 
                 game.getGameThread().getEntityFactory().createObstacle(
                         200, 50, -200, 0, 30, 10, BodyFactory.Material.RUBBER, BodyDef.BodyType.KinematicBody
@@ -62,9 +62,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(3);
@@ -84,9 +84,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(4);
@@ -97,9 +97,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(4);
@@ -117,9 +117,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(4);
@@ -140,9 +140,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(5);
@@ -153,9 +153,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(5);
@@ -166,9 +166,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(5);
@@ -179,9 +179,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(6);
@@ -192,9 +192,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(6);
@@ -205,9 +205,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(6);
@@ -218,9 +218,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(7);
@@ -231,9 +231,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(7);
@@ -244,9 +244,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(7);
@@ -257,9 +257,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(8);
@@ -270,9 +270,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(8);
@@ -283,9 +283,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(8);
@@ -296,9 +296,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(9);
@@ -309,9 +309,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(9);
@@ -322,9 +322,9 @@ public class LevelFactory {
                     entityFactory.createEnemy(
                             GameHelper.notFilledPosition(game).x,
                             GameHelper.notFilledPosition(game).y,
-                            EntityColorHelper.randomEntityColor(),
-                            GameConstants.PENIS_WIDTH,
-                            GameConstants.PENIS_HEIGHT
+                            EntityStyleHelper.randomEntityStyle(),
+                            EntityStyleHelper.getStyle().getPenisLength(),
+                            EntityStyleHelper.getStyle().getPenisGirth()
                     );
                 }
                 ScoreKeeper.setInitialEnemies(9);

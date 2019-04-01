@@ -5,13 +5,12 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.*;
-import com.wisekrakr.androidmain.helpers.EntityColorHelper;
+import com.wisekrakr.androidmain.helpers.EntityStyleHelper;
 import com.wisekrakr.androidmain.helpers.GameHelper;
-import com.wisekrakr.androidmain.helpers.PowerHelper;
+import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ public class EnemySystem extends IteratingSystem implements SystemEntityContext{
 
         savedPositions = enemyComponent.initialPositions;
 
-        enemyComponent.setSpeed(GameConstants.ENEMY_SPEED);//todo change with screen resolution (scaling)
+        enemyComponent.setSpeed(EntityStyleHelper.getStyle().getPenisSpeed());
 
         for (Entity ent: game.getEngine().getEntities()){
             if (ent.getComponent(TypeComponent.class).getType()== TypeComponent.Type.PLAYER){
@@ -67,16 +66,16 @@ public class EnemySystem extends IteratingSystem implements SystemEntityContext{
 
         float length = enemyComponent.getPenisLength();
         float girth = enemyComponent.getPenisGirth();
+        EntityStyle style = enemyComponent.getEntityStyleContext().getEntityStyle();
 
         if (!enemyComponent.isDestroy()){
             penisHandler(entity);
             if (collisionComponent.hitPenis){
-                spawnEnemyAtPoint(length, girth);
-                destroy(entity);
+                enemyComponent.setDestroy(true);
                 collisionComponent.setHitPenis(false);
             }
         }else {
-            spawnEnemyAtPoint(length, girth);
+            spawnEnemyAtPoint(style, length, girth);
             destroy(entity);
         }
 
@@ -84,20 +83,20 @@ public class EnemySystem extends IteratingSystem implements SystemEntityContext{
         outOfBounds(entity);
         bodyHandler(entity, bodyComponent);
 
+//        System.out.println("enemy: " +enemyComponent.getAttachedEntities().size()); //todo remove
+
     }
 
     private void penisHandler(Entity entity){
         EnemyComponent enemyComponent = game.getGameThread().getComponentMapperSystem().getEnemyComponentMapper().get(entity);
         Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
 
-        for (Entity ent: game.getEngine().getEntities()) {
+        for (Entity ent: enemyComponent.getAttachedEntities()) {
+            ent.getComponent(Box2dBodyComponent.class).body.setLinearVelocity(
+                    bodyComponent.body.getLinearVelocity().x,
+                    bodyComponent.body.getLinearVelocity().y
+            );
 
-            if (ent == enemyComponent.getAttachedEntity()) {
-                ent.getComponent(Box2dBodyComponent.class).body.setLinearVelocity(
-                        bodyComponent.body.getLinearVelocity().x,
-                        bodyComponent.body.getLinearVelocity().y
-                );
-            }
         }
     }
 
@@ -116,40 +115,26 @@ public class EnemySystem extends IteratingSystem implements SystemEntityContext{
         Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
         EnemyComponent enemyComponent = game.getGameThread().getComponentMapperSystem().getEnemyComponentMapper().get(entity);
 
-        enemyComponent.getAttachedEntity().getComponent(Box2dBodyComponent.class).isDead = true;
-        bodyComponent.isDead = true;
         enemyComponent.setDestroy(false);
 
+        for (Entity ent: enemyComponent.getAttachedEntities()){
+            ent.getComponent(Box2dBodyComponent.class).isDead = true;
+        }
+
+        enemyComponent.getAttachedEntities().clear();
+
+        bodyComponent.isDead = true;
     }
 
     @Override
     public void outOfBounds(Entity entity){
         EnemyComponent enemyComponent = game.getGameThread().getComponentMapperSystem().getEnemyComponentMapper().get(entity);
 
-        if (enemyComponent.getPosition().x - enemyComponent.getRadius()/2 > GameConstants.WORLD_WIDTH
-                ||  enemyComponent.getPosition().x + enemyComponent.getRadius()/2 < 0 ||
-                enemyComponent.getPosition().y - enemyComponent.getRadius()/2 > GameConstants.WORLD_HEIGHT ||
-                enemyComponent.getPosition().y + enemyComponent.getRadius()/2 < 0){
-            System.out.println("ball is out of bounds"); //todo remove
+        if (enemyComponent.getPosition().x - enemyComponent.getWidth()/2 > GameConstants.WORLD_WIDTH
+                ||  enemyComponent.getPosition().x + enemyComponent.getWidth()/2 < 0 ||
+                enemyComponent.getPosition().y - enemyComponent.getHeight()/2 > GameConstants.WORLD_HEIGHT ||
+                enemyComponent.getPosition().y + enemyComponent.getHeight()/2 < 0){
             enemyComponent.setDestroy(true);
-        }
-    }
-
-
-    @Override
-    public void powerHandler(Entity entity) {
-        EnemyComponent enemyComponent = game.getGameThread().getComponentMapperSystem().getEnemyComponentMapper().get(entity);
-        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
-        CollisionComponent collisionComponent = game.getGameThread().getComponentMapperSystem().getCollisionComponentMapper().get(entity);
-        float initialRadius = enemyComponent.getRadius();
-
-        if (collisionComponent.hitPower) {
-            if (PowerHelper.getPower() == PowerHelper.Power.ENLARGE_ENEMY) {
-                for (Fixture fixture : bodyComponent.body.getFixtureList()) {
-                    fixture.getShape().setRadius(initialRadius * 1.2f);
-                    enemyComponent.setRadius(initialRadius);
-                }
-            }
         }
     }
 
@@ -165,17 +150,14 @@ public class EnemySystem extends IteratingSystem implements SystemEntityContext{
         }
     }
 
-    private void spawnEnemyAtPoint(float length, float girth){
+    private void spawnEnemyAtPoint(EntityStyle style, float length, float girth){
 
         for (int i = savedPositions.size(); i>0; i--) {
             game.getGameThread().getEntityFactory().createEnemy(
                     savedPositions.get(i-1).x,
                     savedPositions.get(i-1).y,
-                    EntityColorHelper.randomEntityColor(),
-                    length,
-                    girth
+                    style, length, girth
             );
-            //todo if out of bounds set a new position
         }
     }
 }

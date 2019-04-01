@@ -45,11 +45,6 @@ public class ObstacleSystem extends IteratingSystem implements SystemEntityConte
     }
 
     @Override
-    public void powerHandler(Entity entity) {
-
-    }
-
-    @Override
     public void destroy(Entity entity) {
         Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
 
