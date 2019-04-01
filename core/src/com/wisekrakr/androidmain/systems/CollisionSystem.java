@@ -4,131 +4,74 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.components.*;
+import com.wisekrakr.androidmain.helpers.StringHelper;
 
 
 public class CollisionSystem extends IteratingSystem {
-
-    private AndroidGame game;
+    private ComponentMapper<CollisionComponent> collisionComponentMapper;
+    private ComponentMapper<TransformComponent> transformComponentMapper;
 
     @SuppressWarnings("unchecked")
-    public CollisionSystem(AndroidGame game) {
+    public CollisionSystem() {
         super(Family.all(CollisionComponent.class).get());
-        this.game = game;
-
+        collisionComponentMapper = ComponentMapper.getFor(CollisionComponent.class);
+        transformComponentMapper = ComponentMapper.getFor(TransformComponent.class);
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
 
-        CollisionComponent collisionComponent = game.getGameThread().getComponentMapperSystem().getCollisionComponentMapper().get(entity);
+        CollisionComponent collisionComponent = collisionComponentMapper.get(entity);
 
         Entity collidedEntity = collisionComponent.collisionEntity;
 
         TypeComponent thisType = ComponentMapper.getFor(TypeComponent.class).get(entity);
 
-        if (thisType.getType().equals(TypeComponent.Type.ENEMY)){
+        if (thisType.getType().equals(TypeComponent.Type.BALL)){
             if (collidedEntity != null) {
                 TypeComponent typeComponent = collidedEntity.getComponent(TypeComponent.class);
                 if (typeComponent != null) {
                     switch (typeComponent.getType()) {
-                        case SCENERY:
-                            collisionComponent.setHitSurface(true);
-                            break;
-                        case ENEMY:
-                            collisionComponent.setHitEnemy(true);
-                            break;
-                        case OBSTACLE:
-                            collisionComponent.setHitObstacle(true);
-                            break;
-                        case PLAYER:
-                            collisionComponent.setHitPlayer(true);
-                            collidedEntity.getComponent(CollisionComponent.class).setHitEnemy(true);
-                            break;
-                        case PENIS:
-                            collisionComponent.setHitPenis(true);
-                            collidedEntity.getComponent(CollisionComponent.class).setHitEnemy(true);
-                            break;
-                    }
-                    collisionComponent.collisionEntity = null;
-                }
-            }
-        }
-        if (thisType.getType().equals(TypeComponent.Type.POWER)) {
-            if (collidedEntity != null) {
-                TypeComponent typeComponent = collidedEntity.getComponent(TypeComponent.class);
-                if (typeComponent != null) {
-                    switch (typeComponent.getType()) {
-                        case SCENERY:
-                            collisionComponent.setHitSurface(true);
-                            break;
-                        case ENEMY:
-                            collisionComponent.setHitEnemy(true);
-                            break;
-                        case OBSTACLE:
-                            collisionComponent.setHitObstacle(true);
-                            break;
-                        case PLAYER:
-                            collisionComponent.setHitPlayer(true);
-                            collidedEntity.getComponent(CollisionComponent.class).setHitPower(true);
-                            break;
                         case POWER:
                             collisionComponent.setHitPower(true);
+                            collisionComponentMapper.get(collidedEntity).setHitBall(true);
                             break;
-                        case PENIS:
-                            collisionComponent.setHitPenis(true);
-                            break;
-                    }
-                    collisionComponent.collisionEntity = null;
-                }
-            }
-        }
-        if (thisType.getType().equals(TypeComponent.Type.PLAYER)) {
-            if (collidedEntity != null) {
-                TypeComponent typeComponent = collidedEntity.getComponent(TypeComponent.class);
-                if (typeComponent != null) {
-                    switch (typeComponent.getType()) {
                         case SCENERY:
                             collisionComponent.setHitSurface(true);
-                            break;
-                        case ENEMY:
-                            collisionComponent.setHitEnemy(true);
-                            collidedEntity.getComponent(CollisionComponent.class).setHitPlayer(true);
                             break;
                         case OBSTACLE:
                             collisionComponent.setHitObstacle(true);
                             break;
-                        case POWER:
-                            collisionComponent.setHitPower(true);
-                            collidedEntity.getComponent(CollisionComponent.class).setHitPlayer(true);
+                        case PLAYER:
+                            collisionComponent.setHitPlayer(true);
+                            System.out.println(StringHelper.ANSI_RED_BACKGROUND +"Ball hit Player" + StringHelper.ANSI_RESET);
                             break;
-                        case PENIS:
-                            collisionComponent.setHitPenis(true);
-                            collidedEntity.getComponent(CollisionComponent.class).setHitPlayer(true);
-                            break;
+                        default:
+                            //System.out.println("ball: No matching type found " );
                     }
                     collisionComponent.collisionEntity = null;
                 }
             }
-        }
-        if (thisType.getType().equals(TypeComponent.Type.PENIS)) {
+        }else if (thisType.getType().equals(TypeComponent.Type.POWER)) {
             if (collidedEntity != null) {
                 TypeComponent typeComponent = collidedEntity.getComponent(TypeComponent.class);
                 if (typeComponent != null) {
-                    switch (typeComponent.getType()){
-                        case PLAYER:
-                            collisionComponent.setHitPlayer(true);
-                            collidedEntity.getComponent(CollisionComponent.class).setHitPenis(true);
-                            break;
-                        case ENEMY:
-                            collisionComponent.setHitEnemy(true);
-                            collidedEntity.getComponent(CollisionComponent.class).setHitPenis(true);
-                            break;
-                        case PENIS:
-                            collisionComponent.setHitPenis(true);
-                            collidedEntity.getComponent(CollisionComponent.class).setHitPenis(true);
-                            break;
+                    if (typeComponent.getType() == TypeComponent.Type.PLAYER) {
+                        collisionComponent.setHitPlayer(true);
+                        collidedEntity.getComponent(CollisionComponent.class).setHitPower(true);
+                    }
+                    collisionComponent.collisionEntity = null;
+                }
+            }
+        }else if (thisType.getType().equals(TypeComponent.Type.PLAYER)) {
+            if (collidedEntity != null) {
+                TypeComponent typeComponent = collidedEntity.getComponent(TypeComponent.class);
+                if (typeComponent != null) {
+                    if (typeComponent.getType() == TypeComponent.Type.BALL) {
+                        collisionComponent.setHitBall(true);
+                        collisionComponentMapper.get(collidedEntity).setHitPlayer(true);
+                        System.out.println(StringHelper.ANSI_GREEN_BACKGROUND +"Player hit Ball" + StringHelper.ANSI_RESET);
                     }
                     collisionComponent.collisionEntity = null;
                 }

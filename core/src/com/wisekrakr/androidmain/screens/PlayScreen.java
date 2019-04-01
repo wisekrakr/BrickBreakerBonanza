@@ -1,24 +1,17 @@
 package com.wisekrakr.androidmain.screens;
 
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
-
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
-import com.wisekrakr.androidmain.components.TypeComponent;
 import com.wisekrakr.androidmain.controls.Controls;
-import com.wisekrakr.androidmain.helpers.GameHelper;
 import com.wisekrakr.androidmain.systems.*;
 import com.wisekrakr.androidmain.audiovisuals.Visualizer;
-
-import java.util.TimerTask;
 
 public class PlayScreen extends ScreenAdapter  {
 
@@ -32,6 +25,7 @@ public class PlayScreen extends ScreenAdapter  {
     private Visualizer visualizer;
     private InfoDisplay infoDisplay;
     private TouchControl touchControl;
+
 
 //    private EntityAudio entityAudio;
 
@@ -52,26 +46,29 @@ public class PlayScreen extends ScreenAdapter  {
 
 
     /**
-     * Add remaining systems we did not need to add to GameThread.
+     * Add remaining systems we did not need to add to the Gamethread.
      */
     private void addSystems() {
 
         game.getGameThread().getLevelGenerationSystem().init();
 
+//        game.getEngine().addSystem(new GameObjectSystem(game));
+
         game.getEngine().addSystem(new PlayerSystem(game));
-        game.getEngine().addSystem(new EnemySystem(game));
-        game.getEngine().addSystem(new PenisSystem(game));
-        game.getEngine().addSystem(new TesticleSystem(game));
-        game.getEngine().addSystem(new PowerUpSystem(game));
-        game.getEngine().addSystem(new ObstacleSystem(game));
+        game.getEngine().addSystem(new BallSystem(game));
 
         visualizer = new Visualizer(game);
         controls = new Controls();
         touchControl = new TouchControl(game);
 
         game.getEngine().addSystem(new PlayerControlSystem(game, controls, visualizer.getRenderingSystem().getCamera()));
-        game.getEngine().addSystem(new CollisionSystem(game));
+        game.getEngine().addSystem(new CollisionSystem());
 
+//        game.getEngine().addSystem(new ObstacleSystem(game));
+
+    }
+    private void mapLoading() {
+         game.getGameThread().getEntityFactory().loadMap();
     }
 
     @Override
@@ -98,6 +95,9 @@ public class PlayScreen extends ScreenAdapter  {
         game.getEngine().update(delta);
         visualizer.getRenderingSystem().getCamera().update();
 
+//        game.getGameThread().getEntityCreator().getTiledMapRenderer().setView(visualizer.getRenderingSystem().getCamera());
+//        game.getGameThread().getEntityCreator().getTiledMapRenderer().render();
+
         game.getGameThread().getLevelGenerationSystem().updateLevels(delta);
 
         infoDisplay.renderDisplay(
@@ -105,28 +105,13 @@ public class PlayScreen extends ScreenAdapter  {
                 delta
         );
 
-//        visualizer.debugDrawableFilled();
-//        visualizer.debugDrawableLine(delta);
+        visualizer.debugDrawableFilled();
+        visualizer.debugDrawableLine(delta);
 
-        visualizer.draw(delta);
+//        visualizer.draw(delta);
 
 //        entityAudio.audioForAction(controls);
 //        entityAudio.audioForEntity();
-    }
-
-
-
-
-
-    class ColorBackground extends TimerTask{
-        @Override
-        public void run() {
-            Gdx.gl.glClearColor(GameHelper.generateRandomNumberBetween(0, 255),
-                    GameHelper.generateRandomNumberBetween(0, 255),
-                    GameHelper.generateRandomNumberBetween(0, 255),
-                    1
-            );
-        }
     }
 
 

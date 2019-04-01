@@ -2,36 +2,30 @@ package com.wisekrakr.androidmain.retainers;
 
 public class ScoreKeeper {
 
-    public static int lives = 3;
+    public static int lives = 100;
 
     public static void setLives(int lives) {
         ScoreKeeper.lives = lives;
     }
 
-    private static int initialEnemies = 0;
+    private static int initialBalls;
 
-    private static int initialPowerUps = 0;
-
-    public static void setInitialEnemies(int initialEnemies) {
-        ScoreKeeper.initialEnemies = initialEnemies;
+    public static void setInitialBalls(int initialBalls) {
+        ScoreKeeper.initialBalls = initialBalls;
     }
 
-    public static int getInitialEnemies() {
-        return initialEnemies;
-    }
-
-    public static int getInitialPowerUps() {
-        return initialPowerUps;
-    }
-
-    public static void setInitialPowerUps(int initialPowerUps) {
-        ScoreKeeper.initialPowerUps = initialPowerUps;
+    public static int getInitialBalls() {
+        return initialBalls;
     }
 
     private static int score = 0;
 
     public static void setScore(int scores){
-        ScoreKeeper.score += scores;
+        if (scores < 0 || scores > 10000){
+            throw new IllegalArgumentException();
+        }else {
+            ScoreKeeper.score += scores;
+        }
     }
 
     public static int getScore() {

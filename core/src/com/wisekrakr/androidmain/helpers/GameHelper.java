@@ -40,16 +40,14 @@ public class GameHelper {
         Vector2 bestPosition = new Vector2();
 
         for (Entity entity: game.getEngine().getEntities()){
-            if (entity != null) {
-                Vector2 filledPosition = entity.getComponent(Box2dBodyComponent.class).body.getPosition();
-                positions.add(filledPosition);
+            Vector2 filledPosition = entity.getComponent(Box2dBodyComponent.class).body.getPosition();
+            positions.add(filledPosition);
 
-                for (int i = positions.size() - 1; i > 0; i--) {
+            for (int i = positions.size() - 1; i > 0; i--) {
 //                System.out.println(entity.getComponent(TypeComponent.class).getType() + " - position: " + positions.get(i));
 
-                    if (positions.get(i) != newPosition) {
-                        bestPosition = newPosition;
-                    }
+                if (positions.get(i) != newPosition) {
+                    bestPosition = newPosition;
                 }
             }
         }

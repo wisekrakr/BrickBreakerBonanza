@@ -49,7 +49,7 @@ public class LoadingScreen extends ScreenAdapter {
         game.assetManager().assetManager.finishLoading();
 
         TextureAtlas atlas = game.assetManager().assetManager.get("images/loading/loading.atlas");
-        title = atlas.findRegion("logo");
+        title = atlas.findRegion("staying-alight-logo");
         dash = atlas.findRegion("loading-dash");
 
         flameAnimation = new Animation(0.07f, atlas.findRegions("flames"), Animation.PlayMode.LOOP);
@@ -58,12 +58,12 @@ public class LoadingScreen extends ScreenAdapter {
 
     private void drawLoadingBar(int stage, TextureRegion currentFrame){
         for(int i = 0; i < stage;i++){
-            spriteBatch.draw(currentFrame, Gdx.graphics.getWidth()/2f - title.getRegionWidth()/2f + (i * 65f),
+            spriteBatch.draw(currentFrame, Gdx.graphics.getWidth()/2f - title.getRegionWidth()/2f + (i * 60f),
                     Gdx.graphics.getHeight()/2f - title.getRegionHeight()/2f,
-                    60, 60);
-            spriteBatch.draw(dash, Gdx.graphics.getWidth()/2f - title.getRegionWidth()/2f + (i * 65f),
+                    40, 40);
+            spriteBatch.draw(dash, Gdx.graphics.getWidth()/2f - title.getRegionWidth()/2f + (i * 60),
                     Gdx.graphics.getHeight()/2f - title.getRegionHeight()/2f,
-                    60, 60);
+                    40, 40);
         }
     }
 

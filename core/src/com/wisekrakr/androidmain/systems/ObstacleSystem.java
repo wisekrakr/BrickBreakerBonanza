@@ -1,67 +1,64 @@
 package com.wisekrakr.androidmain.systems;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.Box2dBodyComponent;
-import com.wisekrakr.androidmain.components.CollisionComponent;
-import com.wisekrakr.androidmain.components.ObstacleComponent;
 
-public class ObstacleSystem extends IteratingSystem implements SystemEntityContext {
+import com.wisekrakr.androidmain.components.TransformComponent;
 
-    private AndroidGame game;
-
-    public ObstacleSystem(AndroidGame game) {
-        super(Family.all(ObstacleComponent.class).get());
-        this.game = game;
-    }
-
-    @Override
-    protected void processEntity(Entity entity, float deltaTime) {
-        ObstacleComponent obstacleComponent = game.getGameThread().getComponentMapperSystem().getObstacleComponentMapper().get(entity);
-        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
-
-
-        if (obstacleComponent.isDestroy()) {
-            destroy(entity);
-        }else {
-            bodyComponent.body.setLinearVelocity(obstacleComponent.getVelocityX(), obstacleComponent.getVelocityY());
-        }
-
-        outOfBounds(entity);
-        bodyHandler(entity, bodyComponent);
-    }
-
-    @Override
-    public void bodyHandler(Entity entity, Box2dBodyComponent bodyComponent) {
-        ObstacleComponent obstacleComponent = game.getGameThread().getComponentMapperSystem().getObstacleComponentMapper().get(entity);
-
-        obstacleComponent.setPosition(bodyComponent.body.getPosition());
-        obstacleComponent.setVelocityX(bodyComponent.body.getLinearVelocity().x);
-        obstacleComponent.setVelocityY(bodyComponent.body.getLinearVelocity().y);
-        obstacleComponent.setDirection(bodyComponent.body.getAngle());
-    }
-
-    @Override
-    public void destroy(Entity entity) {
-        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
-
-        bodyComponent.isDead = true;
-    }
-
-    @Override
-    public void outOfBounds(Entity entity) {
-        ObstacleComponent obstacleComponent = game.getGameThread().getComponentMapperSystem().getObstacleComponentMapper().get(entity);
-        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
-
-        if (obstacleComponent.getPosition().x + obstacleComponent.getWidth()/2 > GameConstants.WORLD_WIDTH ||
-                obstacleComponent.getPosition().x - obstacleComponent.getWidth()/2 < 0){
-            bodyComponent.body.setLinearVelocity(-obstacleComponent.getVelocityX(), obstacleComponent.getVelocityY());
-        }else if (obstacleComponent.getPosition().y + obstacleComponent.getHeight()/2 > GameConstants.WORLD_HEIGHT ||
-                obstacleComponent.getPosition().y - obstacleComponent.getHeight()/2 < 0){
-            bodyComponent.body.setLinearVelocity(obstacleComponent.getVelocityX(), -obstacleComponent.getVelocityY());
-        }
-    }
-}
+//public class ObstacleSystem extends IteratingSystem implements SystemEntityContext {
+//
+//    private AndroidGame game;
+//    private ComponentMapper<ObstacleComponent>obstacleComponentMapper;
+//    private ComponentMapper<Box2dBodyComponent>bodyComponentMapper;
+//
+//    public ObstacleSystem(AndroidGame game) {
+//        super(Family.all(ObstacleComponent.class).get());
+//        this.game = game;
+//
+//        obstacleComponentMapper = ComponentMapper.getFor(ObstacleComponent.class);
+//        bodyComponentMapper = ComponentMapper.getFor(Box2dBodyComponent.class);
+//    }
+//
+//    @Override
+//    protected void processEntity(Entity entity, float deltaTime) {
+//        ObstacleComponent obstacleComponent = obstacleComponentMapper.get(entity);
+//        Box2dBodyComponent bodyComponent = bodyComponentMapper.get(entity);
+//
+//        outOfBounds(entity, bodyComponent);
+//
+//        if (obstacleComponent.destroy) {
+//           destroy(entity, bodyComponent);
+//        }else {
+//            bodyComponent.body.setLinearVelocity(obstacleComponent.velocityX, obstacleComponent.velocityY);
+//        }
+//    }
+//
+//    @Override
+//    public void destroy(Entity entity, Box2dBodyComponent bodyComponent) {
+//        bodyComponent.isDead = true;
+//        game.getGameThread().getEntityFactory().getTotalObstacles().remove(entity);
+//    }
+//
+//    @Override
+//    public void outOfBounds(Entity entity, Box2dBodyComponent bodyComponent) {
+//        ObstacleComponent obstacleComponent = obstacleComponentMapper.get(entity);
+//
+//        if (bodyComponent.body.getPosition().x + obstacleComponent.width/2 > GameConstants.WORLD_WIDTH ||
+//                bodyComponent.body.getPosition().x - obstacleComponent.width/2 < 0){
+//            obstacleComponent.velocityX = -obstacleComponent.velocityX;
+//        }else if (bodyComponent.body.getPosition().y + obstacleComponent.height/2 > GameConstants.WORLD_HEIGHT ||
+//                bodyComponent.body.getPosition().y - obstacleComponent.height/2 < 0){
+//            obstacleComponent.velocityY = -obstacleComponent.velocityY;
+//        }
+//    }
+//
+//    @Override
+//    public void powerHandler(Entity entity, Box2dBodyComponent bodyComponent) {
+//
+//    }
+//}

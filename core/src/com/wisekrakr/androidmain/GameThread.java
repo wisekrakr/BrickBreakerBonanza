@@ -24,15 +24,11 @@ public class GameThread {
         engine = game.getEngine();
 
         entityFactory = new EntityFactory(game, engine);
-        startNewLevelGeneration();
+        levelGenerationSystem = new LevelGenerationSystem(game, entityFactory);
         componentMapperSystem = new ComponentMapperSystem();
 
         init();
 
-    }
-
-    public void startNewLevelGeneration(){
-        levelGenerationSystem = new LevelGenerationSystem(game, entityFactory);
     }
 
     private void init() {

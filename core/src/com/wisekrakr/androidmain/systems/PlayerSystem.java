@@ -1,14 +1,15 @@
 package com.wisekrakr.androidmain.systems;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.math.Vector2;
 import com.wisekrakr.androidmain.AndroidGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.*;
-import com.wisekrakr.androidmain.helpers.EntityStyleHelper;
+import com.wisekrakr.androidmain.helpers.PowerHelper;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
-import com.wisekrakr.androidmain.retainers.SelectedCharacter;
 
 public class PlayerSystem extends IteratingSystem implements SystemEntityContext {
 
@@ -16,83 +17,93 @@ public class PlayerSystem extends IteratingSystem implements SystemEntityContext
 
     @SuppressWarnings("unchecked")
     public PlayerSystem(AndroidGame game){
-        super(Family.all(PlayerComponent.class).get());
+        super(Family.all(PlayerComponent.class, GameObjectComponent.class).get());
         this.game = game;
+
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
+        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
         CollisionComponent collisionComponent = game.getGameThread().getComponentMapperSystem().getCollisionComponentMapper().get(entity);
-        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
+        GameObjectComponent gameObjectComponent = game.getGameThread().getComponentMapperSystem().getGameObjectComponentMapper().get(entity);
 
-        playerComponent.setSpeed(EntityStyleHelper.getStyle().getPenisSpeed());
-
-        if (!playerComponent.isDestroy()) {
-            penisHandler(entity);
-            if (collisionComponent.hitPenis && playerComponent.isMoving) {
-                collisionComponent.setHitPenis(false);
-                playerComponent.setDestroy(true);
-
-                ScoreKeeper.setLives(ScoreKeeper.lives - 1);
+        if (collisionComponent.hitBall){
+            destroy(entity,bodyComponent, gameObjectComponent);
+            gameObjectComponent.setDestroy(true);
+            for (Entity ball: game.getEngine().getEntities()){
+                if (ball.getComponent(TypeComponent.class).getType()== TypeComponent.Type.BALL) {
+                    ball.getComponent(GameObjectComponent.class).setDestroy(true);
+                }
             }
-        }else {
-            playerComponent.setMoving(false);
-            destroy(entity);
+            if (gameObjectComponent.destroy && ScoreKeeper.lives > 0){
+                spawnNewPlayer();
+                playerComponent.setMoving(false);
+                collisionComponent.setHitBall(false);
+            }
         }
 
-        outOfBounds(entity);
-        bodyHandler(entity, bodyComponent);
-    }
-
-    private void penisHandler(Entity entity){
-        PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
-        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
-
-        for (Entity ent: playerComponent.getAttachedEntities()){
-            ent.getComponent(Box2dBodyComponent.class).body.setLinearVelocity(
-                    bodyComponent.body.getLinearVelocity().x,
-                    bodyComponent.body.getLinearVelocity().y
-            );
-        }
+        outOfBounds(entity, bodyComponent, gameObjectComponent);
+        powerHandler(entity, bodyComponent, gameObjectComponent);
     }
 
     @Override
-    public void bodyHandler(Entity entity, Box2dBodyComponent bodyComponent) {
-        PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
-
-        playerComponent.setPosition(bodyComponent.body.getPosition());
-        playerComponent.setVelocityX(bodyComponent.body.getLinearVelocity().x);
-        playerComponent.setVelocityY(bodyComponent.body.getLinearVelocity().y);
-        playerComponent.setDirection(bodyComponent.body.getAngle());
-    }
-
-    @Override
-    public void destroy(Entity entity) {
-        PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
-        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
-
-        SelectedCharacter.setDestroyed(true); //In LevelModel this is set to false again.
-
-        playerComponent.setDestroy(false);
-
-        for (Entity ent: playerComponent.getAttachedEntities()){
-            ent.getComponent(Box2dBodyComponent.class).isDead = true;
-        }
-        playerComponent.getAttachedEntities().clear();
-
+    public void destroy(Entity entity, Box2dBodyComponent bodyComponent, GameObjectComponent gameObjectComponent) {
+        ScoreKeeper.setLives(ScoreKeeper.lives - 1);
         bodyComponent.isDead = true;
+
+        gameObjectComponent.setDestroy(false);
     }
 
     @Override
-    public void outOfBounds(Entity entity){
-        PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
+    public void outOfBounds(Entity entity, Box2dBodyComponent bodyComponent, GameObjectComponent gameObjectComponent){
 
-        if (playerComponent.getPosition().x > GameConstants.WORLD_WIDTH ||
-                playerComponent.getPosition().x  < 0 ||
-                playerComponent.getPosition().y  > GameConstants.WORLD_HEIGHT ||
-                playerComponent.getPosition().y  < 0){
-            playerComponent.setDestroy(true);
+        if (bodyComponent.body.getPosition().x + gameObjectComponent.radius > GameConstants.WORLD_WIDTH ||
+                bodyComponent.body.getPosition().x - gameObjectComponent.radius < 0){
+            bodyComponent.body.setLinearVelocity(-bodyComponent.body.getLinearVelocity().x, 0);
         }
+    }
+
+    @Override
+    public void powerHandler(Entity entity, Box2dBodyComponent bodyComponent, GameObjectComponent gameObjectComponent) {
+
+        Vector2 savedPosition = bodyComponent.body.getPosition();
+        float initialRadius = gameObjectComponent.radius;
+
+        for (Entity power: game.getGameThread().getEntityFactory().getGameObjects()){
+            if (power.getComponent(TypeComponent.class).getType() == TypeComponent.Type.POWER) {
+                if (power.getComponent(CollisionComponent.class).hitBall) {
+                    switch (PowerHelper.getPower()) {
+                        case REDUCE_PLAYER:
+                            destroy(entity, bodyComponent, gameObjectComponent);
+                            game.getGameThread().getEntityFactory().createPlayer(
+                                    savedPosition.x,
+                                    savedPosition.y
+                            );
+                            gameObjectComponent.radius = initialRadius;
+                            break;
+                        case ENLARGE_PLAYER:
+                            destroy(entity, bodyComponent, gameObjectComponent);
+                            game.getGameThread().getEntityFactory().createPlayer(
+                                    savedPosition.x,
+                                    savedPosition.y
+                            );
+                            gameObjectComponent.radius = initialRadius;
+                            break;
+                        case EXTRA_LIFE:
+                            ScoreKeeper.setLives(ScoreKeeper.lives + 1);
+                            break;
+                    }
+                }
+            }
+        }
+
+    }
+
+    private void spawnNewPlayer(){
+        game.getGameThread().getEntityFactory().createPlayer(
+                GameConstants.WORLD_WIDTH/2, GameConstants.WORLD_HEIGHT/2
+        );
     }
 }

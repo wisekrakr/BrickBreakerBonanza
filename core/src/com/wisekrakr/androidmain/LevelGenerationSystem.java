@@ -7,8 +7,6 @@ import com.wisekrakr.androidmain.factories.EntityFactory;
 import com.wisekrakr.androidmain.helpers.GameHelper;
 import com.wisekrakr.androidmain.levels.LevelModel;
 import com.wisekrakr.androidmain.levels.LevelNumber;
-import com.wisekrakr.androidmain.retainers.ScoreKeeper;
-import com.wisekrakr.androidmain.screens.SuperEndScreen;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,8 +104,12 @@ public class LevelGenerationSystem {
             }else if (mainLevel > 18 && mainLevel <= 21) {
                 levelModel.startLevel(mainLevel);
                 game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(0.25f,0.5f));
-            }else if (mainLevel > 21 ) {
-                game.changeScreen(AndroidGame.SUPERENDGAME); //todo fix how to end the game
+            }else if (mainLevel > 21 && mainLevel <= 24) {
+                levelModel.startLevel(mainLevel);
+                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(0.1f,0.25f));
+            }else if (mainLevel == 25) {
+                levelModel.startLevel(mainLevel);
+                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(0.05f,0.1f));
             }
 
             game.getGamePreferences().setLevelGoing(mainLevel, true);

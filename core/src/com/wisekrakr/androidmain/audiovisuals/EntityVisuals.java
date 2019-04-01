@@ -23,426 +23,61 @@ public class EntityVisuals implements EntityVisualsContext {
     }
 
     @Override
-    public void visualizeEntity(Entity entity) {
+    public void visualizeColoredEntity(Entity entity) {
 
-
-        TypeComponent.Type type = ComponentMapper.getFor(TypeComponent.class).get(entity).getType();
-        if (type == TypeComponent.Type.POWER){
-            PowerUpComponent powerUpComponent = game.getGameThread().getComponentMapperSystem().getPowerUpComponentMapper().get(entity);
-
-            switch (PowerHelper.getPower()){
-                case ENLARGE_PLAYER:
-                    drawObjectViaAtlas(entity, "images/powerups/powerups.atlas","enlarge",
-                            powerUpComponent.getWidth(), powerUpComponent.getHeight()
-                    );
-                    break;
-                case REDUCE_PLAYER:
-                    drawObjectViaAtlas(entity, "images/powerups/powerups.atlas","reduce",
-                            powerUpComponent.getWidth(), powerUpComponent.getHeight()
-                    );
-                    break;
-                case SPEED_BOOST:
-                    drawObjectViaAtlas(entity, "images/powerups/powerups.atlas","speedup",
-                            powerUpComponent.getWidth(), powerUpComponent.getHeight()
-                    );
-                    break;
-                case SLOW_MO:
-                    drawObjectViaAtlas(entity, "images/powerups/powerups.atlas","slowmo",
-                            powerUpComponent.getWidth(), powerUpComponent.getHeight()
-                    );
-                    break;
-                case EXTRA_LIFE:
-                    drawObjectViaAtlas(entity, "images/powerups/powerups.atlas","extralife",
-                            powerUpComponent.getWidth(), powerUpComponent.getHeight()
-                    );
-                    break;
-            }
-
-        }else if (type == TypeComponent.Type.OBSTACLE){
-            ObstacleComponent obstacleComponent = game.getGameThread().getComponentMapperSystem().getObstacleComponentMapper().get(entity);
-
-            drawObjectViaAtlas(entity, "images/others/others.atlas", "platform",
-                    obstacleComponent.getWidth(), obstacleComponent.getHeight()
-            );
-
-        }
-
-        if (type == TypeComponent.Type.ENEMY) {
-            EnemyComponent enemyComponent = game.getGameThread().getComponentMapperSystem().getEnemyComponentMapper().get(entity);
-
-            switch (enemyComponent.getEntityStyleContext().getEntityStyle()) {
-                case WHITE_REDHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_redhair",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "penis", "w_hairyred_testicle");
-                    }
-                    break;
-                case WHITE_BLONDHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_blondhair",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "penis", "w_hairyblond_testicle");
-                    }
-                    break;
-                case WHITE_BROWNHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_brownhair",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "w_penis", "w_bald_testicle");
-                    }
-                    break;
-                case BLACK_BLACKHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "black_blackhair",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "b_penis", "b_hairyblack_testicle");
-                    }
-                    break;
-                case WHITE_BLACKHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_blackhair",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "w_penis", "hairyblack_testicle");
-                    }
-                    break;
-
-                case BLACK_BEARD:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "black_beard",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "b_penis", "b_bald_testicle");
-                    }
-                    break;
-                case BLACK_GREYHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "black_greyhair",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "b_penis", "b_hairygrey_testicle");
-                    }
-                    break;
-                case WHITE_BALD:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_bald",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "w_penis", "bald_testicle");
-                    }
-                    break;
-            }
-
-        }else if (type == TypeComponent.Type.PLAYER){
-            PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
-
-            switch (playerComponent.getEntityStyleContext().getEntityStyle()) {
-                    case WHITE_REDHAIR:
-                        drawObjectViaAtlas(entity,
-                                "images/players/players.atlas", "white_redhair",
-                                playerComponent.getWidth(),
-                                playerComponent.getHeight()
-                        );
-
-                        for (Entity ent: playerComponent.getAttachedEntities()) {
-                            addCockAndBalls(ent, "penis", "w_hairyred_testicle");
-                        }
+        if (entity != null) {
+            TypeComponent.Type type = ComponentMapper.getFor(TypeComponent.class).get(entity).getType();
+            if (type == TypeComponent.Type.BALL) {
+                switch (entity.getComponent(BallComponent.class).getBallColorContext().getBallColor()) {
+                    case RED:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "07-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
                         break;
-                    case WHITE_BLONDHAIR:
-                        drawObjectViaAtlas(entity,
-                                "images/players/players.atlas", "white_blondhair",
-                                playerComponent.getWidth(),
-                                playerComponent.getHeight()
-                        );
-
-                        for (Entity ent: playerComponent.getAttachedEntities()) {
-                            addCockAndBalls(ent, "penis", "w_hairyblond_testicle");
-                        }
+                    case BLUE:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "01-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
                         break;
-                    case WHITE_BROWNHAIR:
-                        drawObjectViaAtlas(entity,
-                                "images/players/players.atlas", "white_brownhair",
-                                playerComponent.getWidth(),
-                                playerComponent.getHeight()
-                        );
-
-                        for (Entity ent: playerComponent.getAttachedEntities()) {
-                            addCockAndBalls(ent, "w_penis", "w_bald_testicle");
-                        }
+                    case WHITE:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "17-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
                         break;
-                    case BLACK_BLACKHAIR:
-                        drawObjectViaAtlas(entity,
-                                "images/players/players.atlas", "black_blackhair",
-                                playerComponent.getWidth(),
-                                playerComponent.getHeight()
-                        );
-
-                        for (Entity ent: playerComponent.getAttachedEntities()) {
-                            addCockAndBalls(ent, "b_penis", "b_hairyblack_testicle");
-                        }
+                    case GREEN:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "03-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
                         break;
-
-                    case WHITE_BLACKHAIR:
-                        drawObjectViaAtlas(entity,
-                                "images/players/players.atlas", "white_blackhair",
-                                playerComponent.getWidth(),
-                                playerComponent.getHeight()
-                        );
-
-                        for (Entity ent: playerComponent.getAttachedEntities()) {
-                            addCockAndBalls(ent, "w_penis", "hairyblack_testicle");
-                        }
+                    case PURPLE:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "05-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
                         break;
-
-                    case BLACK_BEARD:
-                        drawObjectViaAtlas(entity,
-                                "images/players/players.atlas", "black_beard",
-                                playerComponent.getWidth(),
-                                playerComponent.getHeight()
-                        );
-
-                        for (Entity ent: playerComponent.getAttachedEntities()) {
-                            addCockAndBalls(ent, "b_penis", "b_bald_testicle");
-                        }
+                    case GOLD:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "13-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
                         break;
-                    case BLACK_GREYHAIR:
-                        drawObjectViaAtlas(entity,
-                                "images/players/players.atlas", "black_greyhair",
-                                playerComponent.getWidth(),
-                                playerComponent.getHeight()
-                        );
-
-                        for (Entity ent: playerComponent.getAttachedEntities()) {
-                            addCockAndBalls(ent, "b_penis", "b_hairygrey_testicle");
-                        }
-                        break;
-                    case WHITE_BALD:
-                        drawObjectViaAtlas(entity,
-                                "images/players/players.atlas", "white_bald",
-                                playerComponent.getWidth(),
-                                playerComponent.getHeight()
-                        );
-
-                        for (Entity ent: playerComponent.getAttachedEntities()) {
-                            addCockAndBalls(ent, "w_penis", "bald_testicle");
-                        }
+                    case ORANGE:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "09-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).radius, entity.getComponent(GameObjectComponent.class).radius);
                         break;
                 }
-
-        }
-
-    }
-
-    @Override
-    public void visualizeCensoredEntity(Entity entity) {
-        TypeComponent.Type type = ComponentMapper.getFor(TypeComponent.class).get(entity).getType();
-
-        if (type == TypeComponent.Type.ENEMY) {
-            EnemyComponent enemyComponent = game.getGameThread().getComponentMapperSystem().getEnemyComponentMapper().get(entity);
-
-            switch (enemyComponent.getEntityStyleContext().getEntityStyle()) {
-                case WHITE_REDHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_redhair",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "penis_blur", "w_hairyred_testicle_blur");
-                    }
-                    break;
-                case WHITE_BLONDHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_blondhair",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "penis_blur", "w_hairyblond_testicle_blur");
-                    }
-                    break;
-                case WHITE_BROWNHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_brownhair",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "w_penis_blur", "w_bald_testicle_blur");
-                    }
-                    break;
-                case BLACK_BLACKHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "black_blackhair",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "b_penis_blur", "b_hairyblack_testicle_blur");
-                    }
-                    break;
-                case WHITE_BLACKHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_blackhair",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "w_penis_blur", "hairyblack_testicle_blur");
-                    }
-                    break;
-
-                case BLACK_BEARD:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "black_beard",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "b_penis_blur", "b_bald_testicle_blur");
-                    }
-                    break;
-                case BLACK_GREYHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "black_greyhair",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "b_penis_blur", "b_hairygrey_testicle_blur");
-                    }
-                    break;
-                case WHITE_BALD:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_bald",
-                            enemyComponent.getWidth(),
-                            enemyComponent.getHeight()
-                    );
-                    for (Entity ent: enemyComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "w_penis_blur", "bald_testicle_blur");
-                    }
-                    break;
+            }else if (type == TypeComponent.Type.POWER){
+                switch (PowerHelper.getPower()) {
+                    case ENLARGE_PLAYER:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "22-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).width, entity.getComponent(GameObjectComponent.class).height);
+                        break;
+                    case REDUCE_PLAYER:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "21-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).width, entity.getComponent(GameObjectComponent.class).height);
+                        break;
+                    case BIGGER_BALL:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "23-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).width, entity.getComponent(GameObjectComponent.class).height);
+                        break;
+                    case EXTRA_LIFE:
+                        drawObjectViaAtlas(entity, "images/breakout/breakout.atlas", "25-Breakout-Tiles",
+                                entity.getComponent(GameObjectComponent.class).width, entity.getComponent(GameObjectComponent.class).height);
+                        break;
+                }
             }
-
-        }else if (type == TypeComponent.Type.PLAYER){
-            PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
-
-            switch (playerComponent.getEntityStyleContext().getEntityStyle()) {
-                case WHITE_REDHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_redhair",
-                            playerComponent.getWidth(),
-                            playerComponent.getHeight()
-                    );
-
-                    for (Entity ent: playerComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "penis_blur", "w_hairyred_testicle_blur");
-                    }
-                    break;
-                case WHITE_BLONDHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_blondhair",
-                            playerComponent.getWidth(),
-                            playerComponent.getHeight()
-                    );
-
-                    for (Entity ent: playerComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "penis_blur", "w_hairyblond_testicle_blur");
-                    }
-                    break;
-                case WHITE_BROWNHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_brownhair",
-                            playerComponent.getWidth(),
-                            playerComponent.getHeight()
-                    );
-
-                    for (Entity ent: playerComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "w_penis_blur", "w_bald_testicle_blur");
-                    }
-                    break;
-                case BLACK_BLACKHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "black_blackhair",
-                            playerComponent.getWidth(),
-                            playerComponent.getHeight()
-                    );
-
-                    for (Entity ent: playerComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "b_penis_blur", "b_hairyblack_testicle_blur");
-                    }
-                    break;
-
-                case WHITE_BLACKHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_blackhair",
-                            playerComponent.getWidth(),
-                            playerComponent.getHeight()
-                    );
-
-                    for (Entity ent: playerComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "w_penis_blur", "hairyblack_testicle_blur");
-                    }
-                    break;
-
-                case BLACK_BEARD:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "black_beard",
-                            playerComponent.getWidth(),
-                            playerComponent.getHeight()
-                    );
-
-                    for (Entity ent: playerComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "b_penis_blur", "b_bald_testicle_blur");
-                    }
-                    break;
-                case BLACK_GREYHAIR:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "black_greyhair",
-                            playerComponent.getWidth(),
-                            playerComponent.getHeight()
-                    );
-
-                    for (Entity ent: playerComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "b_penis_blur", "b_hairygrey_testicle_blur");
-                    }
-                    break;
-                case WHITE_BALD:
-                    drawObjectViaAtlas(entity,
-                            "images/players/players.atlas", "white_bald",
-                            playerComponent.getWidth(),
-                            playerComponent.getHeight()
-                    );
-
-                    for (Entity ent: playerComponent.getAttachedEntities()) {
-                        addCockAndBalls(ent, "w_penis_blur", "bald_testicle_blur");
-                    }
-                    break;
-            }
-
         }
     }
 
@@ -476,8 +111,7 @@ public class EntityVisuals implements EntityVisualsContext {
                     regionPath,
                     entity.getComponent(Box2dBodyComponent.class).body,
                     spriteBatch,
-                    width, height
-            );
+                    width, height);
         }
     }
 
@@ -486,28 +120,7 @@ public class EntityVisuals implements EntityVisualsContext {
         if (entity != null){
             SpriteHelper.entitySprite(game.assetManager(),
                     fileName,
-                    width, height
-            );
+                    width, height);
         }
-    }
-
-    private void addCockAndBalls(Entity ent, String regionPathPenis, String regionPathTesticle){
-
-        if (ent.getComponent(TypeComponent.class).getType() == TypeComponent.Type.PENIS) {
-            PenisComponent penisComponent = game.getGameThread().getComponentMapperSystem().getPenisComponentMapper().get(ent);
-
-            drawObjectViaAtlas(ent,
-                    "images/cockandballs/cockandballs.atlas", regionPathPenis,
-                    penisComponent.getLength(), penisComponent.getGirth()
-            );
-        }else if (ent.getComponent(TypeComponent.class).getType() == TypeComponent.Type.TESTICLE){
-            TesticleComponent testicleComponent = game.getGameThread().getComponentMapperSystem().getTesticleComponentMapper().get(ent);
-
-            drawObjectViaAtlas(ent,
-                    "images/cockandballs/cockandballs.atlas", regionPathTesticle,
-                    testicleComponent.getRadius(), testicleComponent.getRadius()
-            );
-        }
-
     }
 }
