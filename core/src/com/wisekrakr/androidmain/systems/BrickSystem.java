@@ -80,6 +80,7 @@ public class BrickSystem extends IteratingSystem implements SystemEntityContext{
         if (ScoreKeeper.getScore() > game.getGamePreferences().getHighScore()){
             game.getGamePreferences().setHighScore(ScoreKeeper.getScore());
         }
+
     }
 
     @Override
