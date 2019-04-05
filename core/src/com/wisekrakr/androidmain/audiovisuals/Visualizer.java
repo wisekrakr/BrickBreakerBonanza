@@ -40,7 +40,7 @@ public class Visualizer implements Disposable {
         renderingSystem = new RenderingSystem(spriteBatch);
 
         game.getEngine().addSystem(renderingSystem);
-//        game.getEngine().addSystem(new PhysicsDebugSystem(game.getGameThread().getEntityFactory().world, renderingSystem.getCamera()));
+        game.getEngine().addSystem(new PhysicsDebugSystem(game.getGameThread().getEntityFactory().world, renderingSystem.getCamera()));
 
         entityVisuals = new EntityVisuals(game, spriteBatch);
     }
