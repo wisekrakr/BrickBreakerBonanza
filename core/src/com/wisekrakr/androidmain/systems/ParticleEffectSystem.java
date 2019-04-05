@@ -6,16 +6,16 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.ParticleEffectPool;
-import com.wisekrakr.androidmain.AndroidGame;
+import com.wisekrakr.androidmain.BricksGame;
 import com.wisekrakr.androidmain.components.ParticleEffectComponent;
 
 import java.util.EnumMap;
 
 public class ParticleEffectSystem extends IteratingSystem {
     private final EnumMap<ParticleEffectComponent.ParticleEffectType, ParticleEffectPool>effectPoolEnumMap;
-    private AndroidGame game;
+    private BricksGame game;
 
-    public ParticleEffectSystem(AndroidGame game) {
+    public ParticleEffectSystem(BricksGame game) {
         super(Family.all(ParticleEffectComponent.class).get());
         this.game = game;
 

@@ -1,8 +1,6 @@
 package com.wisekrakr.androidmain;
 
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.utils.ImmutableArray;
-import com.wisekrakr.androidmain.AndroidGame;
+import com.badlogic.gdx.Gdx;
 import com.wisekrakr.androidmain.factories.EntityFactory;
 import com.wisekrakr.androidmain.helpers.GameHelper;
 import com.wisekrakr.androidmain.levels.LevelModel;
@@ -15,7 +13,7 @@ import java.util.List;
 
 
 public class LevelGenerationSystem {
-    private AndroidGame game;
+    private BricksGame game;
     private EntityFactory entityFactory;
     private LevelModel levelModel;
 
@@ -28,7 +26,7 @@ public class LevelGenerationSystem {
     private List<LevelNumber> levelCompleted = new ArrayList<LevelNumber>();
     private int mainLevel = 1;
 
-    public LevelGenerationSystem(AndroidGame game, EntityFactory entityFactory){
+    public LevelGenerationSystem(BricksGame game, EntityFactory entityFactory){
         this.game = game;
         this.entityFactory = entityFactory;
 
@@ -80,36 +78,29 @@ public class LevelGenerationSystem {
 
     }
 
+    /**
+     * Set the number of rows and columns. For rows: + 1 (i.e. when you want 3, set 4)
+     */
     private void building(){
 
         if (!game.getGamePreferences().levelGoing(mainLevel)) {
-            if (mainLevel > 0 && mainLevel <= 3) {
-                levelModel.startLevel(mainLevel);
-                game.getGameThread().getTimeKeeper().setTimeToChase(2f);
-            }else if (mainLevel > 3 && mainLevel <= 6) {
-                levelModel.startLevel(mainLevel);
-                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(1.5f,1.75f));
-            }else if (mainLevel > 6 && mainLevel <= 9) {
-                levelModel.startLevel(mainLevel);
-                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(1.25f,1.5f));
-            }else if (mainLevel > 9 && mainLevel <= 12) {
-                levelModel.startLevel(mainLevel);
-                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(1f,1.25f));
-            }else if (mainLevel > 12 && mainLevel <= 15) {
-                levelModel.startLevel(mainLevel);
-                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(0.75f,2f));
-            }else if (mainLevel > 15 && mainLevel <= 18) {
-                levelModel.startLevel(mainLevel);
-                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(0.5f,0.75f));
-            }else if (mainLevel > 18 && mainLevel <= 21) {
-                levelModel.startLevel(mainLevel);
-                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(0.25f,0.5f));
-            }else if (mainLevel > 21 && mainLevel <= 24) {
-                levelModel.startLevel(mainLevel);
-                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(0.1f,0.25f));
-            }else if (mainLevel == 25) {
-                levelModel.startLevel(mainLevel);
-                game.getGameThread().getTimeKeeper().setTimeToChase(GameHelper.generateRandomNumberBetween(0.05f,0.1f));
+            if (mainLevel > 0 && mainLevel <=3) {
+                levelModel.startLevel(mainLevel,
+                        (int) ((GameConstants.WORLD_WIDTH - GameConstants.BRICK_WIDTH) / GameConstants.BRICK_WIDTH),
+                        4
+                );
+            }
+            if (mainLevel > 3 && mainLevel <= 6) {
+                levelModel.startLevel(mainLevel,
+                        (int) ((GameConstants.WORLD_WIDTH - GameConstants.BRICK_WIDTH) / GameConstants.BRICK_WIDTH),
+                        7
+                );
+            }
+            if (mainLevel >6 && mainLevel <= 9) {
+                levelModel.startLevel(mainLevel,
+                        (int) ((GameConstants.WORLD_WIDTH - GameConstants.BRICK_WIDTH) / GameConstants.BRICK_WIDTH),
+                        10
+                );
             }
 
             game.getGamePreferences().setLevelGoing(mainLevel, true);
@@ -142,7 +133,7 @@ public class LevelGenerationSystem {
         for (LevelNumber levelNumber: levelCompleted) {
             levelsToDo.remove(levelNumber);
         }
-        game.changeScreen(AndroidGame.LEVELSELECTION);
+        game.changeScreen(BricksGame.LEVELSELECTION);
 
     }
 
@@ -154,7 +145,5 @@ public class LevelGenerationSystem {
         return mainLevel;
     }
 
-    public LevelModel getLevelModel() {
-        return levelModel;
-    }
+
 }

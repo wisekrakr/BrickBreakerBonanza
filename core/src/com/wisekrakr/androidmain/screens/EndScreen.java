@@ -13,17 +13,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.wisekrakr.androidmain.AndroidGame;
+import com.wisekrakr.androidmain.BricksGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 
 public class EndScreen extends ScreenAdapter {
 
-    private AndroidGame game;
+    private BricksGame game;
     private Stage stage;
     private Label highScoreLabel;
 
-    public EndScreen(AndroidGame game) {
+    public EndScreen(BricksGame game) {
         this.game = game;
 
         stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
@@ -75,7 +75,7 @@ public class EndScreen extends ScreenAdapter {
         mainMenu.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.changeScreen(AndroidGame.MENU);
+                game.changeScreen(BricksGame.MENU);
             }
         });
 

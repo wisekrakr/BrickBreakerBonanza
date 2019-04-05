@@ -2,20 +2,10 @@ package com.wisekrakr.androidmain.retainers;
 
 public class ScoreKeeper {
 
-    public static int lives = 100;
+    public static int lives = 3;
 
     public static void setLives(int lives) {
         ScoreKeeper.lives = lives;
-    }
-
-    private static int initialBalls;
-
-    public static void setInitialBalls(int initialBalls) {
-        ScoreKeeper.initialBalls = initialBalls;
-    }
-
-    public static int getInitialBalls() {
-        return initialBalls;
     }
 
     private static int score = 0;

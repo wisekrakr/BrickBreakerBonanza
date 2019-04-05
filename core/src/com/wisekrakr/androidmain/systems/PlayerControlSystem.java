@@ -7,106 +7,108 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.wisekrakr.androidmain.AndroidGame;
-import com.wisekrakr.androidmain.GameConstants;
+import com.wisekrakr.androidmain.BricksGame;
 import com.wisekrakr.androidmain.components.*;
 import com.wisekrakr.androidmain.controls.Controls;
+import com.wisekrakr.androidmain.helpers.GameHelper;
+
+import java.util.List;
 
 public class PlayerControlSystem extends IteratingSystem {
 
-    private ComponentMapper<PlayerComponent> playerComponentMapper;
-    private ComponentMapper<Box2dBodyComponent> box2dBodyComponentMapper;
-    private AndroidGame game;
+    private BricksGame game;
     private Controls controller;
     private OrthographicCamera camera;
 
     @SuppressWarnings("unchecked")
-    public PlayerControlSystem(AndroidGame game, Controls controls, OrthographicCamera camera) {
+    public PlayerControlSystem(BricksGame game, Controls controls, OrthographicCamera camera) {
         super(Family.all(PlayerComponent.class).get());
         this.game = game;
         controller = controls;
         this.camera = camera;
-
-        playerComponentMapper = ComponentMapper.getFor(PlayerComponent.class);
-        box2dBodyComponentMapper = ComponentMapper.getFor(Box2dBodyComponent.class);
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        Box2dBodyComponent bodyComponent = box2dBodyComponentMapper.get(entity);
-        PlayerComponent playerComponent = playerComponentMapper.get(entity);
+        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
+        PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
 
         movement(entity);
 
         Vector3 mousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 
-        if (controller.isRightMouseDown) {
-            System.out.println("X= " + (mousePos.x / 2.5f) + " , Y= " + (mousePos.y / 2.5)); //todo remove
-
-        }
         camera.unproject(mousePos);
 
-        float speed = 1000000000f;
+        float angle = GameHelper.angleBetween(bodyComponent.body.getPosition(), new Vector2(mousePos.x, mousePos.y));
+        playerComponent.setShootDirection(angle);
 
-        float xVelocity = mousePos.x - bodyComponent.body.getPosition().x;
-        float yVelocity = mousePos.y - bodyComponent.body.getPosition().y;
+        if (!playerComponent.isHasBall()) {
+            if (controller.isLeftMouseDown || Gdx.input.isTouched()) {
 
-        if (controller.isLeftMouseDown || Gdx.input.isTouched()){
-            float length = (float) Math.sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
-            if (length != 0) {
-                xVelocity = xVelocity / length;
-                yVelocity = yVelocity / length;
+                BallComponent ballComponent = game.getGameThread().getComponentMapperSystem().getBallComponentMapper().get(getBall());
+                Box2dBodyComponent box2dBodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(getBall());
+                getBall().getComponent(
+                        Box2dBodyComponent.class).body.applyForceToCenter(
+                        bodyComponent.body.getLinearVelocity().x + ballComponent.getSpeed() * MathUtils.cos(angle),
+                        bodyComponent.body.getLinearVelocity().y + ballComponent.getSpeed() * MathUtils.sin(angle),
+                        true
+                );
+                box2dBodyComponent.body.setTransform(box2dBodyComponent.body.getPosition(), angle);
+                ballComponent.setDirection(angle);
+                playerComponent.setHasBall(true);
             }
-
-            bodyComponent.body.setLinearVelocity(xVelocity * speed, yVelocity * speed);
-
-            playerComponent.setMoving(true);
         }
-
         if (controller.speedUp) { //spacebar
             if (game.getGameThread().getTimeKeeper().gameClock - game.getGameThread().getTimeKeeper().speedUp > 10) {
                 game.getGameThread().getTimeKeeper().speedUp = game.getGameThread().getTimeKeeper().gameClock;
 
-               //todo speed up player
+                BallComponent ballComponent = game.getGameThread().getComponentMapperSystem().getBallComponentMapper().get(getBall());
+                Box2dBodyComponent box2dBodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(getBall());
+
+                getBall().getComponent(
+                        Box2dBodyComponent.class).body.applyForceToCenter(
+                        box2dBodyComponent.body.getLinearVelocity().x + ballComponent.getSpeed() * MathUtils.cos(ballComponent.getDirection()),
+                        box2dBodyComponent.body.getLinearVelocity().y + ballComponent.getSpeed() * MathUtils.sin(ballComponent.getDirection()),
+                        true
+                );
             }
-
         }
+    }
 
+    private Entity getBall(){
+        Entity ball = null;
+        for (Entity ent: game.getEngine().getEntities()) {
+            if (ent.getComponent(TypeComponent.class).getType() == TypeComponent.Type.BALL) {
+                ball = ent;
+            }
+        }
+        return ball;
     }
 
     private void movement(Entity entity){
-        Box2dBodyComponent bodyComponent = box2dBodyComponentMapper.get(entity);
-        PlayerComponent playerComponent = playerComponentMapper.get(entity);
+        Box2dBodyComponent bodyComponent = game.getGameThread().getComponentMapperSystem().getBodyComponentMapper().get(entity);
 
         if (controller != null) {
             if (controller.left) {
                 bodyComponent.body.setLinearVelocity(-500f, 0);//a
-
-                bodyComponent.body.setTransform(bodyComponent.body.getPosition(), MathUtils.PI);
-                playerComponent.setMoving(true);
             }
             if (controller.right) {
                 bodyComponent.body.setLinearVelocity(500f, 0); //d
-                bodyComponent.body.setTransform(bodyComponent.body.getPosition(), 0);
-                playerComponent.setMoving(true);
             }
             if (controller.down) {
-                bodyComponent.body.setLinearVelocity(0, -500); //s
+                bodyComponent.body.setLinearVelocity(0, 0); //s
+            }
+            if (controller.nextLevel){ //left alt
 
-                bodyComponent.body.setTransform(bodyComponent.body.getPosition(), -MathUtils.PI/2);
-                playerComponent.setMoving(true);
-            }
-            if (controller.up) {
-                bodyComponent.body.setLinearVelocity(0, 500); //w
+                for (Entity ent : game.getEngine().getEntities()) {
+                    if (ent.getComponent(TypeComponent.class).getType() == TypeComponent.Type.BRICK) {
+                        ent.getComponent(BrickComponent.class).setDestroy(true);
+                    }
+                }
 
-                bodyComponent.body.setTransform(bodyComponent.body.getPosition(), MathUtils.PI/2);
-                playerComponent.setMoving(true);
             }
-            if (controller.nextLevel) { //left alt
-                game.getGameThread().getTimeKeeper().setTime(0);
-            }
-            System.out.println(bodyComponent.body.getAngle());
         }
 
     }

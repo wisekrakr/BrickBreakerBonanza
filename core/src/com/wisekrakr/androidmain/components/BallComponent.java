@@ -10,43 +10,81 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BallComponent implements Component, Pool.Poolable {
+    private Vector2 position = new Vector2();
+    private float velocityX = 0;
+    private float velocityY = 0;
+    private boolean destroy;
+    private float radius = 0;
+    private float speed = 0;
+    private float direction = 0;
 
-    public final Vector2 initialPosition = new Vector2();
+    public Vector2 getPosition() {
+        return position;
+    }
 
-    public float speed = 1000000f;
+    public void setPosition(Vector2 position) {
+        this.position = position;
+    }
+
+    public float getVelocityX() {
+        return velocityX;
+    }
+
+    public void setVelocityX(float velocityX) {
+        this.velocityX = velocityX;
+    }
+
+    public float getVelocityY() {
+        return velocityY;
+    }
+
+    public void setVelocityY(float velocityY) {
+        this.velocityY = velocityY;
+    }
+
+    public boolean isDestroy() {
+        return destroy;
+    }
+
+    public void setDestroy(boolean destroy) {
+        this.destroy = destroy;
+    }
+
+    public float getRadius() {
+        return radius;
+    }
+
+    public void setRadius(float radius) {
+        this.radius = radius;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
     public void setSpeed(float speed) {
         this.speed = speed;
     }
 
-    public List<Vector2>initialPositions = new ArrayList<Vector2>();
-
-    public float chaseInterval = 0;
-
-    private EntityColor entityColor = null;
-
-    public BallColorContext getBallColorContext() {
-        return ballColorContext;
+    public float getDirection() {
+        return direction;
     }
 
-    private BallColorContext ballColorContext = new BallColorContext() {
+    public void setDirection(float direction) {
+        this.direction = direction;
+    }
 
-        @Override
-        public EntityColor getBallColor() {
-            return entityColor;
-        }
 
-        @Override
-        public void setBallColor(EntityColor color) {
-            entityColor = color;
-        }
-    };
 
     @Override
     public void reset() {
+        position = new Vector2();
+        velocityX = 0;
+        velocityY = 0;
+        destroy = false;
+        radius = 0;
+        direction = 0;
 
-        initialPositions = new ArrayList<Vector2>();
-        chaseInterval = 0;
-
-        speed = 1000000f;
+        speed = 0;
     }
 }

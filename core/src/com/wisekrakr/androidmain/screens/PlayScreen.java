@@ -4,14 +4,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.wisekrakr.androidmain.AndroidGame;
+import com.wisekrakr.androidmain.BricksGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.controls.Controls;
 import com.wisekrakr.androidmain.systems.*;
 import com.wisekrakr.androidmain.audiovisuals.Visualizer;
+import com.wisekrakr.androidmain.systems.entitysystems.*;
 
 public class PlayScreen extends ScreenAdapter  {
 
@@ -20,7 +20,7 @@ public class PlayScreen extends ScreenAdapter  {
 
     private Controls controls;
 
-    private AndroidGame game;
+    private BricksGame game;
 
     private Visualizer visualizer;
     private InfoDisplay infoDisplay;
@@ -29,7 +29,7 @@ public class PlayScreen extends ScreenAdapter  {
 
 //    private EntityAudio entityAudio;
 
-    public PlayScreen(AndroidGame game) {
+    public PlayScreen(BricksGame game) {
         this.game = game;
 
         addSystems();
@@ -52,19 +52,20 @@ public class PlayScreen extends ScreenAdapter  {
 
         game.getGameThread().getLevelGenerationSystem().init();
 
-//        game.getEngine().addSystem(new GameObjectSystem(game));
-
         game.getEngine().addSystem(new PlayerSystem(game));
         game.getEngine().addSystem(new BallSystem(game));
+        game.getEngine().addSystem(new BrickSystem(game));
+        game.getEngine().addSystem(new ObstacleSystem(game));
+        game.getEngine().addSystem(new PowerUpSystem(game));
 
         visualizer = new Visualizer(game);
         controls = new Controls();
         touchControl = new TouchControl(game);
 
         game.getEngine().addSystem(new PlayerControlSystem(game, controls, visualizer.getRenderingSystem().getCamera()));
-        game.getEngine().addSystem(new CollisionSystem());
+        game.getEngine().addSystem(new CollisionSystem(game));
 
-//        game.getEngine().addSystem(new ObstacleSystem(game));
+
 
     }
     private void mapLoading() {
@@ -105,10 +106,10 @@ public class PlayScreen extends ScreenAdapter  {
                 delta
         );
 
-        visualizer.debugDrawableFilled();
-        visualizer.debugDrawableLine(delta);
+//        visualizer.debugDrawableFilled();
+//        visualizer.debugDrawableLine();
 
-//        visualizer.draw(delta);
+        visualizer.draw();
 
 //        entityAudio.audioForAction(controls);
 //        entityAudio.audioForEntity();

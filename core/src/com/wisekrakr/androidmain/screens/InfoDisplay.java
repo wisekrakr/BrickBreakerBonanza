@@ -10,10 +10,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.wisekrakr.androidmain.AndroidGame;
+import com.wisekrakr.androidmain.BricksGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.CollisionComponent;
+import com.wisekrakr.androidmain.components.TypeComponent;
 import com.wisekrakr.androidmain.helpers.LabelHelper;
+import com.wisekrakr.androidmain.retainers.EntityKeeper;
 import com.wisekrakr.androidmain.retainers.ScoreKeeper;
 import com.wisekrakr.androidmain.retainers.TimeKeeper;
 
@@ -22,12 +24,11 @@ import java.util.Iterator;
 
 public class InfoDisplay implements Disposable {
 
-
+    private Integer bricksLeft;
     private Integer levelNumber;
     private Integer score;
     private Integer bounces;
     private Integer lives;
-    private Integer balls;
 
     private Label scoreCountLabel;
     private Label scoreAddedLabel;
@@ -35,21 +36,22 @@ public class InfoDisplay implements Disposable {
     private Integer worldTimer;
     private Label timeCountLabel;
     private Label levelNumberLabel;
-    private Label ballNumberLabel;
     private Label bounceNumberLabel;
     private Label livesNumberLabel;
+    private Label brickNumberLabel;
 
-    private AndroidGame game;
+    private BricksGame game;
 
     private Stage stage;
     private float timeCounter;
     private Integer currentScore = 0;
     private Integer multi = 0;
 
-    InfoDisplay(AndroidGame game) {
+    InfoDisplay(BricksGame game) {
         this.game = game;
 
         worldTimer = 0;
+        bounces = 0;
 
         stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
@@ -64,8 +66,8 @@ public class InfoDisplay implements Disposable {
         scoreCountLabel =LabelHelper.label(score != null ? score.toString() : null, font, Color.GOLDENROD);
         scoreAddedLabel =LabelHelper.label(currentScore != null ? currentScore.toString() : null, font, Color.GREEN);
         multiplierLabel = LabelHelper.label(multi != null ? multi.toString() : null, font, Color.PINK);
-        Label ballNameLabel = LabelHelper.label("Balls to Dodge", font, Color.WHITE);
-        ballNumberLabel = LabelHelper.label(balls != null ? balls.toString() : null, font, Color.GOLDENROD);
+        Label ballNameLabel = LabelHelper.label("Bricks to Break", font, Color.WHITE);
+        brickNumberLabel = LabelHelper.label(bricksLeft != null ? bricksLeft.toString() : null, font, Color.GOLDENROD);
         Label bounceLabel = LabelHelper.label("Bounces", font, Color.WHITE);
         bounceNumberLabel = LabelHelper.label(bounces != null ? bounces.toString() : null, font, Color.GOLDENROD);
         Label livesLabel = LabelHelper.label("Lives left", font, Color.WHITE);
@@ -85,7 +87,7 @@ public class InfoDisplay implements Disposable {
         tableRight.row();
         tableRight.add(ballNameLabel);
         tableRight.row();
-        tableRight.add(ballNumberLabel);
+        tableRight.add(brickNumberLabel);
         tableRight.row();
         tableRight.add(bounceLabel).padBottom(2);
         tableRight.row();
@@ -125,7 +127,7 @@ public class InfoDisplay implements Disposable {
             scoreAdded();
 
             levelNumberLabel.setText(Integer.toString(game.getGameThread().getLevelGenerationSystem().getMainLevel()));
-            ballNumberLabel.setText(Integer.toString(game.getGameThread().getEntityFactory().getGameObjects().size()));
+            brickNumberLabel.setText(Integer.toString(EntityKeeper.getInitialBricks()));
 
             bounces();
             multiplier();
@@ -146,11 +148,10 @@ public class InfoDisplay implements Disposable {
     }
 
     private void bounces(){
-        Iterator<Entity>iterator = game.getGameThread().getEntityFactory().getGameObjects().iterator();
-        if (iterator.hasNext()){
-            bounceNumberLabel.setText(Integer.toString(iterator.next().getComponent(CollisionComponent.class).bounces));
-        }else {
-            bounceNumberLabel.setText("");
+        for (Entity entity: game.getEngine().getEntities()){
+            if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.BALL){
+                bounceNumberLabel.setText(Integer.toString(entity.getComponent(CollisionComponent.class).bounces));
+            }
         }
     }
 

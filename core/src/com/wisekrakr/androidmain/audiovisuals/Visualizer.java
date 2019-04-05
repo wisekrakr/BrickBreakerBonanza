@@ -2,9 +2,7 @@ package com.wisekrakr.androidmain.audiovisuals;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -13,43 +11,36 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Disposable;
-import com.wisekrakr.androidmain.AndroidGame;
-import com.wisekrakr.androidmain.GameConstants;
+import com.wisekrakr.androidmain.BricksGame;
 import com.wisekrakr.androidmain.components.*;
 import com.wisekrakr.androidmain.systems.PhysicsDebugSystem;
 import com.wisekrakr.androidmain.systems.RenderingSystem;
 
 public class Visualizer implements Disposable {
 
-    private AndroidGame game;
+    private BricksGame game;
     private RenderingSystem renderingSystem;
     private EntityVisuals entityVisuals;
 
     private final SpriteBatch spriteBatch;
 
     private Animation<TextureRegion>animation;
-    private Texture sheet;
-    private float stateTime;
 
     private ParticleEffect effect;
 
-    public Visualizer(AndroidGame game) {
+    public Visualizer(BricksGame game) {
         this.game = game;
 
         spriteBatch = new SpriteBatch();
 
         addSystems();
-
-        sheet = new Texture(Gdx.files.internal("images/player/player.png"));
-
-        stateTime = 0f;
     }
 
     private void addSystems(){
         renderingSystem = new RenderingSystem(spriteBatch);
 
         game.getEngine().addSystem(renderingSystem);
-        game.getEngine().addSystem(new PhysicsDebugSystem(game.getGameThread().getEntityFactory().world, renderingSystem.getCamera()));
+//        game.getEngine().addSystem(new PhysicsDebugSystem(game.getGameThread().getEntityFactory().world, renderingSystem.getCamera()));
 
         entityVisuals = new EntityVisuals(game, spriteBatch);
     }
@@ -74,69 +65,17 @@ public class Visualizer implements Disposable {
         }
     }
 
-    public void draw(float delta){
-        stateTime += delta;
+    public void draw(){
 
         spriteBatch.setProjectionMatrix(renderingSystem.getCamera().combined);
 
         spriteBatch.begin();
-//        for (Entity entity: game.getEngine().getEntities()){
-//            TypeComponent.Type type = entity.getComponent(TypeComponent.class).getType();
-//
-//            switch (type){
-//                case BALL:
-//                    entityVisuals.drawObjectViaAtlas(entity,
-//                            "images/breakout/breakout.atlas",
-//                            "58-Breakout-Tiles",
-//                            entity.getComponent(BallComponent.class).radius,
-//                            entity.getComponent(BallComponent.class).radius
-//                    );
-//                    break;
-//
-//                case PLAYER:
-////                    TextureRegion[][] tmp = TextureRegion.split(sheet,
-////                            (int) entity.getComponent(PlayerComponent.class).width,
-////                            (int) entity.getComponent(PlayerComponent.class).height
-////                    );
-////                    TextureRegion[] frames = new TextureRegion[6 * 5];
-////                    int index = 0;
-////                    for (int i = 0; i < 5; i++) {
-////                        for (int j = 0; j < 6; j++) {
-////                            frames[index++] = tmp[i][j];
-////                        }
-////                    }
-////
-////                    animation = new Animation<TextureRegion>(0.05f, frames);
-////                    TextureRegion currentFrame = animation.getKeyFrame(stateTime, true);
-////                    spriteBatch.draw(currentFrame,
-////                            entity.getComponent(Box2dBodyComponent.class).body.getPosition().x - entity.getComponent(PlayerComponent.class).width/2,
-////                            entity.getComponent(Box2dBodyComponent.class).body.getPosition().y - entity.getComponent(PlayerComponent.class).height/2
-////                    );
-//
-//
-//                    entityVisuals.drawObjectViaAtlas(entity,
-//                            "images/breakout/breakout.atlas",
-//                            "50-Breakout-Tiles",
-//                            entity.getComponent(PlayerComponent.class).radius,
-//                            entity.getComponent(PlayerComponent.class).radius
-//                    );
-//                    break;
-//                case OBSTACLE:
-//                    entityVisuals.drawObjectViaAtlas(entity,
-//                            "images/breakout/breakout.atlas",
-//                            "29-Breakout-Tiles",
-//                            entity.getComponent(ObstacleComponent.class).width,
-//                            entity.getComponent(ObstacleComponent.class).height
-//                    );
-//                    break;
-//                case POWER:
-//                    entityVisuals.visualizePower(entity);
-//                    break;
-//
-//            }
-//
-//
-//        }
+
+        for (Entity entity: game.getEngine().getEntities()){
+            entityVisuals.visualizeEntity(entity);
+        }
+
+
         spriteBatch.end();
     }
 
@@ -145,15 +84,13 @@ public class Visualizer implements Disposable {
         shapeRenderer.setProjectionMatrix(renderingSystem.getCamera().combined);
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        for (Entity entity: game.getGameThread().getEntityFactory().getGameObjects()) {
-            GameObjectComponent gameObjectComponent = ComponentMapper.getFor(GameObjectComponent.class).get(entity);
-            TypeComponent.Type type = ComponentMapper.getFor(TypeComponent.class).get(entity).getType();
-            if (type == TypeComponent.Type.BALL) {
-                BallComponent ballComponent = ComponentMapper.getFor(BallComponent.class).get(entity);
+        for (Entity entity: game.getEngine().getEntities()) {
 
-                float radius = gameObjectComponent.radius;
-                shapeRenderer.setColor(Color.RED);
-                switch (ballComponent.getBallColorContext().getBallColor()){
+            TypeComponent.Type type = ComponentMapper.getFor(TypeComponent.class).get(entity).getType();
+            if (type == TypeComponent.Type.BRICK) {
+                BrickComponent brickComponent = game.getGameThread().getComponentMapperSystem().getBrickComponentMapper().get(entity);
+
+                switch (brickComponent.getBrickColorContext().getBrickColor()){
                     case RED:
                         shapeRenderer.setColor(Color.RED);
                         break;
@@ -176,63 +113,52 @@ public class Visualizer implements Disposable {
                         shapeRenderer.setColor(Color.ORANGE);
                         break;
                 }
-                shapeRenderer.circle((entity.getComponent(GameObjectComponent.class).position.x ),
-                        (entity.getComponent(GameObjectComponent.class).position.y),
-                        radius/2
+                shapeRenderer.rect((brickComponent.getPosition().x ),
+                        (brickComponent.getPosition().y),
+                        brickComponent.getWidth()/2,
+                        brickComponent.getHeight()/2
                 );
             }else if (type == TypeComponent.Type.POWER){
                 shapeRenderer.setColor(Color.CORAL);
-                shapeRenderer.rect((entity.getComponent(GameObjectComponent.class).position.x ),
-                        (entity.getComponent(GameObjectComponent.class).position.y),
-                        entity.getComponent(GameObjectComponent.class).width,
-                        entity.getComponent(GameObjectComponent.class).height
+                shapeRenderer.rect((entity.getComponent(PowerUpComponent.class).getPosition().x ),
+                        (entity.getComponent(PowerUpComponent.class).getPosition().y),
+                        entity.getComponent(PowerUpComponent.class).getWidth(),
+                        entity.getComponent(PowerUpComponent.class).getHeight()
                 );
             }
         }
-
-
-
-//                shapeRenderer.triangle(entity.getComponent(PowerUpComponent.class).position.x - GameConstants.POWER_WIDTH,
-//                        entity.getComponent(PowerUpComponent.class).position.y ,
-//                        entity.getComponent(PowerUpComponent.class).position.x - GameConstants.POWER_WIDTH + GameConstants.POWER_WIDTH,
-//                        entity.getComponent(PowerUpComponent.class).position.y + GameConstants.POWER_HEIGHT,
-//                        entity.getComponent(PowerUpComponent.class).position.x + GameConstants.POWER_WIDTH,
-//                        entity.getComponent(PowerUpComponent.class).position.y
-//                );
-
-
-
         shapeRenderer.end();
     }
 
-    public void debugDrawableLine(float delta){
+    public void debugDrawableLine(){
         ShapeRenderer shapeRenderer = new ShapeRenderer();
         shapeRenderer.setProjectionMatrix(renderingSystem.getCamera().combined);
-
-        stateTime += delta;
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
 
         for (Entity entity: game.getEngine().getEntities()) {
-            GameObjectComponent gameObjectComponent = ComponentMapper.getFor(GameObjectComponent.class).get(entity);
+
             TypeComponent typeComponent = ComponentMapper.getFor(TypeComponent.class).get(entity);
             shapeRenderer.setColor(Color.CYAN);
             switch (typeComponent.getType()){
                 case PLAYER:
-                    Vector2 position = gameObjectComponent.position;
-                    float angle = entity.getComponent(Box2dBodyComponent.class).body.getAngle();
-                    float radius = gameObjectComponent.radius;
+                    PlayerComponent playerComponent = game.getGameThread().getComponentMapperSystem().getPlayerComponentMapper().get(entity);
 
-                    shapeRenderer.circle(position.x,position.y, radius);
+                    Vector2 position = playerComponent.getPosition();
+                    float angle = playerComponent.getShootDirection();
+                    float width = playerComponent.getWidth();
+                    float height = playerComponent.getHeight();
 
-                    shapeRenderer.line(position.x - radius * MathUtils.cos(angle),position.y - radius * MathUtils.sin(angle),
-                            position.x - 20f * MathUtils.cos(angle), position.y - 20f * MathUtils.sin(angle)
-                    );
+                    shapeRenderer.rect(position.x - width/2 ,position.y - height/2, width, height);
+
+//                    shapeRenderer.line(position.x * MathUtils.cos(angle),position.y + height * MathUtils.sin(angle),
+//                            position.x * MathUtils.cos(angle), position.y + 20f * MathUtils.sin(angle)
+//                    );
                     break;
                 case BALL:
-                    shapeRenderer.circle(gameObjectComponent.position.x ,
-                            gameObjectComponent.position.y,
-                            gameObjectComponent.radius/2
+                    shapeRenderer.circle(entity.getComponent(BallComponent.class).getPosition().x ,
+                            entity.getComponent(BallComponent.class).getPosition().y,
+                            entity.getComponent(BallComponent.class).getRadius()/2
                     );
                     break;
                 case OBSTACLE:
@@ -240,15 +166,23 @@ public class Visualizer implements Disposable {
                 case SCENERY:
                     break;
                 case POWER:
-                    shapeRenderer.triangle(gameObjectComponent.position.x - GameConstants.POWER_WIDTH,
-                            gameObjectComponent.position.y ,
-                            gameObjectComponent.position.x - GameConstants.POWER_WIDTH + GameConstants.POWER_WIDTH,
-                            gameObjectComponent.position.y + GameConstants.POWER_HEIGHT,
-                            gameObjectComponent.position.x + GameConstants.POWER_WIDTH,
-                            gameObjectComponent.position.y
+                    PowerUpComponent powerUpComponent = game.getGameThread().getComponentMapperSystem().getPowerUpComponentMapper().get(entity);
+
+                    shapeRenderer.rect(powerUpComponent.getPosition().x - powerUpComponent.getWidth()/2,
+                            powerUpComponent.getPosition().y - powerUpComponent.getHeight()/2,
+                            powerUpComponent.getWidth(), powerUpComponent.getHeight()
                     );
                     break;
-                    default:
+                case BRICK:
+                    BrickComponent brickComponent = game.getGameThread().getComponentMapperSystem().getBrickComponentMapper().get(entity);
+
+                    shapeRenderer.rect(brickComponent.getPosition().x - brickComponent.getWidth()/2,
+                            brickComponent.getPosition().y - brickComponent.getHeight()/2,
+                            brickComponent.getWidth(), brickComponent.getHeight()
+                    );
+
+                    break;
+                default:
                         System.out.println("No entity to draw line around");
             }
         }
@@ -259,6 +193,5 @@ public class Visualizer implements Disposable {
     @Override
     public void dispose() {
         spriteBatch.dispose();
-        sheet.dispose();
     }
 }

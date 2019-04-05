@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Pool;
 public class TypeComponent implements Component, Pool.Poolable {
 
     public enum Type{
-        PLAYER, BALL, OBSTACLE, SCENERY, POWER
+        PLAYER, BALL, OBSTACLE, SCENERY, POWER, BRICK
     }
 
     private Type type = null;

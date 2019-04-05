@@ -11,12 +11,12 @@ public class GameThread {
 
     private final EntityFactory entityFactory;
     private LevelGenerationSystem levelGenerationSystem;
-    private AndroidGame game;
+    private BricksGame game;
     private PooledEngine engine;
     private TimeKeeper timeKeeper;
     private ComponentMapperSystem componentMapperSystem;
 
-    protected GameThread(AndroidGame game) {
+    protected GameThread(BricksGame game) {
         this.game = game;
 
         timeKeeper = new TimeKeeper();
@@ -24,7 +24,7 @@ public class GameThread {
         engine = game.getEngine();
 
         entityFactory = new EntityFactory(game, engine);
-        levelGenerationSystem = new LevelGenerationSystem(game, entityFactory);
+        startNewLevelGeneration();
         componentMapperSystem = new ComponentMapperSystem();
 
         init();
@@ -33,6 +33,10 @@ public class GameThread {
 
     private void init() {
         engine.addSystem(new PhysicsSystem(entityFactory.world));
+    }
+
+    public void startNewLevelGeneration(){
+        levelGenerationSystem = new LevelGenerationSystem(game, entityFactory);
     }
 
     public EntityFactory getEntityFactory(){return entityFactory;}

@@ -1,17 +1,15 @@
 package com.wisekrakr.androidmain.screens;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.wisekrakr.androidmain.AndroidGame;
+import com.wisekrakr.androidmain.BricksGame;
 import com.wisekrakr.androidmain.GameConstants;
 
 public class LoadingScreen extends ScreenAdapter {
@@ -24,7 +22,7 @@ public class LoadingScreen extends ScreenAdapter {
 
     private final SpriteBatch spriteBatch;
     private final Stage stage;
-    private AndroidGame game;
+    private BricksGame game;
     private TextureAtlas.AtlasRegion title;
     private TextureAtlas.AtlasRegion dash;
     private int currentLoadingStage = 0;
@@ -32,10 +30,10 @@ public class LoadingScreen extends ScreenAdapter {
     private Animation flameAnimation;
     private float stateTime;
 
-    public LoadingScreen(AndroidGame game) {
+    public LoadingScreen(BricksGame game) {
         this.game = game;
 
-        stage = new Stage(new FitViewport(GameConstants.WORLD_WIDTH, GameConstants.WORLD_HEIGHT));
+        stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
 
         spriteBatch = new SpriteBatch();
         spriteBatch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE);
@@ -49,7 +47,7 @@ public class LoadingScreen extends ScreenAdapter {
         game.assetManager().assetManager.finishLoading();
 
         TextureAtlas atlas = game.assetManager().assetManager.get("images/loading/loading.atlas");
-        title = atlas.findRegion("staying-alight-logo");
+        title = atlas.findRegion("logo");
         dash = atlas.findRegion("loading-dash");
 
         flameAnimation = new Animation(0.07f, atlas.findRegions("flames"), Animation.PlayMode.LOOP);
@@ -58,12 +56,12 @@ public class LoadingScreen extends ScreenAdapter {
 
     private void drawLoadingBar(int stage, TextureRegion currentFrame){
         for(int i = 0; i < stage;i++){
-            spriteBatch.draw(currentFrame, Gdx.graphics.getWidth()/2f - title.getRegionWidth()/2f + (i * 60f),
+            spriteBatch.draw(currentFrame, Gdx.graphics.getWidth()/2f - title.getRegionWidth()/2f + (i * 65f),
                     Gdx.graphics.getHeight()/2f - title.getRegionHeight()/2f,
-                    40, 40);
-            spriteBatch.draw(dash, Gdx.graphics.getWidth()/2f - title.getRegionWidth()/2f + (i * 60),
+                    60, 60);
+            spriteBatch.draw(dash, Gdx.graphics.getWidth()/2f - title.getRegionWidth()/2f + (i * 65f),
                     Gdx.graphics.getHeight()/2f - title.getRegionHeight()/2f,
-                    40, 40);
+                    60, 60);
         }
     }
 
@@ -121,7 +119,7 @@ public class LoadingScreen extends ScreenAdapter {
                 currentLoadingStage = 6;
 
                 if (countDown <= 0){
-                    game.changeScreen(AndroidGame.TITLE);
+                    game.changeScreen(BricksGame.TITLE);
                 }
             }
         }
@@ -129,7 +127,7 @@ public class LoadingScreen extends ScreenAdapter {
 
     @Override
     public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
+        stage.getViewport().update(width, height);
     }
 
 

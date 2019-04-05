@@ -2,16 +2,16 @@ package com.wisekrakr.androidmain.audiovisuals;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.audio.Sound;
-import com.wisekrakr.androidmain.AndroidGame;
+import com.wisekrakr.androidmain.BricksGame;
 import com.wisekrakr.androidmain.components.*;
 import com.wisekrakr.androidmain.controls.Controls;
 import com.wisekrakr.androidmain.helpers.PowerHelper;
 
 public class EntityAudio implements EntityAudioContext {
 
-    private AndroidGame game;
+    private BricksGame game;
 
-    public EntityAudio(AndroidGame game) {
+    public EntityAudio(BricksGame game) {
         this.game = game;
     }
 
@@ -20,7 +20,7 @@ public class EntityAudio implements EntityAudioContext {
         for (Entity entity: game.getEngine().getEntities()) {
             if (entity != null) {
                 if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.BALL) {
-                    if (entity.getComponent(GameObjectComponent.class).destroy) {
+                    if (entity.getComponent(BallComponent.class).isDestroy()) {
                         addSound("sounds/secret.wav");
                     } else {
                         if (entity.getComponent(CollisionComponent.class).hitSurface ||
@@ -31,7 +31,7 @@ public class EntityAudio implements EntityAudioContext {
                     }
                 }
                 if (entity.getComponent(TypeComponent.class).getType() == TypeComponent.Type.POWER) {
-                    if (entity.getComponent(GameObjectComponent.class).destroy){
+                    if (entity.getComponent(PowerUpComponent.class).isDestroy()){
                         if (PowerHelper.getPower() == PowerHelper.Power.EXTRA_LIFE){
                             addSound("sounds/powerup_extratime.wav");
                         }else if (PowerHelper.getPower() == PowerHelper.Power.BIGGER_BALL){

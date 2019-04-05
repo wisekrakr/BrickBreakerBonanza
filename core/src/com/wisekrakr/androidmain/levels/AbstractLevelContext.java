@@ -10,7 +10,7 @@ public class AbstractLevelContext implements LevelContext {
     }
 
     @Override
-    public void startLevel(int numberOfLevel) {
+    public void startLevel(int numberOfLevel, int columns, int rows) {
 
     }
 

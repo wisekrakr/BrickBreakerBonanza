@@ -4,25 +4,23 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.wisekrakr.androidmain.AndroidGame;
+import com.wisekrakr.androidmain.BricksGame;
 import com.wisekrakr.androidmain.GameConstants;
 
 public class TitleScreen extends ScreenAdapter {
 
     private final SpriteBatch spriteBatch;
     private final Stage stage;
-    private AndroidGame game;
+    private BricksGame game;
     private float countDown;
     private TextureRegion title;
 
 
-    public TitleScreen(AndroidGame game) {
+    public TitleScreen(BricksGame game) {
         this.game = game;
 
         stage = new Stage(new FitViewport(GameConstants.WORLD_WIDTH, GameConstants.WORLD_HEIGHT));
@@ -33,7 +31,7 @@ public class TitleScreen extends ScreenAdapter {
     @Override
     public void show() {
 
-        title = new TextureRegion(new Texture("images/background/The Penis Mightier title card.jpg"));
+        title = new TextureRegion(new Texture("images/others/title.jpg"));
     }
 
 
@@ -54,7 +52,7 @@ public class TitleScreen extends ScreenAdapter {
         if (countDown > 3){
             countDown = 0;
 
-            game.changeScreen(AndroidGame.MENU);
+            game.changeScreen(BricksGame.MENU);
 
         }
 

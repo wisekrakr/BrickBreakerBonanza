@@ -14,7 +14,6 @@ public class GamePreferences {
 
     private static final String COMPLETED = "completed";
     private static final String ONGOING = "ongoing";
-    private static final String CENSORED = "censored";
 
     private boolean completed = false;
     private boolean onGoing = false;
@@ -28,9 +27,6 @@ public class GamePreferences {
     }
     private Preferences getPrefsOnGoing() {
         return Gdx.app.getPreferences(ONGOING);
-    }
-    private Preferences getPrefsCensored(){
-        return Gdx.app.getPreferences(CENSORED);
     }
 
     public boolean isSoundEffectsEnabled() {
@@ -109,17 +105,5 @@ public class GamePreferences {
         return getPrefsOnGoing().getBoolean(string, onGoing);
     }
 
-    /*
-    Censoring
-     */
 
-    public void setCensoring(boolean censoring){
-        censored = censoring;
-        getPrefs().putBoolean(CENSORED, censoring);
-        getPrefs().flush();
-    }
-
-    public boolean isCensored(){
-        return getPrefsCensored().getBoolean(CENSORED, censored);
-    }
 }

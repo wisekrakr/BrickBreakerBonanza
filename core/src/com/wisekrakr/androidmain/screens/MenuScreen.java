@@ -2,30 +2,24 @@ package com.wisekrakr.androidmain.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.wisekrakr.androidmain.AndroidGame;
-import com.wisekrakr.androidmain.GameConstants;
-import com.wisekrakr.androidmain.helpers.LabelFormatter;
-import com.wisekrakr.androidmain.helpers.SpriteHelper;
-import javafx.scene.text.TextBoundsType;
+import com.wisekrakr.androidmain.BricksGame;
 
 public class MenuScreen extends ScreenAdapter {
 
     private Stage stage;
-    private AndroidGame game;
+    private BricksGame game;
     private TextureRegion textureRegion;
-    private Label formatLabel;
+    private TextureRegion textureRegionTitle;
 
-    public MenuScreen(AndroidGame game) {
+    public MenuScreen(BricksGame game) {
         this.game = game;
         stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
     }
@@ -43,10 +37,13 @@ public class MenuScreen extends ScreenAdapter {
         TextButton newGame = new TextButton("start", skin);
         TextButton preferences = new TextButton("preferences", skin);
         TextButton exit = new TextButton("exit", skin);
+        TextButton reset = new TextButton("reset levels", skin);
 
         table.add(newGame).expandX();
         table.row();
         table.add(preferences).expandX();
+        table.row();
+        table.add(reset).expandX();
         table.row();
         table.add(exit).expandX();
 
@@ -61,19 +58,26 @@ public class MenuScreen extends ScreenAdapter {
         newGame.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.changeScreen(AndroidGame.APPLICATION);
+                game.changeScreen(BricksGame.APPLICATION);
             }
         });
 
         preferences.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.changeScreen(AndroidGame.PREFERENCES);
+                game.changeScreen(BricksGame.PREFERENCES);
             }
         });
 
-        Texture texture = new Texture("images/background/mainbg.jpg");
-        textureRegion = new TextureRegion(texture);
+        reset.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.getGameThread().startNewLevelGeneration();
+            }
+        });
+
+        textureRegion = new TextureRegion(new Texture("images/background/mainbg.jpg"));
+        textureRegionTitle = new TextureRegion(new Texture("images/others/controls.png"));
 
         stage.addActor(table);
     }
@@ -89,30 +93,17 @@ public class MenuScreen extends ScreenAdapter {
         stage.getBatch().draw(textureRegion, Gdx.graphics.getWidth()/2f - Gdx.graphics.getWidth()/2f,
                 Gdx.graphics.getHeight()/2f - Gdx.graphics.getHeight()/2f,
                 Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+//        stage.getBatch().draw(textureRegionTitle, 0, Gdx.graphics.getHeight()/2f - Gdx.graphics.getHeight()/2f,
+//                Gdx.graphics.getWidth()/2f, Gdx.graphics.getHeight()/2f);
         stage.getBatch().end();
         stage.draw();
 
     }
 
-//    private void labelFormattingTest(final float delta){
-//
-//        formatLabel = new Label("A Game made with Love, by The Wisekrakr", skin);
-//        formatLabel.setBounds(10, 10, Gdx.graphics.getWidth() - 10f, 30);
-//
-//
-//        formatLabel.addAction(new TemporalAction(10) {
-//            LabelFormatter formatter = new LabelFormatter("A Game made with Love, by The Wisekrakr");
-//            @Override
-//            protected void update(float percent) {
-//                formatLabel.setText(formatter.getText(delta));
-//            }
-//        });
-//
-//    }
 
     @Override
     public void resize (int width, int height) {
-        stage.getViewport().update(width, height, true);
+        stage.getViewport().update(width, height);
     }
 
     @Override

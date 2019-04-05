@@ -1,0 +1,47 @@
+
+player.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+50-Breakout-Tiles
+  rotate: false
+  xy: 1, 261
+  size: 485, 128
+  orig: 485, 128
+  offset: 0, 0
+  index: -1
+51-Breakout-Tiles
+  rotate: false
+  xy: 1, 131
+  size: 485, 128
+  orig: 485, 128
+  offset: 0, 0
+  index: -1
+52-Breakout-Tiles
+  rotate: false
+  xy: 488, 261
+  size: 485, 128
+  orig: 485, 128
+  offset: 0, 0
+  index: -1
+53-Breakout-Tiles
+  rotate: false
+  xy: 1, 1
+  size: 485, 128
+  orig: 485, 128
+  offset: 0, 0
+  index: -1
+54-Breakout-Tiles
+  rotate: false
+  xy: 488, 131
+  size: 485, 128
+  orig: 485, 128
+  offset: 0, 0
+  index: -1
+55-Breakout-Tiles
+  rotate: false
+  xy: 488, 1
+  size: 485, 128
+  orig: 485, 128
+  offset: 0, 0
+  index: -1

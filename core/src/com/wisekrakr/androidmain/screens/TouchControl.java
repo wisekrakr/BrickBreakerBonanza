@@ -8,16 +8,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.wisekrakr.androidmain.AndroidGame;
+import com.wisekrakr.androidmain.BricksGame;
 import com.wisekrakr.androidmain.GameConstants;
 
 
 public class TouchControl implements Disposable {
     private Stage stage;
-    private AndroidGame game;
+    private BricksGame game;
     private Touchpad touchPad;
 
-    public TouchControl(AndroidGame game) {
+    public TouchControl(BricksGame game) {
         this.game = game;
 
         stage = new Stage(new FitViewport(GameConstants.WORLD_WIDTH, GameConstants.WORLD_HEIGHT));

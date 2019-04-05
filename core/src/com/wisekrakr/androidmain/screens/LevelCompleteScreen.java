@@ -13,16 +13,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.wisekrakr.androidmain.AndroidGame;
+import com.wisekrakr.androidmain.BricksGame;
 import com.wisekrakr.androidmain.GameConstants;
-import com.wisekrakr.androidmain.GamePreferences;
 
 public class LevelCompleteScreen extends ScreenAdapter {
 
-    private AndroidGame game;
+    private BricksGame game;
     private Stage stage;
 
-    public LevelCompleteScreen(AndroidGame game) {
+    public LevelCompleteScreen(BricksGame game) {
         this.game = game;
         stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()));
     }
@@ -43,6 +42,8 @@ public class LevelCompleteScreen extends ScreenAdapter {
         Label highScoreTextLabel = new Label("HIGH SCORE" , new Label.LabelStyle(font, Color.LIME));
         Label highScoreLabel = new Label(game.getGamePreferences().getHighScore() + " on " +
                 game.getGameThread().getTimeKeeper().getDate(), new Label.LabelStyle(font, Color.LIME));
+        Label gameTimeLabel = new Label("Total Game TIme: " +
+                game.getGameThread().getTimeKeeper().getTotalGameTime(), new Label.LabelStyle(font, Color.LIME));
         Label playAgainLabel = new Label("play another one?", new Label.LabelStyle(font, Color.LIME));
 
         TextButton nextLevel = new TextButton("next level", skin);
@@ -57,18 +58,20 @@ public class LevelCompleteScreen extends ScreenAdapter {
         table.add(highScoreTextLabel).uniformX().padTop(50);
         table.row();
         table.add(highScoreLabel).uniformX().padTop(10);
+        table.row();
+        table.add(gameTimeLabel).uniformX().padTop(30);
 
         nextLevel.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.changeScreen(AndroidGame.APPLICATION);
+                game.changeScreen(BricksGame.APPLICATION);
             }
         });
 
         mainMenu.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.changeScreen(AndroidGame.MENU); //app screen shows level 2
+                game.changeScreen(BricksGame.MENU); //app screen shows level 2
             }
         });
 

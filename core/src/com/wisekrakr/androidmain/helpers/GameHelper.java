@@ -2,10 +2,9 @@ package com.wisekrakr.androidmain.helpers;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
-import com.wisekrakr.androidmain.AndroidGame;
+import com.wisekrakr.androidmain.BricksGame;
 import com.wisekrakr.androidmain.GameConstants;
 import com.wisekrakr.androidmain.components.Box2dBodyComponent;
-import com.wisekrakr.androidmain.components.TypeComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,7 @@ public class GameHelper {
         );
     }
 
-    public static Vector2 notFilledPosition(AndroidGame game){
+    public static Vector2 notFilledPosition(BricksGame game){
         List<Vector2>positions = new ArrayList<Vector2>();
 
         Vector2 newPosition = randomPosition();
